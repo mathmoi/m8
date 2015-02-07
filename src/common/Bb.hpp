@@ -17,13 +17,18 @@
 #     include <intrin.h>
 #     pragma intrinsic(_BitScanForward64)
 #     pragma intrinsic(_BitScanReverse64)
-#     define M8_USE_MSC_INTRINSICS____
+#     define M8_USE_MSC_INTRINSICS
 #  endif
+#endif
+
+// Determine if we can use the g++ asm instruction
+#if defined(__GNUC__) && defined(__LP64__)
+#  define M8_USE_GCC_ASSEMBLY
 #endif
 
 // Determine if we are doing a 64 bit compilation
 #if defined(_WIN64) || defined(__LP64__)
-#  define M8_64_BITS_COMPILE____
+#  define M8_64_BITS_COMPILE
 #endif
 
 namespace m8
@@ -35,7 +40,7 @@ namespace m8
    ///
    /// @param bb  The bitboard read the bit from.
    /// @param bit The position of the bit to read.
-   /// @returns True if the bit is set to 1.
+   /// @returns True if the bit is set to 1. 
    inline bool GetBit(Bb bb, std::uint32_t bit)
    {
       return (bb & (UINT64_C(1) << bit)) != 0;
@@ -79,6 +84,11 @@ namespace m8
       unsigned long index;
       _BitScanForward64(&index, bb);
       return index;
+#elif defined(M8_USE_GCC_ASSEMBLY)
+      // This is the g++ assembly version
+      asm ("bsfq %0, %0" : "=r" (bb) : "0" (bb));
+      return static_cast<unsigned int>(bb);
+
 #elif defined(M8_64_BITS_COMPILE)
       // This is a 64 bit friendly of GetLsb using debruijn multiplication
       const unsigned int index64[64] =
