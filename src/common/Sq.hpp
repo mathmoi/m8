@@ -38,7 +38,7 @@ namespace m8
    ///
    /// @param colmn The column to test.
    /// @return True if the column is on the board.
-   inline bool IsColmnOnBoard(Colmn colmn) { return colmn < kNumColmnOnBoard; };
+   inline bool IsColmnOnBoard(Colmn colmn) { return colmn < kNumColmnOnBoard; }
 
    ////////////////////////////////////////////////////////////////////////////
    //                                  Rows                                  //
@@ -67,7 +67,7 @@ namespace m8
    ///
    /// @param row The row to test.
    /// @return True if the row is on the board.
-   inline bool IsRowOnBoard(Row row) { return row < kNumRowOnBoard; };
+   inline bool IsRowOnBoard(Row row) { return row < kNumRowOnBoard; }
 
    ////////////////////////////////////////////////////////////////////////////
    //                               Square                                   //
@@ -159,7 +159,7 @@ namespace m8
    ///
    /// @param sq The square to test.
    /// @return True if the square is on the board.
-   inline bool IsSqOnBoard(Sq sq) { return sq < kNumSqOnBoard; };
+   inline bool IsSqOnBoard(Sq sq) { return sq < kNumSqOnBoard; }
 }
 
 #endif // M8_SQ_HPP_

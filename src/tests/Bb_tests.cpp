@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "..\common\Bb.hpp"
+#include "../common/Bb.hpp"
 
 using namespace m8;
 using namespace std;

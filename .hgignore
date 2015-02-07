@@ -7,3 +7,5 @@ regexp syntax
 \.sdf$
 \.suo$
 \.vcxproj\.user$
+^build/
+~$
