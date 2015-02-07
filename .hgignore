@@ -1,0 +1,9 @@
+regexp syntax
+
+^Doxygen/html
+^VS/Debug/
+^VS/.*/Debug/
+\.opensdf$
+\.sdf$
+\.suo$
+\.vcxproj\.user$
