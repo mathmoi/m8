@@ -1,7 +1,7 @@
-/// @file   square_tests.cpp
+/// @file   Sq_tests.cpp
 /// @author Mathieu Pagé
 /// @date   Feburary 2015
-/// @brief  Contains tests of the types and functionalities in square.hpp.
+/// @brief  Contains tests of the types and functionalities in Sq.hpp.
 
 #include "catch.hpp"
 

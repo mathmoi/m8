@@ -140,11 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\common\Bb.hpp" />
+    <ClInclude Include="..\..\src\common\Piece.hpp" />
     <ClInclude Include="..\..\src\common\Sq.hpp" />
     <ClInclude Include="..\..\src\tests\catch.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\tests\Bb_tests.cpp" />
+    <ClCompile Include="..\..\src\tests\Piece_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Sq_tests.cpp" />
     <ClCompile Include="..\..\src\tests\tests_main.cpp" />
   </ItemGroup>

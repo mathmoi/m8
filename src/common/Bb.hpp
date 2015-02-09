@@ -10,6 +10,7 @@
 #define M8_BB_HPP_
 
 #include <cstdint>
+#include <cassert>
 
 // Determine if we can use the MSVC++ Intrinsics.
 #ifdef _MSC_VER
@@ -52,6 +53,9 @@ namespace m8
    /// @param bit The position of the bit to set.
    inline void SetBit(Bb& bb, std::uint32_t bit)
    {
+      // A : Bit is a valid bit index
+      assert(bit < 64);
+
       bb |= (UINT64_C(1) << bit);
    }
 
@@ -61,6 +65,9 @@ namespace m8
    /// @param bit The position of the bit to set.
    inline void UnsetBit(Bb& bb, std::uint32_t bit)
    {
+      // A : Bit is a valid bit index
+      assert(bit < 64);
+
       bb &= ~(UINT64_C(1) << bit);
    }
 
@@ -70,6 +77,9 @@ namespace m8
    /// @param bit The position of the bit to set.
    inline void SwitchBit(Bb& bb, std::uint32_t bit)
    {
+      // A : Bit is a valid bit index
+      assert(bit < 64);
+
       bb ^= (UINT64_C(1) << bit);
    }
 
@@ -79,6 +89,9 @@ namespace m8
    /// @return Position of the least significatn bit set to 1.
    inline std::uint32_t GetLsb(Bb bb)
    {
+      // A : The bitboard is not empty
+      assert(bb != 0);
+
 #if defined(M8_USE_MSC_INTRINSICS)
       // This is the intrinsics version of GetLsb used with VC++
       unsigned long index;
@@ -123,6 +136,42 @@ namespace m8
       bb ^= (bb - 1);
       folded = (int)bb ^ (bb >> 32);
       return lsz64_tbl[folded * 0x78291ACF >> 26];
+#endif
+   }
+
+   /// Get the least significant bit set to 1 in a bitboard and set it to 0.
+   ///
+   /// @param bb Bitboard to read.
+   /// @returns Position of the least significant bit set to 1 in bb.
+   inline std::uint32_t RemoveLsb(Bb& bb)
+   {
+      // A : The bitboard is not empty
+      assert(bb != 0);
+
+      std::uint32_t lsb = GetLsb(bb);
+      bb &= bb - 1;
+      return lsb;
+   }
+
+   /// Count the number of bits set to 1 in a bitboard.
+   ///
+   /// @param bb Bitboard to count the bits from.
+   /// @returns The number of bits set to 1 (0..64).
+   inline std::uint64_t GetPopct(Bb bb)
+   {
+#if defined(M8_USE_MSC_INTRINSICS)
+      return __popcnt64(bb);
+#else
+      unsigned int w = static_cast<unsigned int>(bb >> 32),
+         v = static_cast<unsigned int>(bb);
+      v = v - ((v >> 1) & 0x55555555);
+      w = w - ((w >> 1) & 0x55555555);
+      v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+      w = (w & 0x33333333) + ((w >> 2) & 0x33333333);
+      v = (v + (v >> 4)) & 0x0F0F0F0F;
+      w = (w + (w >> 4)) & 0x0F0F0F0F;
+      v = ((v + w) * 0x01010101) >> 24;
+      return v;
 #endif
    }
 }

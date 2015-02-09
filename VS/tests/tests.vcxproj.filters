@@ -24,6 +24,9 @@
     <ClInclude Include="..\..\src\common\Sq.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\common\Piece.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\tests\tests_main.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\tests\Sq_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tests\Piece_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

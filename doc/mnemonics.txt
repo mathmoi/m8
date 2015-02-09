@@ -1,3 +1,8 @@
-Columns				Colmn
-Number				Num
-Square				Sq
+Columns					Colmn
+Number					Num
+Square					Sq
+Population count		Popct
+Least significant bit	Lsb
+Bishop					Bishp
+Knight					Knigt
+Opposite				Oppos
