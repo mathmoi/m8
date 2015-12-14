@@ -10,3 +10,4 @@ regexp syntax
 ^build/
 ~$
 ^VS/packages
+\.opendb$
