@@ -37,6 +37,9 @@ namespace m8
    /// Type that represents a bitboard.
    typedef std::uint64_t Bb;
 
+   /// Empty bitboard constant
+   const Bb kEmptyBb = UINT64_C(0);
+
    /// Returns the state of a bit in a bitboard.
    ///
    /// @param bb  The bitboard read the bit from.
@@ -86,7 +89,7 @@ namespace m8
    /// Get the position of the least significant bit set to 1 in a bitboard.
    ///
    /// @param bb Bitboard to read from.
-   /// @return Position of the least significatn bit set to 1.
+   /// @return Position of the least significant bit set to 1.
    inline std::uint32_t GetLsb(Bb bb)
    {
       // A : The bitboard is not empty
@@ -136,6 +139,50 @@ namespace m8
       bb ^= (bb - 1);
       folded = (int)bb ^ (bb >> 32);
       return lsz64_tbl[folded * 0x78291ACF >> 26];
+#endif
+   }
+
+   /// Get the position of the most significant bit set to 1 in a bitboard.
+   ///
+   /// @param bb Bitboard to read from.
+   /// @return Position of the most significant bit set to 1.
+   inline std::uint32_t GetMsb(Bb bb)
+   {
+      // A : The bitboard is not empty
+      assert(bb != 0);
+
+#if defined(M8_USE_MSC_INTRINSICS)
+      // This is the intrinsics version of GetMsb used with VC++
+      unsigned long index;
+      _BitScanReverse64(&index, bb);
+      return index;
+#elif defined(M8_USE_GCC_ASSEMBLY)
+      // This is the g++ assembly version
+      asm("bsrl %0, %0" : "=r" (bb) : "0" (bb));
+      return static_cast<unsigned int>(bb);
+
+#else
+      // This is a 64 bit friendly of GetMsb using debruijn multiplication
+      const unsigned int index64[64] =
+      {
+         0, 47,  1, 56, 48, 27,  2, 60,
+         57, 49, 41, 37, 28, 16,  3, 61,
+         54, 58, 35, 52, 50, 42, 21, 44,
+         38, 32, 29, 23, 17, 11,  4, 62,
+         46, 55, 26, 59, 40, 36, 15, 53,
+         34, 51, 20, 43, 31, 22, 10, 45,
+         25, 39, 14, 33, 19, 30,  9, 24,
+         13, 18,  8, 12,  7,  6,  5, 63
+      };
+
+      bb |= bb >> 1; 
+      bb |= bb >> 2;
+      bb |= bb >> 4;
+      bb |= bb >> 8;
+      bb |= bb >> 16;
+      bb |= bb >> 32;
+      return index64[(bb * debruijn64) >> 58];
+
 #endif
    }
 

@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <unordered_map>
 
 namespace m8
 {
@@ -119,6 +120,61 @@ namespace m8
    /// Type that represent a piece. A piece has two attributes a PieceType and
    /// a color.
    typedef std::uint8_t Piece;
+
+   const Piece kNoPiece = 0;
+   const Piece kMinPiece = 1;
+   const Piece kMaxPiece = 14;
+
+   /// @name Piece constants
+   /// Constants for piece of specific type and color
+   /// @{
+   const Piece kWhitePawn = 1;
+   const Piece kWhiteKnigt = 2;
+   const Piece kWhiteKing = 3;
+   const Piece kWhiteQueen = 4;
+   const Piece kWhiteBishp = 5;
+   const Piece kWhiteRook = 6;
+   const Piece kBlackPawn = 9;
+   const Piece kBlackKnigt = 10;
+   const Piece kBlackKing = 11;
+   const Piece kBlackQueen = 12;
+   const Piece kBlackBishp = 13;
+   const Piece kBlackRook = 14;
+   /// @}
+
+   /// Map that can be used to translate from character to Piece.
+   const std::unordered_map<char, Piece> char_to_piece_map = 
+   {
+      {'P', kWhitePawn},
+      { 'N', kWhiteKnigt },
+      { 'K', kWhiteKing },
+      { 'Q', kWhiteQueen },
+      { 'B', kWhiteBishp },
+      { 'R', kWhiteRook },
+      { 'p', kBlackPawn },
+      { 'n', kBlackKnigt },
+      { 'k', kBlackKing },
+      { 'q', kBlackQueen },
+      { 'b', kBlackBishp },
+      { 'r', kBlackRook }
+   };
+
+   /// Map that can be used to translate from Piece to character.
+   const std::unordered_map<char, Piece> piece_to_char_map =
+   {
+      { kWhitePawn, 'P' },
+      { kWhiteKnigt, 'N' },
+      { kWhiteKing, 'K' },
+      { kWhiteQueen, 'Q' },
+      { kWhiteBishp, 'B' },
+      { kWhiteRook, 'R' },
+      { kBlackPawn, 'p' },
+      { kBlackKnigt, 'n' },
+      { kBlackKing, 'k' },
+      { kBlackQueen, 'q' },
+      { kBlackBishp, 'b' },
+      { kBlackRook, 'r' }
+   };
 
    /// Indicate if a value is a valid piece.
    ///

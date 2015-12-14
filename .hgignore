@@ -9,3 +9,4 @@ regexp syntax
 \.vcxproj\.user$
 ^build/
 ~$
+^VS/packages

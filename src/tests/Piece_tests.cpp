@@ -103,19 +103,19 @@ TEST_CASE("Test IsPiece")
 
 TEST_CASE("Test NewPiece")
 {
-   REQUIRE(NewPiece(kPawn, kWhite) == 1);
-   REQUIRE(NewPiece(kKnigt, kWhite) == 2);
-   REQUIRE(NewPiece(kKing, kWhite) == 3);
-   REQUIRE(NewPiece(kQueen, kWhite) == 4);
-   REQUIRE(NewPiece(kBishp, kWhite) == 5);
-   REQUIRE(NewPiece(kRook, kWhite) == 6);
+   REQUIRE(NewPiece(kPawn, kWhite) == kWhitePawn);
+   REQUIRE(NewPiece(kKnigt, kWhite) == kWhiteKnigt);
+   REQUIRE(NewPiece(kKing, kWhite) == kWhiteKing);
+   REQUIRE(NewPiece(kQueen, kWhite) == kWhiteQueen);
+   REQUIRE(NewPiece(kBishp, kWhite) == kWhiteBishp);
+   REQUIRE(NewPiece(kRook, kWhite) == kWhiteRook);
 
-   REQUIRE(NewPiece(kPawn, kBlack) == 9);
-   REQUIRE(NewPiece(kKnigt, kBlack) == 10);
-   REQUIRE(NewPiece(kKing, kBlack) == 11);
-   REQUIRE(NewPiece(kQueen, kBlack) == 12);
-   REQUIRE(NewPiece(kBishp, kBlack) == 13);
-   REQUIRE(NewPiece(kRook, kBlack) == 14);
+   REQUIRE(NewPiece(kPawn, kBlack) == kBlackPawn);
+   REQUIRE(NewPiece(kKnigt, kBlack) == kBlackKnigt);
+   REQUIRE(NewPiece(kKing, kBlack) == kBlackKing);
+   REQUIRE(NewPiece(kQueen, kBlack) == kBlackQueen);
+   REQUIRE(NewPiece(kBishp, kBlack) == kBlackBishp);
+   REQUIRE(NewPiece(kRook, kBlack) == kBlackRook);
 }
 
 TEST_CASE("Test GetPieceType")

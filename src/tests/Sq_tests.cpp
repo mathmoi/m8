@@ -20,6 +20,8 @@ TEST_CASE("Test IsColmnOnBoard")
 
    REQUIRE(IsColmnOnBoard(kColmnA - 1) == false);
    REQUIRE(IsColmnOnBoard(kColmnH + 1) == false);
+
+   REQUIRE(IsColmnOnBoard(kInvalColmn) == false);
 }
 
 
@@ -47,4 +49,30 @@ TEST_CASE("Test IsSqOnBoard")
 
    REQUIRE(IsSqOnBoard(kA1 - 1) == false);
    REQUIRE(IsSqOnBoard(kH8 + 1) == false);
+}
+
+TEST_CASE("Test GetRow")
+{
+   REQUIRE(GetRow(kA1) == kRow1);
+   REQUIRE(GetRow(kH1) == kRow1);
+   REQUIRE(GetRow(kA8) == kRow8);
+   REQUIRE(GetRow(kH8) == kRow8);
+
+   REQUIRE(GetRow(kB1) == kRow1);
+   REQUIRE(GetRow(kD3) == kRow3);
+   REQUIRE(GetRow(kF5) == kRow5);
+   REQUIRE(GetRow(kG8) == kRow8);
+}
+
+TEST_CASE("Test GetColmn")
+{
+   REQUIRE(GetColmn(kA1) == kColmnA);
+   REQUIRE(GetColmn(kH1) == kColmnH);
+   REQUIRE(GetColmn(kA8) == kColmnA);
+   REQUIRE(GetColmn(kH8) == kColmnH);
+
+   REQUIRE(GetColmn(kB1) == kColmnB);
+   REQUIRE(GetColmn(kD3) == kColmnD);
+   REQUIRE(GetColmn(kF5) == kColmnF);
+   REQUIRE(GetColmn(kG8) == kColmnG);
 }

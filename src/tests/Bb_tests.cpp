@@ -1,4 +1,4 @@
-/// @file   square_tests.cpp
+/// @file   Bb_tests.cpp
 /// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains tests of the types and functionalities in square.hpp.
@@ -72,6 +72,18 @@ TEST_CASE("Test GetLsb")
 
    Bb bb = (UINT64_C(1) << 63) | (UINT64_C(1) << 32) | (UINT64_C(1) << 5);
    REQUIRE(GetLsb(bb) == 5);
+}
+
+TEST_CASE("Test GetMsb")
+{
+   for (uint8_t i = 0; i < 64; ++i)
+   {
+      Bb bb = UINT64_C(1) << i;
+      REQUIRE(GetMsb(bb) == i);
+   }
+
+   Bb bb = (UINT64_C(1) << 63) | (UINT64_C(1) << 32) | (UINT64_C(1) << 5);
+   REQUIRE(GetMsb(bb) == 63);
 }
 
 TEST_CASE("Test GetPopct")
