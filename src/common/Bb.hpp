@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <iostream>
 
 // Determine if we can use the MSVC++ Intrinsics.
 #ifdef _MSC_VER
@@ -221,6 +222,22 @@ namespace m8
       return v;
 #endif
    }
+
+   /// Visually display the binary representation of a Bitboard on a std::ostream.
+   ///
+   /// example output:
+   /// --X - ----
+   /// X X - X - X - X
+   /// -X X X - X X X
+   /// X X X - X - X X
+   /// X X - -X - -X
+   /// -X - X X - -X
+   /// -X - X - -X -
+   /// X - --X - -X
+   ///
+   /// @param out Output stream on wich to display the bitboard
+   /// @param bb  Bitboard to display
+   void DisplayBb(std::ostream& out, Bb bb);
 }
 
 #endif // M8_BB_HPP_
