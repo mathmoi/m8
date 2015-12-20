@@ -3,6 +3,7 @@ regexp syntax
 ^Doxygen/html
 ^VS/Debug/
 ^VS/.*/Debug/
+^VS/.*/Release/
 \.opensdf$
 \.sdf$
 \.suo$
@@ -11,3 +12,4 @@ regexp syntax
 ~$
 ^VS/packages
 \.opendb$
+\.vspx$

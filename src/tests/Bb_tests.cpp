@@ -66,11 +66,11 @@ TEST_CASE("Test GetLsb")
 {
    for (uint8_t i = 0; i < 64; ++i)
    {
-      Bb bb = UINT64_C(1) << i;
+      Bb bb = GetSingleBitBb(i);
       REQUIRE(GetLsb(bb) == i);
    }
 
-   Bb bb = (UINT64_C(1) << 63) | (UINT64_C(1) << 32) | (UINT64_C(1) << 5);
+   Bb bb = GetSingleBitBb(63) | GetSingleBitBb(32) | GetSingleBitBb(5);
    REQUIRE(GetLsb(bb) == 5);
 }
 
@@ -78,11 +78,11 @@ TEST_CASE("Test GetMsb")
 {
    for (uint8_t i = 0; i < 64; ++i)
    {
-      Bb bb = UINT64_C(1) << i;
+      Bb bb = GetSingleBitBb(i);
       REQUIRE(GetMsb(bb) == i);
    }
 
-   Bb bb = (UINT64_C(1) << 63) | (UINT64_C(1) << 32) | (UINT64_C(1) << 5);
+   Bb bb = GetSingleBitBb(63) | GetSingleBitBb(32) | GetSingleBitBb(5);
    REQUIRE(GetMsb(bb) == 63);
 }
 
@@ -90,11 +90,11 @@ TEST_CASE("Test GetPopct")
 {
    for (uint8_t i = 0; i < 64; ++i)
    {
-      Bb bb = (UINT64_C(1) << i) - 1;
+      Bb bb = GetSingleBitBb(i) - 1;
       REQUIRE(GetPopct(bb) == i);
    }
 
-   Bb bb = (UINT64_C(1) << 63) | (UINT64_C(1) << 32) | (UINT64_C(1) << 5);
+   Bb bb = GetSingleBitBb(63) | GetSingleBitBb(32) | GetSingleBitBb(5);
    REQUIRE(GetPopct(bb) == 3);
 
    bb = UINT64_C(0) - 1;
@@ -103,7 +103,7 @@ TEST_CASE("Test GetPopct")
 
 TEST_CASE("Test RemoveLsb")
 {
-   Bb bb = (UINT64_C(1) << 63) | (UINT64_C(1) << 32) | (UINT64_C(1) << 5);
+   Bb bb = GetSingleBitBb(63) | GetSingleBitBb(32) | GetSingleBitBb(5);
 
    REQUIRE(RemoveLsb(bb) == 5);
    REQUIRE(RemoveLsb(bb) == 32);

@@ -200,6 +200,30 @@ namespace m8
 
       return sq >> 3;
    }
+
+   /// Get the index of the diagonals the square is on.
+   ///
+   /// @param sq The square.
+   /// @return the index of the diagonal the square is on.
+   inline std::uint8_t GetDiag(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return 7 - GetColmn(sq) + GetRow(sq);
+   }
+
+   /// Get the index of the anti-diagonals the square is on.
+   ///
+   /// @param sq The square.
+   /// @return the index of the anti-diagonal the square is on.
+   inline std::uint8_t GetAntiDiag(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return GetColmn(sq) + GetRow(sq);
+   }
 }
 
 #endif // M8_SQ_HPP_
