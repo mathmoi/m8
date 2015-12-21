@@ -4,3 +4,4 @@ project(m8)
 
 add_subdirectory(tests)
 add_subdirectory(m8)
+add_subdirectory(magic-finder)

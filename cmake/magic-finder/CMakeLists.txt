@@ -1,4 +1,4 @@
-# enable c++11 for gcc
+# set flags for g++
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 endif()
@@ -17,12 +17,7 @@ file(GLOB_RECURSE common_header_files
      RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
      ${CMAKE_CURRENT_SOURCE_DIR}/../../src/common/*.hpp)
 
-add_executable(m8
-	       ../../src/m8/m8.cpp
-	       ../../src/m8/ShellIntrf.cpp
-	       ../../src/m8/ShellIntrf.hpp
-	       ../../src/m8/m8Intrf.cpp
-	       ../../src/m8/m8Intrf.hpp
-               ../../src/common/Board.cpp
+add_executable(magic-finder
+	       ../../src/magic-finder/magic-finder.cpp
                ../../src/common/Bb.cpp
                ${common_header_files})

@@ -132,9 +132,6 @@ namespace m8 {
 
         Bb attack_set = BB_C(0);
         Bb bb;
-
-        const std::uint32_t kNumDir = 2;
-        std::array <Row, kNumDir> max_rows = { kRow7 };
         
         // Go north
         bb = occupancy & kBbColmn[GetColmn(sq)] & ~(GetSingleBitBb(sq) - 1);
@@ -187,7 +184,7 @@ namespace m8 {
     std::vector<Bb> GenerateAttackSets(std::vector<Bb> occupancies, Sq sq)
     {
         std::vector<Bb> attack_sets;
-        for each (Bb occupancy in occupancies)
+        for (Bb occupancy : occupancies)
         {
             attack_sets.push_back(GenerateAttackSet(occupancy, sq));
         }
@@ -272,7 +269,7 @@ namespace m8 {
 
                 ++index_occup;
             }
-        } while (fail);
+        } while (fail); 
 
         return magic;
     }
