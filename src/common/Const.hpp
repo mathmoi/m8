@@ -25,7 +25,7 @@ namespace m8
       assert(IsRowOnBoard(row));
 
       return UINT64_C(0x00000000000000ff) << (row * 8);
-   };
+   }
 
    /// Returns a bitboard with all the bits of a specific column set to 1.
    ///
@@ -37,7 +37,7 @@ namespace m8
       assert(IsColmnOnBoard(colmn));
 
       return UINT64_C(0x1010101010101010) << colmn;
-   };
+   }
 }
 
 

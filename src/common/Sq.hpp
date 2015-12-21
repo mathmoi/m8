@@ -175,7 +175,7 @@ namespace m8
       assert(IsRowOnBoard(row));
 
       return (row << 3) + colmn;
-   };
+   }
 
    /// Get the column of a square.
    ///

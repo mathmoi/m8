@@ -17,5 +17,9 @@ add_executable(m8_tests
 	       ../../src/tests/tests_main.cpp
                ../../src/tests/Sq_tests.cpp
                ../../src/tests/Bb_tests.cpp
+	       ../../src/tests/Piece_tests.cpp
+               ../../src/tests/Board_tests.cpp
                ../../src/tests/catch.hpp
+               ../../src/common/Board.cpp
+               ../../src/common/Bb.cpp
                ${common_header_files})
