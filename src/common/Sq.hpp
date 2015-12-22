@@ -78,7 +78,7 @@ namespace m8
    /// Type that represents a square of the chess board.
    typedef std::uint8_t Sq;
 
-   // Number of squares on a chess board
+   /// Number of squares on a chess board
    const std::uint8_t kNumSqOnBoard = 64;
 
    /// @name Square constants

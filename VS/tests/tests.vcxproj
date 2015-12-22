@@ -146,6 +146,7 @@
     <ClInclude Include="..\..\src\common\Bb.hpp" />
     <ClInclude Include="..\..\src\common\Board.hpp" />
     <ClInclude Include="..\..\src\common\Const.hpp" />
+    <ClInclude Include="..\..\src\common\Move.hpp" />
     <ClInclude Include="..\..\src\common\Piece.hpp" />
     <ClInclude Include="..\..\src\common\Sq.hpp" />
     <ClInclude Include="..\..\src\common\Utils.hpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="..\..\src\common\Board.cpp" />
     <ClCompile Include="..\..\src\tests\Bb_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Board_tests.cpp" />
+    <ClCompile Include="..\..\src\tests\Move_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Piece_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Sq_tests.cpp" />
     <ClCompile Include="..\..\src\tests\tests_main.cpp" />

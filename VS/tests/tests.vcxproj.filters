@@ -30,6 +30,9 @@
     <ClInclude Include="..\..\src\tests\catch.hpp">
       <Filter>tests</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\common\Move.hpp">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\tests\Bb_tests.cpp">
@@ -49,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\common\Board.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tests\Move_tests.cpp">
+      <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
