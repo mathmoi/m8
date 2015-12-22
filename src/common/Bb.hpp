@@ -232,7 +232,7 @@ namespace m8
       return index;
 #elif defined(M8_USE_GCC_ASSEMBLY)
       // This is the g++ assembly version
-      asm("bsrl %0, %0" : "=r" (bb) : "0" (bb));
+      asm("bsrq %0, %0" : "=r" (bb) : "0" (bb));
       return static_cast<unsigned int>(bb);
 
 #else
