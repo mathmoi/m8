@@ -43,6 +43,15 @@ namespace m8
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GenerateKnightMoves(Color color, bool is_captures, Move* next_move) const;
 
+        /// Generate the moves of the king. The moves are added to an array specified by
+        /// the parameter next_move.
+        ///
+        /// @param color       Color of the king to generate the moves for.
+        /// @param is_captures Indicate if we should generate captures or non captures 
+        ///                    moves.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateKingMoves(Color color, bool is_captures, Move* next_move) const;
     private:
         /// Type for an attack array for simples moves (knight and kings).
         typedef std::array<Bb, 64> AttackArray;
@@ -113,6 +122,17 @@ namespace m8
                                    piece,
                                    board_.bb_piece(piece),
                                    knight_attack_bb_,
+                                   next_move);
+    }
+
+    inline Move* MoveGen::GenerateKingMoves(Color color, bool is_captures, Move* next_move) const
+    {
+        Piece piece = NewPiece(kKing, color);
+        return GenerateSimpleMoves(color,
+                                   is_captures,
+                                   piece,
+                                   board_.bb_piece(piece),
+                                   king_attack_bb_,
                                    next_move);
     }
 

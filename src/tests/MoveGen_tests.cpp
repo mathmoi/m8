@@ -151,3 +151,75 @@ TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoardAbleToCaptureSinglePawn_TwoCaptur
         REQUIRE(Contains(moves.data(), next_move, expected));
     }
 }
+
+TEST_CASE("GenerateKingMoves_NoKing_ZeroMovesReturned")
+{
+    Board board("8/8/8/8/8/K7/8/8 w - - 1 1 ");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GenerateKingMoves(kBlack, false, next_move);
+
+    REQUIRE((next_move - moves.data()) == 0);
+}
+
+TEST_CASE("GenerateKingMoves_AllMovesBlockedByOwnPiece_ZeroMovesReturned")
+{
+    Board board("4k3/8/8/8/8/8/3RRR2/3RKR2 b KQ - 1 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
+
+    REQUIRE((next_move - moves.data()) == 0);
+}
+
+TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SevenMovesReturned")
+{
+    Board board("4k3/8/8/8/8/4Kp2/8/8 b - - 1 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves = 
+      { NewMove(kE3, kE4, kWhiteKing),
+        NewMove(kE3, kF4, kWhiteKing),
+        NewMove(kE3, kF2, kWhiteKing),
+        NewMove(kE3, kE2, kWhiteKing),
+        NewMove(kE3, kD2, kWhiteKing),
+        NewMove(kE3, kD3, kWhiteKing),
+        NewMove(kE3, kD4, kWhiteKing)};
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
+
+    REQUIRE((next_move - moves.data()) == 7);
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}
+
+TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SingleCaptureReturned")
+{
+    Board board("4k3/8/8/8/8/4Kp2/8/8 b - - 1 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves =
+    { NewMove(kE3, kF3, kWhiteKing, kBlackPawn)};
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GenerateKingMoves(kWhite, true, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}
