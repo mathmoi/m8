@@ -82,6 +82,11 @@ namespace m8
       ///          a piece of the color specified in parameter.
       inline Bb bb_color(Color color) const;
 
+      /// Accessor for the bitboard of all occupied squares
+      ///
+      /// @returns A bitboard with bits to 1 for every position where there is a piece.
+      inline Bb bb_occupied() const;
+
       /// Accessor for the castlings rights.
       /// 
       /// @param color Side for which we want the castling rights
@@ -218,6 +223,11 @@ namespace m8
       assert(IsColor(color));
 
       return bb_color_[color];
+   }
+
+   inline Bb Board::bb_occupied() const
+   {
+       return bb_color_[kWhite] | bb_color_[kBlack];
    }
 
    inline bool Board::casle(Color color, std::uint8_t casle_right) const

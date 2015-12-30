@@ -63,6 +63,7 @@ namespace m8
    const Row kRow6 = 5;
    const Row kRow7 = 6;
    const Row kRow8 = 7;
+   const Row kInvalRow = 255;
    /// @}
 
    /// Indicate if a given row is on the board.
@@ -156,6 +157,9 @@ namespace m8
    const Sq kG8 = 62;
    const Sq kH8 = 63;
    /// @}
+
+   /// Value of an invalid square.
+   const Sq kInvalSq = 255;
 
    /// Indicate if a given square is on the board.
    ///

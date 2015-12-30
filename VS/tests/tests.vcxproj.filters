@@ -33,6 +33,12 @@
     <ClInclude Include="..\..\src\common\Move.hpp">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\common\MoveGen.hpp">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\Init.hpp">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\tests\Bb_tests.cpp">
@@ -55,6 +61,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\tests\Move_tests.cpp">
       <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\MoveGen.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tests\MoveGen_tests.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\Bb.cpp">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

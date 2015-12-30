@@ -16,6 +16,12 @@ namespace m8
     /// Type tha represent a move.
     typedef std::uint32_t Move;
 
+    /// Move list.
+    typedef std::array<Move, 256> MoveList;
+
+    /// Null move to identify the end of lists
+    const Move kNullMove = 0;
+
     /// @name Move constants
     /// Constants used to pack and unpack moves.
     /// @{

@@ -110,41 +110,44 @@ namespace m8
       // rights field.
       while (it < fen.end() && *it != ' ')
       {
-         Color color;
-         Colmn colmn;
-         uint8_t casle_right;
-         Bb bb_rook;
-         Sq sq_rook;
-         Sq sq_king;
+          if (*it != '-')
+          {
+              Color color;
+              Colmn colmn;
+              uint8_t casle_right;
+              Bb bb_rook;
+              Sq sq_rook;
+              Sq sq_king;
 
-         color = isupper(*it) ? kWhite : kBlack;
-         bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(color * kRow8);
+              color = isupper(*it) ? kWhite : kBlack;
+              bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(color * kRow8);
 
-         if (*it == 'Q' || *it == 'q')
-         {
-            sq_rook = GetLsb(bb_rook);
-            casle_right = kQueenSideCasle;
-         }
-         else if (*it == 'K' || *it == 'k')
-         {
-            sq_rook = GetMsb(bb_rook);
-            casle_right = kKingSideCasle;
-         }
-         else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
-         {
-            sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
-            sq_king = GetLsb(bb_piece(NewPiece(kKing, color)));
-            casle_right = (sq_rook < sq_king ? kQueenSideCasle : kKingSideCasle);
-         }
-         else
-         {
-            // We are unable to parse the castling rights, we raise an exception;
-            throw InvalFenError("Unable to read the castinling rights from the fen string.");
-         }
+              if (*it == 'Q' || *it == 'q')
+              {
+                  sq_rook = GetLsb(bb_rook);
+                  casle_right = kQueenSideCasle;
+              }
+              else if (*it == 'K' || *it == 'k')
+              {
+                  sq_rook = GetMsb(bb_rook);
+                  casle_right = kKingSideCasle;
+              }
+              else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
+              {
+                  sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
+                  sq_king = GetLsb(bb_piece(NewPiece(kKing, color)));
+                  casle_right = (sq_rook < sq_king ? kQueenSideCasle : kKingSideCasle);
+              }
+              else
+              {
+                  // We are unable to parse the castling rights, we raise an exception;
+                  throw InvalFenError("Unable to read the castinling rights from the fen string.");
+              }
 
-         colmn = GetColmn(sq_rook);
-         casle_colmn_[casle_right == kQueenSideCasle ? 0 : 1] = colmn;
-         set_casle(color, casle_right, true);
+              colmn = GetColmn(sq_rook);
+              casle_colmn_[casle_right == kQueenSideCasle ? 0 : 1] = colmn;
+              set_casle(color, casle_right, true);
+          }
 
          ++it;
       }

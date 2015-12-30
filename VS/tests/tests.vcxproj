@@ -146,16 +146,21 @@
     <ClInclude Include="..\..\src\common\Bb.hpp" />
     <ClInclude Include="..\..\src\common\Board.hpp" />
     <ClInclude Include="..\..\src\common\Const.hpp" />
+    <ClInclude Include="..\..\src\common\Init.hpp" />
     <ClInclude Include="..\..\src\common\Move.hpp" />
+    <ClInclude Include="..\..\src\common\MoveGen.hpp" />
     <ClInclude Include="..\..\src\common\Piece.hpp" />
     <ClInclude Include="..\..\src\common\Sq.hpp" />
     <ClInclude Include="..\..\src\common\Utils.hpp" />
     <ClInclude Include="..\..\src\tests\catch.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\Bb.cpp" />
     <ClCompile Include="..\..\src\common\Board.cpp" />
+    <ClCompile Include="..\..\src\common\MoveGen.cpp" />
     <ClCompile Include="..\..\src\tests\Bb_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Board_tests.cpp" />
+    <ClCompile Include="..\..\src\tests\MoveGen_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Move_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Piece_tests.cpp" />
     <ClCompile Include="..\..\src\tests\Sq_tests.cpp" />
