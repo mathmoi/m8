@@ -64,12 +64,12 @@ namespace m8
         ///                     moves.
         /// @param next_move    Pointer into an array of move where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
-        inline Move* MoveGen::GenerateSimpleMoves(Color color,
-                                                  bool is_captures,
-                                                  Piece piece,
-                                                  Bb bb_pieces,
-                                                  AttackArray attack_array,
-                                                  Move* next_move) const;
+        inline Move* GenerateSimpleMoves(Color color,
+                                         bool is_captures,
+                                         Piece piece,
+                                         Bb bb_pieces,
+                                         AttackArray attack_array,
+                                         Move* next_move) const;
 
         static AttackArray knight_attack_bb_;
         static AttackArray king_attack_bb_;
