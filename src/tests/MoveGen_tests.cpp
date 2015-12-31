@@ -223,3 +223,124 @@ TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SingleCaptureRetur
         REQUIRE(Contains(moves.data(), next_move, expected));
     }
 }
+
+TEST_CASE("GeneratePawnMoves_NoPawnsOfTheRequestedColor_NoMoves")
+{
+    Board board("3k4/3p4/8/8/8/8/8/3K4 w - - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves = {};
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GeneratePawnMoves(kWhite, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}
+
+TEST_CASE("GeneratePawnMoves_TwoPawnsThatCanMoveForward_TwoMoves")
+{
+    Board board("4k3/8/8/8/5P2/3P4/8/4K3 w - - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves = 
+    {
+        NewMove(kD3, kD4, kWhitePawn),
+        NewMove(kF4, kF5, kWhitePawn)
+    };
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GeneratePawnMoves(kWhite, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}
+
+TEST_CASE("GeneratePawnMoves_BlockedPawn_NoMoves")
+{
+    Board board("4k3/8/8/8/3R4/3P4/8/4K3 w - - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves = {};
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GeneratePawnMoves(kWhite, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+}
+
+TEST_CASE("GeneratePawnMoves_PawnOnStartingRow_TwoMoves")
+{
+    Board board("4k3/3p4/8/8/8/8/8/4K3 w - - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves =
+    {
+        NewMove(kD7, kD6, kBlackPawn),
+        NewMove(kD7, kD5, kBlackPawn)
+    };
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GeneratePawnMoves(kBlack, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}
+
+TEST_CASE("GeneratePawnMoves_PawnOnStartingRowDoubleMoveBlocked_OneMoves")
+{
+    Board board("4k3/3p4/8/3n4/8/8/8/4K3 w - - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves =
+    {
+        NewMove(kD7, kD6, kBlackPawn)
+    };
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GeneratePawnMoves(kBlack, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}
+
+TEST_CASE("GeneratePawnMoves_PawnOnStartingRowBlocked_NoMoves")
+{
+    Board board("4k3/3p4/3n4/8/8/8/8/4K3 w - - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    std::vector<Move> expected_moves = {};
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GeneratePawnMoves(kBlack, next_move);
+
+    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    for (auto expected : expected_moves)
+    {
+        REQUIRE(Contains(moves.data(), next_move, expected));
+    }
+}

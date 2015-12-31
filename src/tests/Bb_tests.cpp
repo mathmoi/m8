@@ -110,3 +110,50 @@ TEST_CASE("Test RemoveLsb")
    REQUIRE(RemoveLsb(bb) == 63);
    REQUIRE(bb == 0);
 }
+
+TEST_CASE("Shift_ZeroLength_BitboardIsUnchanged")
+{
+    Bb original = BB_C(0);
+    SetBit(original, 10);
+    SetBit(original, 19);
+    SetBit(original, 54);
+
+    Bb bb = original;
+    Shift(bb, 0);
+
+    REQUIRE(original == bb);
+}
+
+TEST_CASE("Shift_PositiveLength_BitboardIsShiftedLeft")
+{
+    Bb bb = BB_C(0);
+    SetBit(bb, 10);
+    SetBit(bb, 19);
+    SetBit(bb, 54);
+
+    Bb expected = BB_C(0);
+    SetBit(expected, 13);
+    SetBit(expected, 22);
+    SetBit(expected, 57);
+
+    Shift(bb, 3);
+
+    REQUIRE(expected == bb);
+}
+
+TEST_CASE("Shift_NegateiveLength_BitboardIsShiftedRight")
+{
+    Bb bb = BB_C(0);
+    SetBit(bb, 10);
+    SetBit(bb, 19);
+    SetBit(bb, 54);
+
+    Bb expected = BB_C(0);
+    SetBit(expected, 5);
+    SetBit(expected, 14);
+    SetBit(expected, 49);
+
+    Shift(bb, -5);
+
+    REQUIRE(expected == bb);
+}

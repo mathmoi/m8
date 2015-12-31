@@ -296,6 +296,21 @@ namespace m8
 #endif
    }
 
+   /// Shift a bitboard left or right depending on the sign of the shift length passed in
+   /// parameter.
+   ///
+   /// @param bb     Bitboard to shift.
+   /// @param length Length to shift. If the value is positige a left shift is applied if
+   ///               the value is negative a right shift is applied.
+   /// @return The result of the shift.
+   inline void Shift(Bb& bb, int length)
+   {
+       if (length > 0)
+           bb <<= length;
+       else
+           bb >>= -length;
+   }
+
    /// Visually display the binary representation of a Bitboard on a std::ostream.
    ///
    /// example output:

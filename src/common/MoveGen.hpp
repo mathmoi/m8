@@ -52,6 +52,14 @@ namespace m8
         /// @param next_move   Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GenerateKingMoves(Color color, bool is_captures, Move* next_move) const;
+
+        /// Generate the moves of the pawns. The moves are added to an array specified by
+        /// the parameter next_move.
+        ///
+        /// @param color       Color of the pawn to generate the moves for.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GeneratePawnMoves(Color color, Move* next_move) const;
     private:
         /// Type for an attack array for simples moves (knight and kings).
         typedef std::array<Bb, 64> AttackArray;
@@ -59,6 +67,7 @@ namespace m8
         /// Initialize the precalculation of knight_attack_bb_.
         static void InitializeKnightAttackBb();
 
+        /// Initialize the precalculation of king_attack_bb_.
         static void InitializeKingAttackBb();
 
         /// Generates simples moves from an attack array (knights and king)
@@ -134,6 +143,43 @@ namespace m8
                                    board_.bb_piece(piece),
                                    king_attack_bb_,
                                    next_move);
+
+        // TODO : Generate castling moves. We'll need a way to encode Chess960 castlings.
+    }
+
+    inline Move* MoveGen::GeneratePawnMoves(Color color, Move* next_move) const
+    {
+        Piece piece = NewPiece(kPawn, color);
+        Row third_row = kRow3 + 3 * color;
+        Row seventh_row = kRow7 - 5 * color;
+        int forward_move = 8 - 16 * color;
+
+        // Generate the standard one square forward moves. We need to exclude pawns on 
+        // the 7th rank that will generate promotions.
+        Bb target = board_.bb_piece(piece) & ~kBbRow[seventh_row];
+        Shift(target, forward_move);
+        target &= ~board_.bb_occupied();
+
+        // Generate the two squares moves
+        Bb target_dbl = target & kBbRow[third_row];
+        Shift(target_dbl, forward_move);
+        target_dbl &= ~board_.bb_occupied();
+
+        while (target)
+        {
+            Sq to = RemoveLsb(target);
+            Sq from = to - forward_move;
+            *(next_move++) = NewMove(from, to, piece);
+        }
+
+        while (target_dbl)
+        {
+            Sq to = RemoveLsb(target_dbl);
+            Sq from = to - forward_move * 2;
+            *(next_move++) = NewMove(from, to, piece);
+        }
+
+        return next_move;
     }
 
 }
