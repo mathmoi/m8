@@ -122,7 +122,7 @@ namespace m8
         /// @param color         Color of the pawn to generate the moves for.
         /// @param next_move     Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
-        inline Move* MoveGen::GeneratePawnPromotions(Color color, Move* next_move) const;
+        inline Move* GeneratePawnPromotions(Color color, Move* next_move) const;
 
         static AttackArray knight_attack_bb_;
         static AttackArray king_attack_bb_;
