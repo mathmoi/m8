@@ -60,6 +60,16 @@ namespace m8
         /// @param next_move   Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GeneratePawnMoves(Color color, Move* next_move) const;
+
+        /// Generate the pawn's captures. The moves are added to an array specified by
+        /// the parameter next_move. Promotions are considered captures and are generated
+        /// by this method.
+        ///
+        /// @param color       Color of the pawn to generate the captures for.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GeneratePawnCaptures(Color color, Move* next_move) const;
+
     private:
         /// Type for an attack array for simples moves (knight and kings).
         typedef std::array<Bb, 64> AttackArray;
@@ -89,6 +99,31 @@ namespace m8
                                          AttackArray attack_array,
                                          Move* next_move) const;
 
+        /// Generate pawn moves from a bitboard representing destinations squares.
+        ///
+        /// @param color       Color of the pawn to generate the moves for.
+        /// @param target      Bitboard representing the destinations.
+        /// @param from_delta  Delta to apply to the destination to get the origin.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* UnpackPawnMoves(Color color, Bb target, int from_delta, Move* next_move) const;
+
+        /// Generate pawn side captures.
+        ///
+        /// @param color         Color of the pawn to generate the moves for.
+        /// @param ignored_colmn Colomn that should be ignored.
+        /// @param delta         Delta applied between the from and to squares.
+        /// @param next_move     Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const;
+
+        /// Generate pawn promotions
+        ///
+        /// @param color         Color of the pawn to generate the moves for.
+        /// @param next_move     Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* MoveGen::GeneratePawnPromotions(Color color, Move* next_move) const;
+
         static AttackArray knight_attack_bb_;
         static AttackArray king_attack_bb_;
 
@@ -103,7 +138,7 @@ namespace m8
                                               Move* next_move) const
     {
         Bb targets;
-        if (is_captures)
+        if (is_captures) // TODO : Test : Could this branch be replaced by some multiplication (color)?
             targets = board_.bb_color(OpposColor(color));
         else
             targets = ~board_.bb_occupied();
@@ -147,6 +182,57 @@ namespace m8
         // TODO : Generate castling moves. We'll need a way to encode Chess960 castlings.
     }
 
+    inline Move* MoveGen::UnpackPawnMoves(Color color, Bb target, int from_delta, Move* next_move) const
+    {
+        Piece piece = NewPiece(kPawn, color);
+        Row eighth_row = 7 - 7 * color;
+
+        while (target)
+        {
+            Sq to = RemoveLsb(target);
+            Sq from = to + from_delta;
+            if (GetRow(to) != eighth_row)
+            {
+                *(next_move++) = NewMove(from, to, piece, board_[to]);
+            }
+            else
+            {
+                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kQueen, color));
+                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kRook, color));
+                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kKnigt, color));
+                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kBishp, color));
+            }
+        }
+
+        return next_move;
+    }
+
+    inline Move* MoveGen::GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const
+    {
+        Piece piece = NewPiece(kPawn, color);
+
+        Bb target = board_.bb_piece(piece) & ~kBbColmn[ignored_colmn];
+        Shift(target, delta);
+        target &= board_.bb_color(OpposColor(color));
+        next_move = UnpackPawnMoves(color, target, -delta, next_move);
+
+        return next_move;
+    }
+
+    inline Move* MoveGen::GeneratePawnPromotions(Color color, Move* next_move) const 
+    {
+        Piece piece = NewPiece(kPawn, color);
+        Row seventh_row = kRow7 - 5 * color;
+        int forward_move = 8 - 16 * color;
+
+        Bb target = board_.bb_piece(piece) & kBbRow[seventh_row];
+        Shift(target, forward_move);
+        target &= ~board_.bb_occupied();
+        next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
+
+        return next_move;
+    }
+
     inline Move* MoveGen::GeneratePawnMoves(Color color, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
@@ -165,23 +251,24 @@ namespace m8
         Shift(target_dbl, forward_move);
         target_dbl &= ~board_.bb_occupied();
 
-        while (target)
-        {
-            Sq to = RemoveLsb(target);
-            Sq from = to - forward_move;
-            *(next_move++) = NewMove(from, to, piece);
-        }
-
-        while (target_dbl)
-        {
-            Sq to = RemoveLsb(target_dbl);
-            Sq from = to - forward_move * 2;
-            *(next_move++) = NewMove(from, to, piece);
-        }
+        next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
+        next_move = UnpackPawnMoves(color, target_dbl, -forward_move * 2, next_move);
 
         return next_move;
     }
 
+    inline Move* MoveGen::GeneratePawnCaptures(Color color, Move* next_move) const
+    {
+        Piece piece = NewPiece(kPawn, color);
+        int forward_left = 7 - 16 * color;
+        int forward_right = 9 - 16 * color;
+
+        next_move = GeneratePawnSideCaptures(color, kColmnA, forward_left, next_move);
+        next_move = GeneratePawnSideCaptures(color, kColmnH, forward_right, next_move);
+        next_move = GeneratePawnPromotions(color, next_move);
+
+        return next_move;
+    }
 }
 
 #endif
