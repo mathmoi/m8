@@ -111,7 +111,7 @@ namespace m8
         /// Generate pawn side captures.
         ///
         /// @param color         Color of the pawn to generate the moves for.
-        /// @param ignored_colmn Colomn that should be ignored.
+        /// @param ignored_colmn Column that should be ignored.
         /// @param delta         Delta applied between the from and to squares.
         /// @param next_move     Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
@@ -259,7 +259,6 @@ namespace m8
 
     inline Move* MoveGen::GeneratePawnCaptures(Color color, Move* next_move) const
     {
-        Piece piece = NewPiece(kPawn, color);
         int forward_left = 7 - 16 * color;
         int forward_right = 9 - 16 * color;
 
