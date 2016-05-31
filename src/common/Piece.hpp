@@ -23,10 +23,10 @@ namespace m8
    /// Constants for piece types
    /// @{
    const PieceType kPawn = 1;
-   const PieceType kKnigt = 2;
+   const PieceType kKnight = 2;
    const PieceType kKing = 3;
    const PieceType kQueen = 4;
-   const PieceType kBishp = 5;
+   const PieceType kBishop = 5;
    const PieceType kRook = 6;
    /// @}
 
@@ -77,7 +77,7 @@ namespace m8
    /// 
    /// @param piece_type The piece type to check
    /// @returns True if the piece slide like a bishop (Queen, Bishop).
-   inline bool CanSlideBishp(PieceType piece_type)
+   inline bool CanSlideBishop(PieceType piece_type)
    {
       // A : piece_type is valid
       assert(IsPieceType(piece_type));
@@ -129,16 +129,16 @@ namespace m8
    /// Constants for piece of specific type and color
    /// @{
    const Piece kWhitePawn = 1;
-   const Piece kWhiteKnigt = 2;
+   const Piece kWhiteKnight = 2;
    const Piece kWhiteKing = 3;
    const Piece kWhiteQueen = 4;
-   const Piece kWhiteBishp = 5;
+   const Piece kWhiteBishop = 5;
    const Piece kWhiteRook = 6;
    const Piece kBlackPawn = 9;
-   const Piece kBlackKnigt = 10;
+   const Piece kBlackKnight = 10;
    const Piece kBlackKing = 11;
    const Piece kBlackQueen = 12;
-   const Piece kBlackBishp = 13;
+   const Piece kBlackBishop = 13;
    const Piece kBlackRook = 14;
    /// @}
 
@@ -146,16 +146,16 @@ namespace m8
    const std::unordered_map<char, Piece> char_to_piece_map = 
    {
       {'P', kWhitePawn},
-      { 'N', kWhiteKnigt },
+      { 'N', kWhiteKnight },
       { 'K', kWhiteKing },
       { 'Q', kWhiteQueen },
-      { 'B', kWhiteBishp },
+      { 'B', kWhiteBishop },
       { 'R', kWhiteRook },
       { 'p', kBlackPawn },
-      { 'n', kBlackKnigt },
+      { 'n', kBlackKnight },
       { 'k', kBlackKing },
       { 'q', kBlackQueen },
-      { 'b', kBlackBishp },
+      { 'b', kBlackBishop },
       { 'r', kBlackRook }
    };
 
@@ -163,16 +163,16 @@ namespace m8
    const std::unordered_map<char, Piece> piece_to_char_map =
    {
       { kWhitePawn, 'P' },
-      { kWhiteKnigt, 'N' },
+      { kWhiteKnight, 'N' },
       { kWhiteKing, 'K' },
       { kWhiteQueen, 'Q' },
-      { kWhiteBishp, 'B' },
+      { kWhiteBishop, 'B' },
       { kWhiteRook, 'R' },
       { kBlackPawn, 'p' },
-      { kBlackKnigt, 'n' },
+      { kBlackKnight, 'n' },
       { kBlackKing, 'k' },
       { kBlackQueen, 'q' },
-      { kBlackBishp, 'b' },
+      { kBlackBishop, 'b' },
       { kBlackRook, 'r' }
    };
 

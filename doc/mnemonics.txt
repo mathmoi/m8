@@ -3,12 +3,9 @@ Number					Num
 Square					Sq
 Population count		Popct
 Least significant bit	Lsb
-Bishop					Bishp
-Knight					Knigt
 Opposite				Oppos
 Castle					Casle
 En-passant				enpas
-Current					curnt
 Iterator				it
 Invalid					Inval
 Conversion				Convr

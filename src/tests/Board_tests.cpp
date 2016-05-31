@@ -48,12 +48,12 @@ TEST_CASE("Test Board(fen)")
    Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
    REQUIRE(board[kA8] == kBlackRook);
-   REQUIRE(board[kB8] == kBlackKnigt);
-   REQUIRE(board[kC8] == kBlackBishp);
+   REQUIRE(board[kB8] == kBlackKnight);
+   REQUIRE(board[kC8] == kBlackBishop);
    REQUIRE(board[kD8] == kBlackQueen);
    REQUIRE(board[kE8] == kBlackKing);
-   REQUIRE(board[kF8] == kBlackBishp);
-   REQUIRE(board[kG8] == kBlackKnigt);
+   REQUIRE(board[kF8] == kBlackBishop);
+   REQUIRE(board[kG8] == kBlackKnight);
    REQUIRE(board[kH8] == kBlackRook);
 
    REQUIRE(board[kA7] == kBlackPawn);
@@ -84,12 +84,12 @@ TEST_CASE("Test Board(fen)")
    REQUIRE(board[kH2] == kWhitePawn);
 
    REQUIRE(board[kA1] == kWhiteRook);
-   REQUIRE(board[kB1] == kWhiteKnigt);
-   REQUIRE(board[kC1] == kWhiteBishp);
+   REQUIRE(board[kB1] == kWhiteKnight);
+   REQUIRE(board[kC1] == kWhiteBishop);
    REQUIRE(board[kD1] == kWhiteQueen);
    REQUIRE(board[kE1] == kWhiteKing);
-   REQUIRE(board[kF1] == kWhiteBishp);
-   REQUIRE(board[kG1] == kWhiteKnigt);
+   REQUIRE(board[kF1] == kWhiteBishop);
+   REQUIRE(board[kG1] == kWhiteKnight);
    REQUIRE(board[kH1] == kWhiteRook);
 
    REQUIRE(board.side_to_move() == kWhite);

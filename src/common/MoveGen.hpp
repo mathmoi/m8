@@ -160,7 +160,7 @@ namespace m8
 
     inline Move* MoveGen::GenerateKnightMoves(Color color, bool is_captures, Move* next_move) const
     {
-        Piece piece = NewPiece(kKnigt, color);
+        Piece piece = NewPiece(kKnight, color);
         return GenerateSimpleMoves(color,
                                    is_captures,
                                    piece,
@@ -199,8 +199,8 @@ namespace m8
             {
                 *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kQueen, color));
                 *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kRook, color));
-                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kKnigt, color));
-                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kBishp, color));
+                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kKnight, color));
+                *(next_move++) = NewMove(from, to, piece, board_[to], NewPiece(kBishop, color));
             }
         }
 

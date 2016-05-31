@@ -46,14 +46,14 @@ TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoard_EightMovesReturned")
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = {NewMove(kE5, kF7, kWhiteKnigt),
-                                        NewMove(kE5, kG6, kWhiteKnigt),
-                                        NewMove(kE5, kG4, kWhiteKnigt),
-                                        NewMove(kE5, kF3, kWhiteKnigt),
-                                        NewMove(kE5, kD3, kWhiteKnigt),
-                                        NewMove(kE5, kC4, kWhiteKnigt),
-                                        NewMove(kE5, kC6, kWhiteKnigt),
-                                        NewMove(kE5, kD7, kWhiteKnigt)};
+    std::vector<Move> expected_moves = {NewMove(kE5, kF7, kWhiteKnight),
+                                        NewMove(kE5, kG6, kWhiteKnight),
+                                        NewMove(kE5, kG4, kWhiteKnight),
+                                        NewMove(kE5, kF3, kWhiteKnight),
+                                        NewMove(kE5, kD3, kWhiteKnight),
+                                        NewMove(kE5, kC4, kWhiteKnight),
+                                        NewMove(kE5, kC6, kWhiteKnight),
+                                        NewMove(kE5, kD7, kWhiteKnight)};
 
     MoveGen move_gen(board);
 
@@ -72,13 +72,13 @@ TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoardOneMoveObstructed_SevenMov
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnigt),
-                                         NewMove(kE5, kG6, kWhiteKnigt),
-                                         NewMove(kE5, kG4, kWhiteKnigt),
-                                         NewMove(kE5, kD3, kWhiteKnigt),
-                                         NewMove(kE5, kC4, kWhiteKnigt),
-                                         NewMove(kE5, kC6, kWhiteKnigt),
-                                         NewMove(kE5, kD7, kWhiteKnigt) };
+    std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnight),
+                                         NewMove(kE5, kG6, kWhiteKnight),
+                                         NewMove(kE5, kG4, kWhiteKnight),
+                                         NewMove(kE5, kD3, kWhiteKnight),
+                                         NewMove(kE5, kC4, kWhiteKnight),
+                                         NewMove(kE5, kC6, kWhiteKnight),
+                                         NewMove(kE5, kD7, kWhiteKnight) };
 
     MoveGen move_gen(board);
 
@@ -102,7 +102,7 @@ TEST_CASE("GenerateKnighCaptures_SingleKnightMidleOfBoardOnePawnToCapture_OneMov
     next_move = move_gen.GenerateKnightMoves(kWhite, true, next_move);
 
     REQUIRE((next_move - moves.data()) == 1);
-    REQUIRE(moves[0] == NewMove(kE5, kF3, kWhiteKnigt, kBlackPawn));
+    REQUIRE(moves[0] == NewMove(kE5, kF3, kWhiteKnight, kBlackPawn));
 }
 
 TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoard_EightMovesReturned")
@@ -111,15 +111,15 @@ TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoard_EightMovesReturned")
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnigt),
-                                         NewMove(kE5, kG6, kWhiteKnigt),
-                                         NewMove(kE5, kG4, kWhiteKnigt),
-                                         NewMove(kE5, kD3, kWhiteKnigt),
-                                         NewMove(kE5, kC4, kWhiteKnigt),
-                                         NewMove(kE5, kC6, kWhiteKnigt),
-                                         NewMove(kE5, kD7, kWhiteKnigt),
-                                         NewMove(kG1, kE2, kWhiteKnigt),
-                                         NewMove(kG1, kH3, kWhiteKnigt)};
+    std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnight),
+                                         NewMove(kE5, kG6, kWhiteKnight),
+                                         NewMove(kE5, kG4, kWhiteKnight),
+                                         NewMove(kE5, kD3, kWhiteKnight),
+                                         NewMove(kE5, kC4, kWhiteKnight),
+                                         NewMove(kE5, kC6, kWhiteKnight),
+                                         NewMove(kE5, kD7, kWhiteKnight),
+                                         NewMove(kG1, kE2, kWhiteKnight),
+                                         NewMove(kG1, kH3, kWhiteKnight)};
 
     MoveGen move_gen(board);
 
@@ -138,8 +138,8 @@ TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoardAbleToCaptureSinglePawn_TwoCaptur
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = { NewMove(kE5, kF3, kWhiteKnigt, kBlackPawn),
-                                         NewMove(kG1, kF3, kWhiteKnigt, kBlackPawn) };
+    std::vector<Move> expected_moves = { NewMove(kE5, kF3, kWhiteKnight, kBlackPawn),
+                                         NewMove(kG1, kF3, kWhiteKnight, kBlackPawn) };
 
     MoveGen move_gen(board);
 
@@ -366,7 +366,7 @@ TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnLeft_OneMovesReturned")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(kE4, kD5, kWhitePawn, kBlackKnigt)
+        NewMove(kE4, kD5, kWhitePawn, kBlackKnight)
     };
 
     MoveGen move_gen(board);
@@ -388,7 +388,7 @@ TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnRight_OneMovesReturned")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(kE4, kF5, kWhitePawn, kBlackKnigt)
+        NewMove(kE4, kF5, kWhitePawn, kBlackKnight)
     };
 
     MoveGen move_gen(board);
@@ -412,8 +412,8 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToPromote_FourMovesReturned")
     {
         NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackQueen),
         NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackRook),
-        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackKnigt),
-        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackBishp)
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackKnight),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackBishop)
     };
 
     MoveGen move_gen(board);
@@ -437,8 +437,8 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
     {
         NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackQueen),
         NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackRook),
-        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackKnigt),
-        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackBishp)
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackKnight),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackBishop)
     };
 
     MoveGen move_gen(board);
