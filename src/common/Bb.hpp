@@ -105,6 +105,16 @@ namespace m8
                                                   BB_C(0x4080000000000000),
                                                   BB_C(0x8000000000000000) };
 
+   /// Array containing bitboards with bits set for the squares between two squared 
+   /// indexed by 0x88 difference.
+   extern std::array<Bb, 240> kBbBetweenArray;
+
+   /// Pointer used to access m8_g_bb_between_array with indices in the range [-119, 199].
+   extern Bb* kBbBetween;
+
+   /// Initialize the pre calculated array pertaining to the Bb type.
+   void BbInitializePreCalc();
+
    /// Returns a bitboard with a single bit set.
    ///
    /// @param bit Position of the bit to set.
@@ -311,6 +321,35 @@ namespace m8
            bb >>= -length;
    }
 
+   /// Rotate a bitboard to the left. A rotation is like a shift, but the bits on the that
+   /// overflow to the left swap around to the right.
+   /// 
+   /// @param bb Bitboard to rotate.
+   /// @param x Number of bits to rotate.
+   /// @return The rotated bitboard.
+   inline Bb RotateLeft(Bb bb, uint32_t x)
+   {
+       return (bb << x) | (bb >> (64 - x));
+   }
+
+   /// Rotate a bitboard to the right. A rotation is like a shift, but the bits that
+   /// overflow to the right swap around to the left.
+   ///
+   /// @param bb Bitboard to rotate.
+   /// @param x Number of bits to rotate.
+   /// @return The rotated bitboard.
+   inline Bb RotateRight(Bb bb, uint32_t x)
+   {
+       return RotateLeft(bb, 64 - x);
+   }
+
+   /// Distribute the bits of index into a bitboard using only the bits set to one in mask.
+   ///
+   /// @param index Integer from which we take the bits to distribute.
+   /// @param mask Bitboard representing the postion to which the bits should be distributed.
+   /// @return A bitboard.
+   Bb DistributeBits(Bb bits, Bb mask);
+
    /// Visually display the binary representation of a Bitboard on a std::ostream.
    ///
    /// example output:
@@ -326,6 +365,44 @@ namespace m8
    /// @param out Output stream on wich to display the bitboard
    /// @param bb  Bitboard to display
    void DisplayBb(std::ostream& out, Bb bb);
+
+
+
+
+
+
+
+
+
+   /// Return the 0x88 index of a Mailbox square.
+   ///
+   /// @param sq Index of the square in a mailbox board representation.
+   /// @return Index of the square in a 0x88 board representation.
+   inline std::uint8_t Get0x88Index(std::uint8_t index)
+   {
+       return index + (index & ~7);
+   }
+
+   /// Return the 0x88 difference between two square. This diffrence has the property of
+   /// being unique for each combination of squares in regards to direction and distance.
+   ///
+   /// @param from First square.
+   /// @param to Second square.
+   /// @param The difference between the squares. Should be in the range [-119, 119];
+   inline std::int8_t CalculateOx88diff(std::uint8_t from, std::uint8_t to)
+   {
+       return Get0x88Index(to) - Get0x88Index(from);
+   }
+
+   /// Return a bitboard with the bits between two squares set to one.
+   ///
+   /// @param from Index of the origin square.
+   /// @param to   Index of the destination square.
+   /// @return A bitboard with the bits between from an to set to one.
+   inline Bb BbBetween(std::uint8_t from, std::uint8_t to)
+   {
+       return RotateLeft(kBbBetween[CalculateOx88diff(from, to)], from);
+   }
 }
 
 #endif // M8_BB_HPP_

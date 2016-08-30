@@ -14,10 +14,10 @@ file(GLOB_RECURSE common_header_files
      ${CMAKE_CURRENT_SOURCE_DIR}/../../src/common/*.hpp)
 
 add_executable(m8_tests
-	       ../../src/tests/tests_main.cpp
+	           ../../src/tests/tests_main.cpp
                ../../src/tests/Sq_tests.cpp
                ../../src/tests/Bb_tests.cpp
-	       ../../src/tests/Piece_tests.cpp
+	           ../../src/tests/Piece_tests.cpp
                ../../src/tests/Board_tests.cpp
                ../../src/tests/Move_tests.cpp
                ../../src/tests/MoveGen_tests.cpp

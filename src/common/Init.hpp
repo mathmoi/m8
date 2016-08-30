@@ -4,6 +4,7 @@
 /// @brief  Contains initialization functionalities.
 
 #include "MoveGen.hpp"
+#include "Bb.hpp"
 
 namespace m8
 {
@@ -11,5 +12,6 @@ namespace m8
     inline void InitializePreCalc()
     {
         MoveGen::InitializePreCalc();
+        BbInitializePreCalc();
     }
 }

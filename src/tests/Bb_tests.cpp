@@ -8,6 +8,7 @@
 #include <cstdint>
 
 #include "../common/Bb.hpp"
+#include "../common/Sq.hpp"
 
 using namespace m8;
 using namespace std;
@@ -156,4 +157,26 @@ TEST_CASE("Shift_NegateiveLength_BitboardIsShiftedRight")
     Shift(bb, -5);
 
     REQUIRE(expected == bb);
+}
+
+TEST_CASE("BbBetween__c2_to_g6__d2_e4_f5_returned")
+{
+    Bb between = BbBetween(kC2, kG6);
+    REQUIRE(between == BB_C(0x0000002010080000));
+}
+
+TEST_CASE("BbBetween__g6_to_c2__d2_e4_f5_returned")
+{
+    using namespace std;
+    Bb between = BbBetween(kG6, kC2);
+
+    REQUIRE(between == BB_C(0x0000002010080000));
+}
+
+TEST_CASE("BbBetween__g6_to_c1__kEmptyBb_returned")
+{
+    using namespace std;
+    Bb between = BbBetween(kG6, kC1);
+
+    REQUIRE(between == kEmptyBb);
 }

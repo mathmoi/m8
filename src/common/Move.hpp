@@ -27,12 +27,14 @@ namespace m8
     /// @{
     const int kFromPos = 0;
     const int kToPos = 8;
+    const int kCastlingPos = 14;
     const int kPiecePos = 16;
     const int kPieceTakenPos = 25;
     const int kPromoteToPos = 29;
 
-    const int kFromSize = 8;
-    const int kToSize = 8;
+    const int kFromSize = 6;
+    const int kToSize = 6;
+    const int kCastlingSize = 2;
     const int kPieceSize = 8;
     const int kPieceTakenSize = 4;
     const int kPromoteToSize = 4;
@@ -42,10 +44,11 @@ namespace m8
     /// uint32_t. The informations are mapped this way :
     ///  
     ///  bits     content
-    ///  -------  -------------------------
-    ///   0 -  7  From square
-    ///   8 - 15  To square
-    ///  16 - 23  PIece moved
+    ///  -------  -----------------------------------------
+    ///   0 -  5  From square
+    ///   8 - 13  To square
+    ///  14 - 15  Castling type (1: queenside, 2: kingside)
+    ///  16 - 23  Piece moved
     ///  25 - 28  Piece taken if any
     ///  29 - 32  Pieced promoted to if any
     ///
@@ -91,6 +94,28 @@ namespace m8
             to << kToPos |
             piece << kPiecePos |
             piece_taken << kPieceTakenPos;
+    }
+
+    /// Create a new move. This is an overload for castling moves. The other NewMove
+    /// documentation still applies.
+    ///
+    /// @param from        From square.
+    /// @param to          To square.
+    /// @param piece       Moved piece.
+    /// @param castling    Type of castling move.
+    /// @return A move.
+    inline Move NewCastlingMove(Sq from, Sq to, Piece piece, std::uint8_t castling)
+    {
+        // A : All the parameters are valids
+        assert(IsSqOnBoard(from));
+        assert(IsSqOnBoard(to));
+        assert(IsPiece(piece));
+        assert(castling == 1 || castling == 2);
+
+        return from << kFromPos         |
+               to << kToPos             |
+               piece << kPiecePos       |
+               castling << kCastlingPos;
     }
 
     /// Create a new move. This is an overload without piece taken or a promotion. The 
@@ -155,6 +180,15 @@ namespace m8
     inline Piece GetPromoteTo(Move move)
     {
         return (move >> kPromoteToPos) & ((1 << kPromoteToSize) - 1);
+    }
+
+    /// Extract the piece castling type from a move.
+    ///
+    /// @param move The move to extract from.
+    /// @return the castling type.
+    inline std::uint8_t GetCastling(Move move)
+    {
+        return (move >> kCastlingPos) & ((1 << kCastlingSize) - 1);
     }
 }
 

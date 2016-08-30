@@ -36,7 +36,7 @@ namespace m8
       // A : The column is valid
       assert(IsColmnOnBoard(colmn));
 
-      return UINT64_C(0x1010101010101010) << colmn;
+      return UINT64_C(0x101010101010101) << colmn;
    }
 }
 

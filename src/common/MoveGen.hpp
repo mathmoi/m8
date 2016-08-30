@@ -6,6 +6,7 @@
 #include <cstdint>
 
 #include "Bb.hpp"
+#include "Const.hpp"
 #include "Sq.hpp"
 #include "Piece.hpp"
 #include "Move.hpp"
@@ -31,6 +32,22 @@ namespace m8
         /// Initialize the precalculated data associated with the MoveGen class. This 
         /// method should be called once before the class can be used.
         static void InitializePreCalc();
+
+        /// Given a board occupancy, returns the squares attacked by a rook on a given 
+        /// square.
+        ///
+        /// @param occ Bitboard representing the occupancy of the board.
+        /// @param sq  Postion of the rook.
+        /// @return    A bitboard representing all squares attacked by the rook.
+        inline static Bb GenerateRookAttacks(Bb occ, Sq sq);
+
+        /// Given a board occupancy, returns the squares attacked by a bishop on a given 
+        /// square.
+        ///
+        /// @param occ Bitboard representing the occupancy of the board.
+        /// @param sq  Postion of the bishop.
+        /// @return    A bitboard representing all squares attacked by the bishop.
+        inline static Bb GenerateBishopAttacks(Bb occ, Sq sq);
 
         /// Generate the moves of the knight. The moves are added to an array specified by
         /// the parameter next_move the end of the sequence of moves is indicated by a 
@@ -70,15 +87,158 @@ namespace m8
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GeneratePawnCaptures(Color color, Move* next_move) const;
 
+        /// Generate the moves of the rooks. The moves are added to an array specified by
+        /// the parameter next_move.
+        ///
+        /// @param color       Color of the piece to generate the moves for.
+        /// @param is_captures Indicate if we should generate captures or non captures 
+        ///                    moves.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateRookMoves(Color color, bool is_captures, Move* next_move) const;
+
+        /// Generate the moves of the bishops. The moves are added to an array specified by
+        /// the parameter next_move.
+        ///
+        /// @param color       Color of the piece to generate the moves for.
+        /// @param is_captures Indicate if we should generate captures or non captures 
+        ///                    moves.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateBishopMoves(Color color, bool is_captures, Move* next_move) const;
+
+        /// Generate the moves of the queens. The moves are added to an array specified by
+        /// the parameter next_move.
+        ///
+        /// @param color       Color of the piece to generate the moves for.
+        /// @param is_captures Indicate if we should generate captures or non captures 
+        ///                    moves.
+        /// @param next_move   Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateQueenMoves(Color color, bool is_captures, Move* next_move) const;
+
+        /// Generate all captures and promotion moves.
+        ///
+        /// @param color     Color of the pieces to generate the moves for.
+        /// @param next_move Pointer into an array where we can add moves.
+        /// @return A pointer to the position afther the last move inserted into the array.
+        inline Move* GenerateCaptures(Color color, Move* next_move) const;
+
+        /// Generate all quiet moves.
+        ///
+        /// @param color     Color of the pieces to generate the moves for.
+        /// @param next_move Pointer into an array where we can add moves.
+        /// @return A pointer to the position afther the last move inserted into the array.
+        inline Move* GenerateQuietMoves(Color color, Move* next_move) const;
+
+        /// Generate all moves.
+        ///
+        /// @param color     Color of the pieces to generate the moves for.
+        /// @param next_move Pointer into an array where we can add moves.
+        /// @return A pointer to the position afther the last move inserted into the array.
+        inline Move* GenerateAllMoves(Color color, Move* next_move) const;
+
+        /// Generate a bitboard of all the squares that attacks a given square.
+        ///
+        /// @param sq Square for which we want to get the attackers.
+        inline Bb AttacksTo(Sq sq) const;
+
+        /// Verify if a given size is in check.
+        ///
+        /// @param color Color of the side to for which to verify if the king is in check.
+        inline bool IsInCheck(Color color) const;
+
     private:
+        /// Structure that hold all the parameters required to do the move generation of a 
+        /// rook or bishop on a given square.
+        struct Magic
+        {
+            Bb* attack;
+            Bb mask;
+            Bb magic;
+            std::uint32_t shift;
+        };
+
         /// Type for an attack array for simples moves (knight and kings).
         typedef std::array<Bb, 64> AttackArray;
+
+        /// Type for an array of Magic structures.
+        typedef std::array<Magic, 64> MagicArray;
 
         /// Initialize the precalculation of knight_attack_bb_.
         static void InitializeKnightAttackBb();
 
         /// Initialize the precalculation of king_attack_bb_.
         static void InitializeKingAttackBb();
+
+        /// Initialise the rook magic array
+        static void InitializeRookMagics();
+
+        /// Generate a bitboard of the square attacked by a rook on a given square given a
+        /// specific occupation of the board.
+        ///
+        /// @param from Position of the rook.
+        /// @param occupation Occupation of the board.
+        /// @return A bitboard indicating the squares attacked by the rook.
+        static Bb GenerateRookAttackForOccupancy(Sq from, Bb occupation);
+
+        /// Generate the rook attacks precalculation for a given square.
+        ///
+        /// @param sq Position of the rook.
+        /// @param magic Magic structure for which the methods generate the attack tables.
+        ///              This parameter is a reference and will be modified by the method.
+        static void InitializeRookAttack(Sq sq, MoveGen::Magic& magic);
+
+        /// Initialise the bishop magic array
+        static void InitializeBishopMagics();
+
+        /// Generate a bitboard of the square attacked by a bishop on a given square given
+        /// a specific occupation of the board.
+        ///
+        /// @param from Position of the bishop.
+        /// @param occupation Occupation of the board.
+        /// @return A bitboard indicating the squares attacked by the bishop.
+        static Bb GenerateBishopAttackForOccupancy(Sq from, Bb occupation);
+
+        /// Generate the bishop attacks precalculation for a given square.
+        ///
+        /// @param sq Position of the rook.
+        /// @param magic Magic structure for which the methods generate the attack tables.
+        ///              This parameter is a reference and will be modified by the method.
+        static void InitializeBishopAttack(Sq sq, MoveGen::Magic& magic);
+
+        /// Given a board occupancy and the magic precalculation array, returns the 
+        /// squares attacked by a slider (rook or bishop) on a given square.
+        ///
+        /// @param magics Precalculation for the magic bitboard move generation for the 
+        ///               slider type. If the magics precalculation for a rook are passed
+        ///               this method will generate attacks for a rook.
+        /// @param occ    Bitboard representing the occupancy of the board.
+        /// @param sq     Postion of the slider.
+        /// @return       A bitboard representing all squares attacked by the slider.
+        inline static Bb GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq);
+
+        /// Returns the target squares give the color of a moving piece and wheter we are
+        /// generating captures or not.
+        ///
+        /// @param color      Color of the piece moving.
+        /// @param is_captures Indicate if we want the targets of captures or not.
+        /// @return A bitboard containing the target squares.
+        inline Bb GetTargets(Color color, bool is_capture) const;
+
+        /// Generate moves of slider pieces.
+        ///
+        /// @param piece             Piece for which we generate moves
+        /// @param color             Color for of the moving piece
+        /// @param targets           Targets squares that should be considered. Allows to 
+        ///                          generate all moves, just the captures or just the
+        ///                          non-captures.
+        /// @param slide_like_rook   Indicate if the piece can move horizontaly and 
+        ///                          verticaly.
+        /// @param slide_like_bishop Indicate if the piece can move diagonaly.
+        /// @param next_move         Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateSliderMove(Piece piece, Color color, Bb targets, bool slide_like_rook, bool slide_like_bishop, Move* next_move) const;
 
         /// Generates simples moves from an attack array (knights and king)
         ///
@@ -93,11 +253,11 @@ namespace m8
         /// @param next_move    Pointer into an array of move where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GenerateSimpleMoves(Color color,
-                                         bool is_captures,
-                                         Piece piece,
-                                         Bb bb_pieces,
-                                         AttackArray attack_array,
-                                         Move* next_move) const;
+            bool is_captures,
+            Piece piece,
+            Bb bb_pieces,
+            AttackArray attack_array,
+            Move* next_move) const;
 
         /// Generate pawn moves from a bitboard representing destinations squares.
         ///
@@ -124,11 +284,105 @@ namespace m8
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GeneratePawnPromotions(Color color, Move* next_move) const;
 
+        /// Generate castling moves.
+        ///
+        /// @param color         Color of the king to generate the castling moves for.
+        /// @param next_move     Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateCastlingMoves(Color color, Move* next_move) const;
+
+        /// Generate a castling move, king side or queen side depending on the parameters
+        /// passed.
+        ///
+        /// @param color                Color of the side to generate castling for. 
+        /// @param castling_side        Castling side. kKingSideCastle ou kQueenSideCastle.
+        /// @param king_final_column    Column of the king afther the castling
+        /// @param rook_original_column Column of the rook before the castling. Because of
+        ///                             the Chess960 rules this might be any column.
+        /// @param rook_final_column    Column of the rook afther the castling move.
+        /// @param next_move            Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GenerateCastlingMoves(Color color,
+                                           std::uint8_t castling_side,
+                                           Colmn king_final_column,
+                                           Colmn rook_original_column,
+                                           Colmn rook_final_column,
+                                           Move* next_move) const;
+
+        static const std::array<const Bb, 64> MoveGen::kRookMagics;
+        static const std::array<const std::uint32_t, 64> MoveGen::kRookMagicShifts;
+        static const std::array<const Bb, 64> MoveGen::kBishopMagics;
+        static const std::array<const std::uint32_t, 64> MoveGen::kBishopMagicShifts;
+
         static AttackArray knight_attack_bb_;
         static AttackArray king_attack_bb_;
-
+        static std::array<Bb, 102400> rook_attack_bb_;
+        static std::array<Bb, 5248> bishop_attack_bb_;
+        static MagicArray rook_magic_;
+        static MagicArray bishop_magic_;
+        
         const Board& board_;
     };
+
+    inline Bb MoveGen::AttacksTo(Sq sq) const
+    {
+        Bb queens = board_.bb_piece(kWhiteQueen) | board_.bb_piece(kBlackQueen);
+        Bb rooks = board_.bb_piece(kWhiteRook) | board_.bb_piece(kBlackRook);
+        Bb bishops = board_.bb_piece(kWhiteBishop) | board_.bb_piece(kBlackBishop);
+        Bb knights = board_.bb_piece(kWhiteKnight) | board_.bb_piece(kBlackKnight);
+        Bb kings = board_.bb_piece(kWhiteKing) | board_.bb_piece(kBlackKing);
+
+        Bb attackers = GenerateRookAttacks(board_.bb_occupied(), sq) & (queens | rooks);
+        attackers |= GenerateBishopAttacks(board_.bb_occupied(), sq) & (queens | bishops);
+        attackers |= knight_attack_bb_[sq] & knights;
+        attackers |= king_attack_bb_[sq] & kings;
+
+        Bb bb_sq = GetSingleBitBb(sq);
+        attackers |= (((bb_sq << 7) & ~GetColmnBb(kColmnH)) | ((bb_sq << 9) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kBlackPawn);
+        attackers |= (((bb_sq >> 9) & ~GetColmnBb(kColmnH)) | ((bb_sq >> 7) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kWhitePawn);
+
+        return attackers;
+    }
+
+    inline bool MoveGen::IsInCheck(Color color) const
+    {
+        Piece king = NewPiece(kKing, color);
+        Bb bb_king = board_.bb_piece(king);
+        Sq king_position = GetLsb(bb_king);
+        Bb attackers = AttacksTo(king_position);
+        Bb opponent_pieces = board_.bb_color(OpposColor(color));
+        return (attackers & opponent_pieces) != kEmptyBb;
+    }
+
+    inline Bb MoveGen::GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
+    {
+        Magic&  magic = magics[sq];
+        occ &=  magic.mask;
+        occ *=  magic.magic;
+        occ >>= magic.shift;
+        return  magic.attack[occ];
+    }
+
+    inline Bb MoveGen::GenerateRookAttacks(Bb occ, Sq sq)
+    {
+        return GenerateSliderAttacks(rook_magic_, occ, sq);
+    }
+
+    inline Bb MoveGen::GenerateBishopAttacks(Bb occ, Sq sq)
+    {
+        return GenerateSliderAttacks(bishop_magic_, occ, sq);
+    }
+
+    inline Bb MoveGen::GetTargets(Color color, bool is_captures) const
+    {
+        Bb targets;
+        if (is_captures)
+            targets = board_.bb_color(OpposColor(color));
+        else
+            targets = ~board_.bb_occupied();
+
+        return targets;
+    }
 
     inline Move* MoveGen::GenerateSimpleMoves(Color color,
                                               bool is_captures,
@@ -137,11 +391,7 @@ namespace m8
                                               AttackArray attack_array,
                                               Move* next_move) const
     {
-        Bb targets;
-        if (is_captures) // TODO : Test : Could this branch be replaced by some multiplication (color)?
-            targets = board_.bb_color(OpposColor(color));
-        else
-            targets = ~board_.bb_occupied();
+        Bb targets = GetTargets(color, is_captures);
 
         while (bb_pieces)
         {
@@ -172,14 +422,19 @@ namespace m8
     inline Move* MoveGen::GenerateKingMoves(Color color, bool is_captures, Move* next_move) const
     {
         Piece piece = NewPiece(kKing, color);
-        return GenerateSimpleMoves(color,
-                                   is_captures,
-                                   piece,
-                                   board_.bb_piece(piece),
-                                   king_attack_bb_,
-                                   next_move);
+        next_move = GenerateSimpleMoves(color,
+                                        is_captures,
+                                        piece,
+                                        board_.bb_piece(piece),
+                                        king_attack_bb_,
+                                        next_move);
 
-        // TODO : Generate castling moves. We'll need a way to encode Chess960 castlings.
+        if (!is_captures)
+        {
+            next_move = GenerateCastlingMoves(color, next_move);
+        }
+
+        return next_move;
     }
 
     inline Move* MoveGen::UnpackPawnMoves(Color color, Bb target, int from_delta, Move* next_move) const
@@ -233,6 +488,63 @@ namespace m8
         return next_move;
     }
 
+    inline Move* MoveGen::GenerateCastlingMoves(Color color,
+                                                std::uint8_t castling_side,
+                                                Colmn king_final_column,
+                                                Colmn rook_original_column,
+                                                Colmn rook_final_column,
+                                                Move* next_move) const
+    {
+        if (board_.casle(color, castling_side))
+        {
+            Piece king = NewPiece(kKing, color);
+            Bb bb_king = board_.bb_piece(king);
+            Sq king_position = GetLsb(bb_king);
+            Row row = GetRow(king_position);
+            Sq king_final_position = NewSq(king_final_column, row);
+            Sq rook_position = NewSq(rook_original_column, row);
+            Sq rook_final_position = NewSq(rook_final_column, row);
+
+            Bb bb_travel_king = BbBetween(king_position, king_final_position);
+            Bb bb_travel_rook = BbBetween(rook_position, rook_final_position);
+
+            // Check if any of the travel squared is occupied.
+            Bb occ = board_.bb_occupied();
+            occ ^= GetSingleBitBb(rook_position) | bb_king;
+            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != kEmptyBb;
+
+            if (!travel_occupied)
+            {
+                // Check if any of the square traveled by the king or the origin or 
+                // destination of the king are under attack.
+                Bb bb_check_attack = bb_travel_king | bb_king | GetSingleBitBb(king_final_position);
+                Bb bb_opponents = board_.bb_color(OpposColor(color));
+
+                bool attacked = false;
+                while (bb_check_attack && !attacked)
+                {
+                    Sq pos = RemoveLsb(bb_check_attack);
+                    attacked = (AttacksTo(pos) & bb_opponents) != kEmptyBb;
+                }
+
+                if (!attacked)
+                {
+                    *(next_move++) = NewCastlingMove(king_position, king_final_position, king, castling_side);
+                }
+            }
+        }
+
+        return next_move;
+    }
+
+    inline Move* MoveGen::GenerateCastlingMoves(Color color, Move* next_move) const
+    {
+        next_move = GenerateCastlingMoves(color, kKingSideCasle, kColmnG, board_.casle_colmn(1), kColmnF, next_move);
+        next_move = GenerateCastlingMoves(color, kQueenSideCasle, kColmnC, board_.casle_colmn(0), kColmnD, next_move);
+
+        return next_move;
+    }
+
     inline Move* MoveGen::GeneratePawnMoves(Color color, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
@@ -266,6 +578,88 @@ namespace m8
         next_move = GeneratePawnSideCaptures(color, kColmnH, forward_right, next_move);
         next_move = GeneratePawnPromotions(color, next_move);
 
+        return next_move;
+    }
+
+    inline Move* MoveGen::GenerateSliderMove(Piece piece, Color color, Bb targets, bool slide_like_rook, bool slide_like_bishop, Move* next_move) const
+    {
+        Bb bb_from = board_.bb_piece(piece);
+
+        while (bb_from)
+        {
+            Sq from = RemoveLsb(bb_from);
+            
+            Bb bb_to = kEmptyBb;
+            if (slide_like_rook)
+                bb_to |= GenerateRookAttacks(board_.bb_occupied(), from);
+            if (slide_like_bishop)
+                bb_to |= GenerateBishopAttacks(board_.bb_occupied(), from);
+            bb_to &= targets;
+
+            while (bb_to)
+            {
+                Sq to = RemoveLsb(bb_to);
+
+                *(next_move++) = NewMove(from, to, piece, board_[to]);
+            }
+        }
+
+        return next_move;
+    }
+
+    inline Move* MoveGen::GenerateRookMoves(Color color, bool is_captures, Move* next_move) const
+    {
+        Piece piece = NewPiece(kRook, color);
+        Bb targets = GetTargets(color, is_captures);
+
+        return GenerateSliderMove(piece, color, targets, true, false, next_move);
+    }
+
+    inline Move* MoveGen::GenerateBishopMoves(Color color, bool is_captures, Move* next_move) const
+    {
+        Piece piece = NewPiece(kBishop, color);
+        Bb targets = GetTargets(color, is_captures);
+
+        return GenerateSliderMove(piece, color, targets, false, true, next_move);
+    }
+
+    inline Move* MoveGen::GenerateQueenMoves(Color color, bool is_captures, Move* next_move) const
+    {
+        Piece piece = NewPiece(kQueen, color);
+        Bb targets = GetTargets(color, is_captures);
+
+        return GenerateSliderMove(piece, color, targets, true, true, next_move);
+    }
+
+    inline Move* MoveGen::GenerateCaptures(Color color, Move* next_move) const
+    {
+        next_move = GeneratePawnCaptures(color, next_move);
+        next_move = GenerateKnightMoves(color, true, next_move);
+        next_move = GenerateBishopMoves(color, true, next_move);
+        next_move = GenerateRookMoves(color, true, next_move);
+        next_move = GenerateQueenMoves(color, true, next_move);
+        next_move = GenerateKingMoves(color, true, next_move);
+
+        return next_move;
+    }
+
+    inline Move* MoveGen::GenerateQuietMoves(Color color, Move* next_move) const
+    {
+        next_move = GeneratePawnMoves(color, next_move);
+        next_move = GenerateKnightMoves(color, false, next_move);
+        next_move = GenerateBishopMoves(color, false, next_move);
+        next_move = GenerateRookMoves(color, false, next_move);
+        next_move = GenerateQueenMoves(color, false, next_move);
+        next_move = GenerateKingMoves(color, false, next_move);
+
+        return next_move;
+    }
+
+    inline Move* MoveGen::GenerateAllMoves(Color color, Move* next_move) const
+    {
+        next_move = GenerateCaptures(color, next_move);
+        next_move = GenerateQuietMoves(color, next_move);
+        
         return next_move;
     }
 }
