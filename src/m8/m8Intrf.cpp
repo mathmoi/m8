@@ -24,6 +24,8 @@ namespace m8
 
    void m8Intrf::SetupShellInterf()
    {
+      using namespace std::placeholders;
+
       shell_intrf_.set_invit(">");
 
       shell_intrf_.AddCmd(ShellCmd("exit",
@@ -34,10 +36,19 @@ namespace m8
                           "",
                           "",
                           std::bind(&m8Intrf::HandleExit, this)));
+      shell_intrf_.AddCmd(ShellCmd("help",
+                          "Display a list of commands",
+                          "help",
+                          std::bind(&m8Intrf::HandleHelp, this, _1)));
    }
 
    void m8Intrf::HandleExit()
    {
       shell_intrf_.set_abort(true);
+   }
+
+   void m8Intrf::HandleHelp(std::vector<std::string> args_list)
+   {
+       shell_intrf_.DisplayHelp();
    }
 }

@@ -36,6 +36,11 @@ namespace m8
       ///
       /// @params args_list Arguments of the command inputed by the user.
       void HandleUserMove(std::vector<std::string> args_list);
+
+      /// Handles the help command.
+      ///
+      /// @params args_list Arguments of the command inputed by the user.
+      void HandleHelp(std::vector<std::string> args_list);
    };
 
 }

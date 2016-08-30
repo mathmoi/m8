@@ -105,6 +105,9 @@ namespace m8
       /// is set to true.
       void Execute() const;
 
+      /// Display a list of the commands and their descriptions
+      void DisplayHelp() const;
+
    private:
 
       typedef std::map<std::string, ShellCmd> CmdList;
