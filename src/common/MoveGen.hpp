@@ -309,10 +309,10 @@ namespace m8
                                            Colmn rook_final_column,
                                            Move* next_move) const;
 
-        static const std::array<const Bb, 64> MoveGen::kRookMagics;
-        static const std::array<const std::uint32_t, 64> MoveGen::kRookMagicShifts;
-        static const std::array<const Bb, 64> MoveGen::kBishopMagics;
-        static const std::array<const std::uint32_t, 64> MoveGen::kBishopMagicShifts;
+        static const std::array<const Bb, 64> kRookMagics;
+        static const std::array<const std::uint32_t, 64> kRookMagicShifts;
+        static const std::array<const Bb, 64> kBishopMagics;
+        static const std::array<const std::uint32_t, 64> kBishopMagicShifts;
 
         static AttackArray knight_attack_bb_;
         static AttackArray king_attack_bb_;
