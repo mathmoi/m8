@@ -39,7 +39,7 @@ namespace m8
       shell_intrf_.AddCmd(ShellCmd("help",
                           "Display a list of commands",
                           "help",
-                          std::bind(&m8Intrf::HandleHelp, this, _1)));
+                          std::bind(&m8Intrf::HandleHelp, this)));
    }
 
    void m8Intrf::HandleExit()
@@ -47,7 +47,7 @@ namespace m8
       shell_intrf_.set_abort(true);
    }
 
-   void m8Intrf::HandleHelp(std::vector<std::string> args_list)
+   void m8Intrf::HandleHelp()
    {
        shell_intrf_.DisplayHelp();
    }

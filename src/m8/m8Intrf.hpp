@@ -40,7 +40,7 @@ namespace m8
       /// Handles the help command.
       ///
       /// @params args_list Arguments of the command inputed by the user.
-      void HandleHelp(std::vector<std::string> args_list);
+      void HandleHelp();
    };
 
 }

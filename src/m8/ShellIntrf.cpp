@@ -42,29 +42,32 @@ namespace m8
             std::cout << invit_;
             std::getline(std::cin, input);
 
-            // Split the command line.
-            std::vector<std::string> token_list;
-            boost::split(token_list,
-                input,
-                boost::is_any_of(" "),
-                boost::token_compress_on);
+            if (input.length() > 0)
+            {
+                // Split the command line.
+                std::vector<std::string> token_list;
+                boost::split(token_list,
+                    input,
+                    boost::is_any_of(" "),
+                    boost::token_compress_on);
 
-            // Find the command and execute it.
-            auto command_pair = cmd_list_.find(token_list[0]);
-            if (command_pair != cmd_list_.end())
-            {
-                command_pair->second(token_list);
-            }
-            else
-            {
-                command_pair = cmd_list_.find("");
+                // Find the command and execute it.
+                auto command_pair = cmd_list_.find(token_list[0]);
                 if (command_pair != cmd_list_.end())
                 {
                     command_pair->second(token_list);
                 }
                 else
                 {
-                    std::cout << "Command not found (" << token_list[0] << ")" << std::endl;
+                    command_pair = cmd_list_.find("");
+                    if (command_pair != cmd_list_.end())
+                    {
+                        command_pair->second(token_list);
+                    }
+                    else
+                    {
+                        std::cout << "Command not found (" << token_list[0] << ")" << std::endl;
+                    }
                 }
             }
         }
@@ -77,7 +80,9 @@ namespace m8
         {
             if (cmd.second.des().length() > 0)
             {
-                std::cout << ' ' << cmd.second.name() << ": " << cmd.second.des() << std::endl;
+                std::cout << ' ';
+                std::cout.width(12);
+                std::cout <<std::left << cmd.second.name() <<' ' << cmd.second.des() << std::endl;
             }
         }
     }
