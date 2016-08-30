@@ -1,5 +1,5 @@
 /// @file   MoveGen.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities to generate moves
 
@@ -293,7 +293,7 @@ namespace m8
         for (Bb occ_index = kEmptyBb; occ_index < (BB_C(1) << nbr_bits); ++occ_index)
         {
             Bb mask = DistributeBits(occ_index, magic.mask);
-            ptrdiff_t index = (ptrdiff_t)((mask * magic.magic) >> magic.shift);
+            std::ptrdiff_t index = (std::ptrdiff_t)((mask * magic.magic) >> magic.shift);
             magic.attack[index] = GenerateRookAttackForOccupancy(sq, mask);
         }
     }
@@ -376,7 +376,7 @@ namespace m8
         for (Bb occ_index = kEmptyBb; occ_index < (BB_C(1) << nbr_bits); ++occ_index)
         {
             Bb mask = DistributeBits(occ_index, magic.mask);
-            ptrdiff_t index = (ptrdiff_t)((mask * magic.magic) >> magic.shift);
+            std::ptrdiff_t index = (std::ptrdiff_t)((mask * magic.magic) >> magic.shift);
             magic.attack[index] = GenerateBishopAttackForOccupancy(sq, mask);
         }
     }

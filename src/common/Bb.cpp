@@ -1,5 +1,5 @@
 /// @file   Bb.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities used to manipulates 
 ///         bitboards. 
@@ -37,7 +37,7 @@ namespace m8
         kBbBetween = kBbBetweenArray.data() + 120;
 
         /* first initalize all entry to zero */
-        for (ptrdiff_t x = 0; x < 240; ++x)
+        for (std::ptrdiff_t x = 0; x < 240; ++x)
         {
             kBbBetweenArray[x] = kEmptyBb;
         }
