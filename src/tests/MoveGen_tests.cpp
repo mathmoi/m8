@@ -410,10 +410,10 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToPromote_FourMovesReturned")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackQueen),
-        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackRook),
-        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackKnight),
-        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kBlackBishop)
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteQueen),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteRook),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteKnight),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteBishop)
     };
 
     MoveGen move_gen(board);
@@ -435,10 +435,10 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
 
     std::vector<Move> expected_moves =
     {
-        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackQueen),
-        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackRook),
-        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackKnight),
-        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kBlackBishop)
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteQueen),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteRook),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteKnight),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteBishop)
     };
 
     MoveGen move_gen(board);
@@ -711,8 +711,8 @@ TEST_CASE("GenerateCastlingMoves__chess960_position__correct_moves_including_cas
         NewMove(kB1, kB2, kWhiteKing),
         NewMove(kB1, kC2, kWhiteKing),
         NewMove(kB1, kC1, kWhiteKing),
-        NewCastlingMove(kB1, kG1, kWhiteKing, kKingSideCasle),
-        NewCastlingMove(kB1, kC1, kWhiteKing, kQueenSideCasle)
+        NewCastlingMove(kB1, kG1, kWhiteKing, kKingSideCastle),
+        NewCastlingMove(kB1, kC1, kWhiteKing, kQueenSideCastle)
     };
 
     MoveGen move_gen(board);
@@ -732,7 +732,7 @@ TEST_CASE("GenerateCastlingMoves__position_traversed_by_rook_attacked__castling_
     MoveList moves;
     Move* next_move = moves.data();
 
-    Move expected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCasle);
+    Move expected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
     
     MoveGen move_gen(board);
 
@@ -747,7 +747,7 @@ TEST_CASE("GenerateCastlingMoves__position_traversed_by_king_attacked__castling_
     MoveList moves;
     Move* next_move = moves.data();
 
-    Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCasle);
+    Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
     MoveGen move_gen(board);
 
@@ -763,7 +763,7 @@ TEST_CASE("GenerateCastlingMoves__positions_traveled_by_rook_occupied__castling_
     MoveList moves;
     Move* next_move = moves.data();
 
-    Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCasle);
+    Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
     MoveGen move_gen(board);
 

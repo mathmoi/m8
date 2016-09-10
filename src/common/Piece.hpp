@@ -10,6 +10,8 @@
 #include <cassert>
 #include <unordered_map>
 
+#include "Color.hpp"
+
 namespace m8
 {
    ////////////////////////////////////////////////////////////////////////////
@@ -83,34 +85,6 @@ namespace m8
       assert(IsPieceType(piece_type));
 
       return (piece_type & UINT8_C(6)) == UINT8_C(4);
-   }
-
-   ////////////////////////////////////////////////////////////////////////////
-   //                               Color                                    //
-   ////////////////////////////////////////////////////////////////////////////
-
-   /// Type that represent the color of the pieces
-   typedef std::uint8_t Color;
-
-   const Color kWhite = 0;
-   const Color kBlack = 1;
-
-   /// Indicate if a value is a valid color
-   ///
-   /// @param color The value to evaluate
-   /// @return True if the value is a valid color (0 or 1)
-   inline bool IsColor(Color color) { return color <= kBlack; }
-
-   /// Return the opposite color than the one it is passed in parameter.
-   ///
-   /// @param color Color for wich we want the opposite.
-   /// @return kWhite if kBlack was passed in parameterm otherwise kBlack.
-   inline Color OpposColor(Color color)
-   {
-      // A : color is valid
-      assert(IsColor(color));
-
-      return color ^ UINT8_C(1); 
    }
 
    ////////////////////////////////////////////////////////////////////////////

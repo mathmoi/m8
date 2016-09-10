@@ -125,18 +125,18 @@ namespace m8
               if (*it == 'Q' || *it == 'q')
               {
                   sq_rook = GetLsb(bb_rook);
-                  casle_right = kQueenSideCasle;
+                  casle_right = kQueenSideCastle;
               }
               else if (*it == 'K' || *it == 'k')
               {
                   sq_rook = GetMsb(bb_rook);
-                  casle_right = kKingSideCasle;
+                  casle_right = kKingSideCastle;
               }
               else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
               {
                   sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
                   sq_king = GetLsb(bb_piece(NewPiece(kKing, color)));
-                  casle_right = (sq_rook < sq_king ? kQueenSideCasle : kKingSideCasle);
+                  casle_right = (sq_rook < sq_king ? kQueenSideCastle : kKingSideCastle);
               }
               else
               {
@@ -145,7 +145,7 @@ namespace m8
               }
 
               colmn = GetColmn(sq_rook);
-              casle_colmn_[casle_right == kQueenSideCasle ? 0 : 1] = colmn;
+              casle_colmn_[casle_right == kQueenSideCastle ? 0 : 1] = colmn;
               set_casle(color, casle_right, true);
           }
 

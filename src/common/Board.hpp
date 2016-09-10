@@ -9,10 +9,12 @@
 
 #include <array>
 #include <cstdint>
+#include <cstdlib>
 
 #include "Piece.hpp"
 #include "Bb.hpp"
 #include "Sq.hpp"
+#include "Move.hpp"
 
 namespace m8
 {
@@ -26,12 +28,18 @@ namespace m8
         {};
     };
 
+    /// Type used for variables containing a castle type
+    typedef std::uint8_t CastleType;
+
     /// @name Castle flags constant
     /// Constant used as flags for the castling rights
     /// @{
-    const std::uint8_t kQueenSideCasle = 1;
-    const std::uint8_t kKingSideCasle = 2;
+    const CastleType kQueenSideCastle = 1;
+    const CastleType kKingSideCastle = 2;
     /// @}
+
+    /// Type for the information used to unmake a move.
+    typedef std::uint32_t UnmakeInfo;
 
     /// Represent the state of a chess board. This include the pieces positions,
     /// the side to move next, the castling rights and the en-passant square.
@@ -91,7 +99,7 @@ namespace m8
         /// 
         /// @param color Side for which we want the castling rights
         /// @param castle_right Castling right to read. Valid values are 
-        ///        kQueenSideCasle and kKingSideCasle
+        ///        kQueenSideCastle and kKingSideCastle
         /// @returns True if the color specified still has the castling right 
         ///          specified.
         inline bool casle(Color color, std::uint8_t casle_right) const;
@@ -153,6 +161,12 @@ namespace m8
         /// @param to Postion of the piece after the move.
         inline void MovePiece(Sq from, Sq to);
 
+        /// Execute a move on the board.
+        ///
+        /// @param move Move to make
+        /// @return Info that need to be passed to Unmake in order to unmake the move.
+        inline UnmakeInfo Make(Move move);
+
     private:
 
         /// Initialize the board with no pieces.
@@ -189,8 +203,59 @@ namespace m8
         /// be captured en passant col_enpas_ has an invalid column value.
         Colmn colmn_enpas_;
 
-        // Number of moves since the last pawn push or the last capture.
+        /// Number of moves since the last pawn push or the last capture.
         std::uint32_t half_move_clock_;
+
+        /// Move a piece on the board.
+        ///
+        /// @param from  Position of the piece before the move.
+        /// @param to    Postion of the piece after the move.
+        /// @param piece Piece moved.
+        inline void Board::MovePiece(Sq from, Sq to, Piece piece);
+
+        /// Execute a move on the board.
+        ///
+        /// @param from  Origin of the move
+        /// @param to    Destination of the move
+        /// @param piece Piece moved
+        /// @param taken Piece taken if the move is a capture
+        inline void MakeSimpleMove(Sq from, Sq to, Piece piece, Piece taken);
+
+        /// Execute a pawn move on the board.
+        ///
+        /// @param from       Origin of the move
+        /// @param to         Destination of the move
+        /// @param piece      Piece moved
+        /// @param taken      Piece taken if the move is a capture
+        /// @param promote_to Indicate that what piece to promote to if the move is a 
+        ///                   promotion.
+        inline void MakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to);
+
+        /// Execute a castling move on the board.
+        ///
+        /// @param from   Origin of the move
+        /// @param to     Destination of the move
+        /// @param piece  Piece moved (king)
+        /// @param castle Side of the castling
+        inline void MakeCastlingMove(Sq from, Sq to, Piece piece, CastleType castle);
+
+        /// Execute a rook move on the board.
+        ///
+        /// @param from   Origin of the move
+        /// @param to     Destination of the move
+        /// @param piece  Piece moved (rook)
+        /// @param taken  Piece taken if any.
+        inline void MakeRookMove(Sq from, Sq to, Piece piece, Piece taken);
+
+        /// Execute a king move on the board.
+        ///
+        /// @param from   Origin of the move
+        /// @param to     Destination of the move
+        /// @param piece  Piece moved (rook)
+        /// @param taken  Piece taken if any.
+        /// @param castle Side of the castling if any
+        inline void MakeKingMove(Sq from, Sq to, Piece piece, Piece taken, CastleType castle);
+
     };
 
     inline Piece Board::operator[](std::size_t index) const
@@ -234,7 +299,7 @@ namespace m8
     {
         // A : The color and castling rights are valids
         assert(IsColor(color));
-        assert(casle_right == kQueenSideCasle || casle_right == kKingSideCasle);
+        assert(casle_right == kQueenSideCastle || casle_right == kKingSideCastle);
 
         return (casle_flag_ & (casle_right << color << color)) != 0;
     }
@@ -243,7 +308,7 @@ namespace m8
     {
         // A : The inputs are valids
         assert(IsColor(color));
-        assert(casle_right == kQueenSideCasle || casle_right == kKingSideCasle);
+        assert(casle_right == kQueenSideCastle || casle_right == kKingSideCastle);
 
         std::uint8_t mask = casle_right << color << color;
         casle_flag_ ^= (-static_cast<std::uint8_t>(value) ^ casle_flag_) & mask;
@@ -287,24 +352,175 @@ namespace m8
         board_[sq] = kNoPiece;
     }
 
-    inline void Board::MovePiece(Sq from, Sq to)
+    inline void Board::MovePiece(Sq from, Sq to, Piece piece)
     {
         // A : from and to are valid squares. From contains a piece and to is empty.
         assert(IsSqOnBoard(from));
         assert(IsSqOnBoard(to));
         assert(IsPiece(board_[from]));
+        assert(board_[from] == piece);
         assert(board_[to] == kNoPiece);
 
-        Piece piece = board_[from];
         board_[from] = kNoPiece;
         board_[to] = piece;
 
-        Bb diff = UINT64_C(0);
-        SetBit(diff, from);
+        Bb diff = GetSingleBitBb(from);
         SetBit(diff, to);
 
         bb_color_[GetColor(piece)] ^= diff;
         bb_piece_[piece] ^= diff;
+    }
+
+    inline void Board::MovePiece(Sq from, Sq to)
+    {
+        Piece piece = board_[from];
+        MovePiece(from, to, piece);
+    }
+
+    inline void Board::MakeSimpleMove(Sq from, Sq to, Piece piece, Piece taken)
+    {
+        assert(IsSqOnBoard(from));
+        assert(IsSqOnBoard(to));
+        assert(IsPiece(piece));
+        assert(board_[from] == piece);
+        assert(board_[to] == taken);
+
+        if (taken != kNoPiece)
+        {
+            RemovePiece(to);
+            half_move_clock_ = 0;
+        }
+
+        MovePiece(from, to, piece);
+    }
+    
+    inline void Board::MakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to)
+    {
+        half_move_clock_ = 0;
+
+        // If the piece taken is not on the target square it must be a prise-en-passant
+        if (board_[to] != taken)
+        {
+            assert(board_[to] == kNoPiece);
+
+            Sq pos_taken = NewSq(GetColmn(to), GetRow(from));
+
+            assert(board_[pos_taken] == NewPiece(kPawn, OpposColor(GetColor(piece))));
+
+            RemovePiece(pos_taken);
+            MakeSimpleMove(from, to, piece, kNoPiece);
+        }
+        else if (IsPiece(promote_to))
+        {
+            if (taken != kNoPiece)
+            {
+                RemovePiece(to);
+            }
+            RemovePiece(from);
+            AddPiece(to, promote_to);
+        }
+        else
+        {
+            MakeSimpleMove(from, to, piece, taken);
+        }
+
+        // If the move is a two square move we need to set the en-passant column.
+        if (std::abs(to - from) == 16)
+        {
+            colmn_enpas_ = GetColmn(to);
+        }
+    }
+
+    inline void Board::MakeCastlingMove(Sq from, Sq to, Piece piece, CastleType castle)
+    {
+        // A : The castling is allowed
+        assert(this->casle(side_to_move_, castle));
+        assert(side_to_move_ == GetColor(piece));
+
+        Piece rook = NewPiece(kRook, side_to_move_);
+        Colmn rook_colmn = casle_colmn_[castle - 1];
+        Row row = GetRow(piece);
+        Sq rook_from = NewSq(rook_colmn, row);
+        Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
+
+        MovePiece(from, to, piece);
+        MovePiece(rook_from, rook_to, rook);
+    }
+
+    inline void Board::MakeRookMove(Sq from, Sq to, Piece piece, Piece taken)
+    {
+        assert(GetPieceType(piece) == kRook);
+
+        Row first_row = GetColorWiseRow(side_to_move_, kRow1);
+
+        if (from == NewSq(casle_colmn_[0], first_row))
+        {
+            set_casle(side_to_move_, kQueenSideCastle, false);
+        }
+        else if (from == NewSq(casle_colmn_[1], first_row))
+        {
+            set_casle(side_to_move_, kKingSideCastle, false);
+        }
+
+        MakeSimpleMove(from, to, piece, taken);
+    }
+
+    inline void Board::MakeKingMove(Sq from, Sq to, Piece piece, Piece taken, CastleType castle)
+    {
+        if (castle != 0)
+        {
+            MakeCastlingMove(from, to, piece, castle);
+        }
+        else
+        {
+            MakeSimpleMove(from, to, piece, taken);
+        }
+
+        this->set_casle(side_to_move_, kQueenSideCastle, false);
+        this->set_casle(side_to_move_, kKingSideCastle, false);
+    }
+
+    inline UnmakeInfo Board::Make(Move move)
+    {
+        assert(GetColor(GetPiece(move)) == side_to_move_);
+
+        Sq from = GetFrom(move);
+        Sq to = GetTo(move);
+        Piece piece = GetPiece(move);
+        Piece taken = GetPieceTaken(move);
+        PieceType piece_type = GetPieceType(piece);
+
+        ++half_move_clock_;
+        colmn_enpas_ = kInvalColmn;
+
+        switch (piece_type)
+        {
+        case kPawn:
+        {
+            Piece promote_to = GetPromoteTo(move);
+            MakePawnMove(from, to, piece, taken, promote_to);
+        }
+            break;
+
+        case kRook:
+            MakeRookMove(from, to, piece, taken);
+            break;
+
+        case kKing:
+        {
+            CastleType castle = GetCastling(move);
+            MakeKingMove(from, to, piece, taken, castle);
+        }
+            break;
+
+        default:
+            MakeSimpleMove(from, to, piece, taken);
+            break;
+        }
+
+        side_to_move_ = OpposColor(side_to_move_);
+
+        return 0;
     }
 }
 

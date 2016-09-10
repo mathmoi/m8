@@ -10,6 +10,8 @@
 #include <cstdint>
 #include <cassert>
 
+#include "Color.hpp"
+
 namespace m8
 {
    ////////////////////////////////////////////////////////////////////////////
@@ -72,7 +74,14 @@ namespace m8
    /// @return True if the row is on the board.
    inline bool IsRowOnBoard(Row row) { return row < kNumRowOnBoard; }
 
-
+   /// Returns a row relative to each color. For exemple, the first row for black is the
+   /// 8th row while to first row for white is the 1st row.
+   ///
+   /// @param color Color
+   /// @param row   Index of the row (0 to 7).
+   /// @return 
+   inline Row GetColorWiseRow(Color color, Row row) { return color * 7 - row; }
+   
    ////////////////////////////////////////////////////////////////////////////
    //                              Diagonals                                 //
    ////////////////////////////////////////////////////////////////////////////

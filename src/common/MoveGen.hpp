@@ -539,8 +539,8 @@ namespace m8
 
     inline Move* MoveGen::GenerateCastlingMoves(Color color, Move* next_move) const
     {
-        next_move = GenerateCastlingMoves(color, kKingSideCasle, kColmnG, board_.casle_colmn(1), kColmnF, next_move);
-        next_move = GenerateCastlingMoves(color, kQueenSideCasle, kColmnC, board_.casle_colmn(0), kColmnD, next_move);
+        next_move = GenerateCastlingMoves(color, kKingSideCastle, kColmnG, board_.casle_colmn(1), kColmnF, next_move);
+        next_move = GenerateCastlingMoves(color, kQueenSideCastle, kColmnC, board_.casle_colmn(0), kColmnD, next_move);
 
         return next_move;
     }

@@ -29,13 +29,13 @@ namespace m8
     const int kToPos = 8;
     const int kCastlingPos = 14;
     const int kPiecePos = 16;
+    const int kPromoteToPos = 20;
     const int kPieceTakenPos = 25;
-    const int kPromoteToPos = 29;
-
+    
     const int kFromSize = 6;
     const int kToSize = 6;
     const int kCastlingSize = 2;
-    const int kPieceSize = 8;
+    const int kPieceSize = 4;
     const int kPieceTakenSize = 4;
     const int kPromoteToSize = 4;
     /// @}
@@ -48,9 +48,9 @@ namespace m8
     ///   0 -  5  From square
     ///   8 - 13  To square
     ///  14 - 15  Castling type (1: queenside, 2: kingside)
-    ///  16 - 23  Piece moved
+    ///  16 - 19  Piece moved
+    ///  20 - 23  Pieced promoted to if any
     ///  25 - 28  Piece taken if any
-    ///  29 - 32  Pieced promoted to if any
     ///
     /// @param from        From square.
     /// @param to          To square.
@@ -91,9 +91,9 @@ namespace m8
         assert(!piece_taken || IsPiece(piece_taken));
 
         return from << kFromPos |
-            to << kToPos |
-            piece << kPiecePos |
-            piece_taken << kPieceTakenPos;
+               to << kToPos |
+               piece << kPiecePos |
+               piece_taken << kPieceTakenPos;
     }
 
     /// Create a new move. This is an overload for castling moves. The other NewMove
