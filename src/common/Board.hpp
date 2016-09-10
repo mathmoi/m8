@@ -1,5 +1,5 @@
 /// @file   Board.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains the definition of the Board type that represent the state 
 ///         of a chess board.
@@ -211,7 +211,7 @@ namespace m8
         /// @param from  Position of the piece before the move.
         /// @param to    Postion of the piece after the move.
         /// @param piece Piece moved.
-        inline void Board::MovePiece(Sq from, Sq to, Piece piece);
+        inline void MovePiece(Sq from, Sq to, Piece piece);
 
         /// Execute a move on the board.
         ///
