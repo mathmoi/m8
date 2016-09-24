@@ -497,3 +497,153 @@ TEST_CASE("Make__queen_side_rook_move__queen_side_castling_flag_cleared")
     REQUIRE(!board.casle(kWhite, kQueenSideCastle));
     REQUIRE(board.casle(kWhite, kKingSideCastle));
 }
+
+TEST_CASE("Unmake__simple_move__piece_is_replaced")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewMove(kF3, kG4, kWhiteQueen);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kF3] == kWhiteQueen);
+    REQUIRE(board[kG4] == kNoPiece);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__simple_capture__capture_is_unmade")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewMove(kE5, kF7, kWhiteKnight, kBlackPawn);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kE5] == kWhiteKnight);
+    REQUIRE(board[kF7] == kBlackPawn);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__king_side_castling__castling_is_unmade")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewCastlingMove(kE1, kG1, kWhiteKing, kKingSideCastle);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kE1] == kWhiteKing);
+    REQUIRE(board[kH1] == kWhiteRook);
+    REQUIRE(board[kG1] == kNoPiece);
+    REQUIRE(board[kF1] == kNoPiece);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__queen_side_castling__castling_is_unmade")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kE1] == kWhiteKing);
+    REQUIRE(board[kA1] == kWhiteRook);
+    REQUIRE(board[kC1] == kNoPiece);
+    REQUIRE(board[kD1] == kNoPiece);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__pawn_move__moved_is_unmade")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewMove(kD5, kD6, kWhitePawn);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kD5] == kWhitePawn);
+    REQUIRE(board[kD6] == kNoPiece);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__pawn_moved_two_square__piece_is_moved")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewMove(kA2, kA4, kWhitePawn);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kA2] == kWhitePawn);
+    REQUIRE(board[kA4] == kNoPiece);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__pawn_capture__piece_are_moved")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    Move move = NewMove(kD5, kE6, kWhitePawn, kBlackPawn);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kD5] == kWhitePawn);
+    REQUIRE(board[kE6] == kBlackPawn);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kWhite);
+}
+
+TEST_CASE("Unmake__pawn_capture_en_passant__piece_are_moved")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q1p/1PPBBPPP/R3K2R b KQkq a3 0 1");
+    Move move = NewMove(kB4, kA3, kBlackPawn, kWhitePawn);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kB4] == kBlackPawn);
+    REQUIRE(board[kA3] == kNoPiece);
+    REQUIRE(board[kA4] == kWhitePawn);
+    REQUIRE(board.colmn_enpas() == kColmnA);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kBlack);
+}
+
+TEST_CASE("Unmake__pawn_promotion__board_is_restored")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q2/1PPBBPpP/R3K2R b KQkq - 0 2");
+    Move move = NewMove(kG2, kH1, kBlackPawn, kWhiteRook, kBlackKnight);
+    UnmakeInfo unmake_info;
+
+    unmake_info = board.Make(move);
+    board.Unmake(move, unmake_info);
+
+    REQUIRE(board[kG2] == kBlackPawn);
+    REQUIRE(board[kH1] == kWhiteRook);
+    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.half_move_clock() == 0);
+    REQUIRE(board.side_to_move() == kBlack);
+}
+

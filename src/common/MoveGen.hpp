@@ -143,7 +143,7 @@ namespace m8
         /// @param sq Square for which we want to get the attackers.
         inline Bb AttacksTo(Sq sq) const;
 
-        /// Verify if a given size is in check.
+        /// Verify if a given color is in check.
         ///
         /// @param color Color of the side to for which to verify if the king is in check.
         inline bool IsInCheck(Color color) const;

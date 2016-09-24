@@ -167,6 +167,13 @@ namespace m8
         /// @return Info that need to be passed to Unmake in order to unmake the move.
         inline UnmakeInfo Make(Move move);
 
+        /// Unmake a move previously made on the board.
+        ///
+        /// @param move        Move to unmake.
+        /// @param unmake_info Informations used to unmake the move produced when the move
+        ///                    was made.
+        inline void Unmake(Move move, UnmakeInfo unmake_info);
+
     private:
 
         /// Initialize the board with no pieces.
@@ -255,6 +262,41 @@ namespace m8
         /// @param taken  Piece taken if any.
         /// @param castle Side of the castling if any
         inline void MakeKingMove(Sq from, Sq to, Piece piece, Piece taken, CastleType castle);
+
+        /// Unmake a move on the board.
+        ///
+        /// @param from  Origin of the move
+        /// @param to    Destination of the move
+        /// @param piece Piece moved
+        /// @param taken Piece taken if the move is a capture
+        inline void UnmakeSimpleMove(Sq from, Sq to, Piece piece, Piece taken);
+
+        /// Unmake a castling move on the board.
+        ///
+        /// @param from   Origin of the move
+        /// @param to     Destination of the move
+        /// @param piece  Piece moved (king)
+        /// @param castle Side of the castling
+        inline void UnmakeCastlingMove(Sq from, Sq to, Piece piece, CastleType castle);
+
+        /// Unmake a king move on the board.
+        ///
+        /// @param from   Origin of the move
+        /// @param to     Destination of the move
+        /// @param piece  Piece moved (rook)
+        /// @param taken  Piece taken if any.
+        /// @param castle Side of the castling if any
+        inline void UnmakeKingMove(Sq from, Sq to, Piece piece, Piece taken, CastleType castle);
+
+        /// Unmake a pawn move on the board.
+        ///
+        /// @param from       Origin of the move
+        /// @param to         Destination of the move
+        /// @param piece      Piece moved
+        /// @param taken      Piece taken if the move is a capture
+        /// @param promote_to Indicate that what piece to promote to if the move is a 
+        ///                   promotion.
+        inline void UnmakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to);
 
     };
 
@@ -490,6 +532,8 @@ namespace m8
         Piece taken = GetPieceTaken(move);
         PieceType piece_type = GetPieceType(piece);
 
+        UnmakeInfo unmake_info = colmn_enpas_ << 24 | half_move_clock_;
+
         ++half_move_clock_;
         colmn_enpas_ = kInvalColmn;
 
@@ -520,7 +564,111 @@ namespace m8
 
         side_to_move_ = OpposColor(side_to_move_);
 
-        return 0;
+        return unmake_info;
+    }
+
+    inline void Board::UnmakeSimpleMove(Sq from, Sq to, Piece piece, Piece taken)
+    {
+        assert(IsSqOnBoard(from));
+        assert(IsSqOnBoard(to));
+        assert(IsPiece(piece));
+        assert(board_[to] == piece);
+        assert(board_[from] == kNoPiece);
+
+        MovePiece(to, from, piece);
+
+        if (taken != kNoPiece)
+        {
+            AddPiece(to, taken);
+        }
+    }
+
+    inline void Board::UnmakeCastlingMove(Sq from, Sq to, Piece piece, CastleType castle)
+    {
+        Piece rook = NewPiece(kRook, OpposColor(side_to_move_));
+        Colmn rook_colmn = casle_colmn_[castle - 1];
+        Row row = GetRow(piece);
+        Sq rook_from = NewSq(rook_colmn, row);
+        Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
+
+        MovePiece(to, from, piece);
+        MovePiece(rook_to, rook_from, rook);
+    }
+
+    inline void Board::UnmakeKingMove(Sq from, Sq to, Piece piece, Piece taken, CastleType castle)
+    {
+        if (castle != 0)
+        {
+            UnmakeCastlingMove(from, to, piece, castle);
+        }
+        else
+        {
+            UnmakeSimpleMove(from, to, piece, taken);
+        }
+    }
+
+    inline void Board::UnmakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to)
+    {
+        Row row_enpas = GetColorWiseRow(OpposColor(side_to_move_), kRow6);
+
+        if (IsColmnOnBoard(colmn_enpas_) &&
+            taken == NewPiece(kPawn, side_to_move_) &&
+            to == NewSq(colmn_enpas_, row_enpas))
+        {
+            UnmakeSimpleMove(from, to, piece, kNoPiece);
+            AddPiece(NewSq(colmn_enpas_, GetColorWiseRow(OpposColor(side_to_move_), kRow5)), taken);
+        }
+        else if (IsPiece(promote_to))
+        {
+            RemovePiece(to);
+            AddPiece(from, piece);
+            
+            if (taken != kNoPiece)
+            {
+                AddPiece(to, taken);
+            }
+        }
+        else
+        {
+            UnmakeSimpleMove(from, to, piece, taken);
+        }
+    }
+
+    inline void Board::Unmake(Move move, UnmakeInfo unmake_info)
+    {
+        assert(GetColor(GetPiece(move)) == OpposColor(side_to_move_));
+
+        Sq from = GetFrom(move);
+        Sq to = GetTo(move);
+        Piece piece = GetPiece(move);
+        Piece taken = GetPieceTaken(move);
+        PieceType piece_type = GetPieceType(piece);
+
+        half_move_clock_ = unmake_info & 0xFFFFFF;
+        colmn_enpas_ = unmake_info >> 24;
+
+        switch (piece_type)
+        {
+        case kPawn:
+        {
+            Piece promote_to = GetPromoteTo(move);
+            UnmakePawnMove(from, to, piece, taken, promote_to);
+        }
+        break;
+
+        case kKing:
+        {
+            CastleType castle = GetCastling(move);
+            UnmakeKingMove(from, to, piece, taken, castle);
+        }
+        break;
+
+        default:
+            UnmakeSimpleMove(from, to, piece, taken);
+            break;
+        }
+
+        side_to_move_ = OpposColor(side_to_move_);
     }
 }
 
