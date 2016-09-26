@@ -6,7 +6,8 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
-#include "../common/Init.hpp"
+#include "../m8common/m8common.hpp"
+#include "../m8chess/m8chess.hpp"
 
 int main(int argc, char* argv[])
 {

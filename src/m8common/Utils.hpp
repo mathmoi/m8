@@ -3,6 +3,9 @@
 /// @date   April 2015
 /// @brief  Contains generic tools used in m8.
 
+#ifndef M8_UTILS_HPP_
+#define M8_UTILS_HPP_
+
 #include <exception>
 #include <string>
 #include <sstream>
@@ -51,3 +54,5 @@ namespace m8
         return std::find(first, last, val) != last;
     }
 }
+
+#endif

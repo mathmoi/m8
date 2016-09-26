@@ -7,7 +7,6 @@
 ///         one bit per square. 
 
 #include "Bb.hpp"
-#include "Sq.hpp"
 
 namespace m8
 {
@@ -33,6 +32,14 @@ namespace m8
 
     void InitializeBbBetween()
     {
+        const std::uint8_t kA1 = 0;
+        const std::uint8_t kA3 = 16;
+        const std::uint8_t kA8 = 56;
+        const std::uint8_t kC1 = 2;
+        const std::uint8_t kC3 = 18;
+        const std::uint8_t kH1 = 7;
+        const std::uint8_t kH8 = 63;
+
         /* Initialize the pointer */
         kBbBetween = kBbBetweenArray.data() + 120;
 
@@ -48,7 +55,7 @@ namespace m8
         // square.
 
         Bb between = kEmptyBb;
-        for (Sq to = kA3; to <= kA8; to += 8)
+        for (std::uint8_t to = kA3; to <= kA8; to += 8)
         {
             SetBit(between, to - 8);
             kBbBetween[CalculateOx88diff(kA1, to)] = between;
@@ -56,7 +63,7 @@ namespace m8
         }
 
         between = kEmptyBb;
-        for (Sq to = kC3; to <= kH8; to += 9)
+        for (std::uint8_t to = kC3; to <= kH8; to += 9)
         {
             SetBit(between, to - 9);
             kBbBetween[CalculateOx88diff(kA1, to)] = between;
@@ -64,7 +71,7 @@ namespace m8
         }
 
         between = kEmptyBb;
-        for (Sq to = kC1; to <= kH1; to += 1)
+        for (std::uint8_t to = kC1; to <= kH1; to += 1)
         {
             SetBit(between, to - 1);
             kBbBetween[CalculateOx88diff(kA1, to)] = between;
@@ -79,12 +86,16 @@ namespace m8
 
 	void DisplayBb(std::ostream& out, Bb bb)
 	{
-		for (Row row = kRow8; IsRowOnBoard(row); --row)
+        const std::uint8_t kRow8 = 7;
+        const std::uint8_t kColmnA = 0;
+        const std::uint8_t kColmnH = 8;
+
+		for (std::uint8_t row = kRow8; row < 8; --row)
 		{
 			out << '\t';
-			for (Colmn colmn = kColmnA; IsColmnOnBoard(colmn); ++colmn)
+			for (std::uint8_t colmn = kColmnA; colmn < 8; ++colmn)
 			{
-				Sq sq = NewSq(colmn, row);
+				std::uint8_t sq = (row << 3) + colmn;
 				out << (GetBit(bb, sq) ? 'X' : '-');
 
 				if (colmn < kColmnH)

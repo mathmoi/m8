@@ -7,8 +7,8 @@
 
 #include <cstdint>
 
-#include "../common/Bb.hpp"
-#include "../common/Sq.hpp"
+#include "../m8common/Bb.hpp"
+#include "../m8chess/Sq.hpp"
 
 using namespace m8;
 using namespace std;

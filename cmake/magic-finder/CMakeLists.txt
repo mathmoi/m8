@@ -18,6 +18,6 @@ file(GLOB_RECURSE common_header_files
      ${CMAKE_CURRENT_SOURCE_DIR}/../../src/common/*.hpp)
 
 add_executable(magic-finder
-	       ../../src/magic-finder/magic-finder.cpp
-               ../../src/common/Bb.cpp
-               ${common_header_files})
+	              ../../src/magic-finder/magic-finder.cpp
+                 ../../src/m8common/Bb.cpp
+                 ${common_header_files})

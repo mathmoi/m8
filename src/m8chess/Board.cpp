@@ -4,9 +4,10 @@
 /// @brief  Contains the definition of methods of the Board class that 
 ///         represent the state of a chess board.
 
+#include "../m8common/m8common.hpp"
+
 #include "Board.hpp"
 #include "Const.hpp"
-#include "Utils.hpp"
 
 namespace m8
 {

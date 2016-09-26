@@ -5,7 +5,7 @@
 
 #include "catch.hpp"
 
-#include "../common/Sq.hpp"
+#include "../m8chess/Sq.hpp"
 
 using namespace m8;
 

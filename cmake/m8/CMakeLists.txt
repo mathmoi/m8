@@ -15,7 +15,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB_RECURSE common_header_files
      RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/common/*.hpp)
+     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8common/*.hpp)
 
 add_executable(m8
 	       ../../src/m8/m8.cpp
@@ -23,6 +23,6 @@ add_executable(m8
 	       ../../src/m8/ShellIntrf.hpp
 	       ../../src/m8/m8Intrf.cpp
 	       ../../src/m8/m8Intrf.hpp
-               ../../src/common/Board.cpp
-               ../../src/common/Bb.cpp
-               ${common_header_files})
+          ../../src/m8chess/Board.cpp
+          ../../src/m8common/Bb.cpp
+          ${common_header_files})

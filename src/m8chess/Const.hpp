@@ -10,7 +10,8 @@
 
 #include <cassert>
 
-#include "Bb.hpp"
+#include "../m8common/m8common.hpp"
+
 #include "Sq.hpp"
 
 namespace m8

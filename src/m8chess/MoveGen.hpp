@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#include "Bb.hpp"
+#include "../m8common/m8common.hpp"
 #include "Const.hpp"
 #include "Sq.hpp"
 #include "Piece.hpp"

@@ -11,8 +11,9 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include "../m8common/m8common.hpp"
+
 #include "Piece.hpp"
-#include "Bb.hpp"
 #include "Sq.hpp"
 #include "Move.hpp"
 

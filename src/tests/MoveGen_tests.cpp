@@ -7,10 +7,10 @@
 
 #include "catch.hpp"
 
-#include "../common/Board.hpp"
-#include "../common/MoveGen.hpp"
-#include "../common/Move.hpp"
-#include "../common/Utils.hpp"
+#include "../m8chess/Board.hpp"
+#include "../m8chess/MoveGen.hpp"
+#include "../m8chess/Move.hpp"
+#include "../m8common/Utils.hpp"
 
 using namespace m8;
 

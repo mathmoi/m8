@@ -6,7 +6,7 @@
 #include "catch.hpp"
 #include <cassert>
 
-#include "../common/Piece.hpp"
+#include "../m8chess/Piece.hpp"
 
 using namespace m8;
 

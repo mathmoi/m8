@@ -3,8 +3,9 @@
 /// @date   December 2015
 /// @brief  Contains initialization functionalities.
 
+#include "../m8common/m8common.hpp"
+
 #include "MoveGen.hpp"
-#include "Bb.hpp"
 
 namespace m8
 {

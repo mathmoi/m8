@@ -5,9 +5,9 @@
 
 #include "catch.hpp"
 
-#include "../common/Move.hpp"
-#include "../common/Sq.hpp"
-#include "../common/Piece.hpp"
+#include "../m8chess/Move.hpp"
+#include "../m8chess/Sq.hpp"
+#include "../m8chess/Piece.hpp"
 
 using namespace m8;
 
