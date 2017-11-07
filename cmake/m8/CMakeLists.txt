@@ -18,11 +18,14 @@ file(GLOB_RECURSE common_header_files
      ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8common/*.hpp)
 
 add_executable(m8
-	       ../../src/m8/m8.cpp
-	       ../../src/m8/ShellIntrf.cpp
-	       ../../src/m8/ShellIntrf.hpp
-	       ../../src/m8/m8Intrf.cpp
-	       ../../src/m8/m8Intrf.hpp
-          ../../src/m8chess/Board.cpp
-          ../../src/m8common/Bb.cpp
-          ${common_header_files})
+           ../../src/m8/m8.cpp
+           ../../src/m8/Engine.cpp
+           ../../src/m8/Engine.hpp
+           ../../src/m8/ShellIntrf.cpp
+           ../../src/m8/ShellIntrf.hpp
+           ../../src/m8/m8Intrf.cpp
+           ../../src/m8/m8Intrf.hpp
+		   ../../src/m8chess/Board.hpp
+           ../../src/m8chess/Board.cpp
+           ../../src/m8common/Bb.cpp
+           ${common_header_files})

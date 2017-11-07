@@ -232,4 +232,120 @@ namespace m8
       colmn_enpas_ = kInvalColmn;
       half_move_clock_ = 0;
    }
+
+   void DisplayPiece(std::ostream& out, Piece piece)
+   {
+       assert(IsPiece(piece));
+
+       out << (GetColor(piece) == kBlack ? '=' : ' ')
+           << static_cast<char>(toupper(piece_to_char_map.find(piece)->second))
+           << (GetColor(piece) == kBlack ? '=' : ' ');
+   }
+
+   void DisplayEmptySq(std::ostream& out, Sq sq)
+   {
+       auto row = GetRow(sq);
+       auto column = GetColmn(sq);
+
+       if (((row & 1) == 1) == ((column & 1) == 1))
+       {
+           out << " . ";
+       }
+       else
+       {
+           out << "   ";
+       }
+   }
+
+   void DisplaySq(std::ostream& out, Sq sq, Piece piece)
+   {
+       if (IsPiece(piece))
+       {
+           DisplayPiece(out, piece);
+       }
+       else
+       {
+           DisplayEmptySq(out, sq);
+       }
+   }
+
+   /// Display the top row of the board. The top row contains an indicator if blacks 
+   /// are on move. There is also indicator that indicated the remaining valid 
+   /// castling starting locations for blacks.
+   void DisplayColorRow(std::ostream& out, const Board& board, Color color)
+   {
+       out << (board.side_to_move() == color ? "=>" : "  ");
+       for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
+       {
+           out << "+-"
+               << ((board.casle_colmn(0) == column && board.casle(color, kQueenSideCastle))
+                   || (board.casle_colmn(1) == column && board.casle(color, kKingSideCastle)) ? 'X' : '-')
+               << '-';
+       }
+       out << "+\n";
+   }
+
+   void DisplayPriseEnPassantIndicator(std::ostream& out, const Board& board)
+   {
+       Colmn enpas = board.colmn_enpas();
+       if (IsColmnOnBoard(enpas))
+       {
+           auto spaces = 4 + enpas * 4;
+           for (int x = 0; x < spaces; ++x)
+           {
+               out << ' ';
+           }
+
+           out << "^\n";
+       }
+   }
+
+   void DisplayHalfmoveClock(std::ostream& out, const Board& board)
+   {
+       out << "  (halfmove clock : " << board.half_move_clock() << ")\n";
+   }
+
+   void DisplayBoardContent(std::ostream& out, const Board& board)
+   {
+       for (auto row = kRow8; IsRowOnBoard(row); --row)
+       {
+           out << GetRowNumber(row) << ' ';
+
+           for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
+           {
+               out << '|';
+
+               Sq sq = NewSq(column, row);
+               Piece piece = board[sq];
+               DisplaySq(out, sq, piece);
+           }
+           out << "|\n";
+
+           if (kRow1 < row)
+           {
+               out << "  +---+---+---+---+---+---+---+---+\n";
+           }
+       }
+   }
+
+   void DisplayColumnsChar(std::ostream& out)
+   {
+       out << "    a   b   c   d   e   f   g   h";
+   }
+
+
+
+   std::ostream& operator<<(std::ostream& out, const Board& board)
+   {
+       DisplayHalfmoveClock(out, board);
+       DisplayColorRow(out, board, kBlack);
+       DisplayBoardContent(out, board);
+       DisplayColorRow(out, board, kWhite);
+       DisplayPriseEnPassantIndicator(out, board);
+       DisplayColumnsChar(out);
+
+       // TODO : Add the output in fen format.
+        
+       return out;
+   }
 }

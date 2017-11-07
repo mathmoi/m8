@@ -12,7 +12,8 @@
 namespace m8
 {
    m8Intrf::m8Intrf()
-      : shell_intrf_()
+      : shell_intrf_(),
+        engine_()
    {
       SetupShellInterf();
    }
@@ -40,6 +41,10 @@ namespace m8
                           "Display a list of commands",
                           "help",
                           std::bind(&m8Intrf::HandleHelp, this)));
+      shell_intrf_.AddCmd(ShellCmd("display",
+                                   "Display the current board",
+                                   "display",
+                                   std::bind(&m8Intrf::HandleDisplay, this)));
    }
 
    void m8Intrf::HandleExit()
@@ -50,5 +55,10 @@ namespace m8
    void m8Intrf::HandleHelp()
    {
        shell_intrf_.DisplayHelp();
+   }
+
+   void m8Intrf::HandleDisplay()
+   {
+       std::cout <<'\n' << engine_.board() <<'\n' <<std::endl;
    }
 }

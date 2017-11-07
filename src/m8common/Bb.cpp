@@ -1,5 +1,5 @@
 /// @file   Bb.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities used to manipulates 
 ///         bitboards. 

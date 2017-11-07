@@ -134,7 +134,7 @@ namespace m8
    };
 
    /// Map that can be used to translate from Piece to character.
-   const std::unordered_map<char, Piece> piece_to_char_map =
+   const std::unordered_map<Piece, char> piece_to_char_map =
    {
       { kWhitePawn, 'P' },
       { kWhiteKnight, 'N' },

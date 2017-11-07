@@ -44,6 +44,9 @@ namespace m8
    /// @return True if the column is on the board.
    inline bool IsColmnOnBoard(Colmn colmn) { return colmn < kNumColmnOnBoard; }
 
+   /// Returns the character representing the column.
+   inline char GetColumnChar(Colmn colmn) { assert(IsColmnOnBoard(colmn));  return 'a' + colmn; }
+
    ////////////////////////////////////////////////////////////////////////////
    //                                  Rows                                  //
    ////////////////////////////////////////////////////////////////////////////
@@ -73,6 +76,9 @@ namespace m8
    /// @param row The row to test.
    /// @return True if the row is on the board.
    inline bool IsRowOnBoard(Row row) { return row < kNumRowOnBoard; }
+
+   /// Returns the character representing the number of a row.
+   inline char GetRowNumber(Row row) { assert(IsRowOnBoard(row));  return '1' + row; }
 
    /// Returns a row relative to each color. For exemple, the first row for black is the
    /// 8th row while to first row for white is the 1st row.

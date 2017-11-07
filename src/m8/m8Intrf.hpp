@@ -7,6 +7,7 @@
 #define M8_M8_INTRF_HPP_
 
 #include "ShellIntrf.hpp"
+#include "Engine.hpp"
 
 namespace m8
 {
@@ -23,6 +24,8 @@ namespace m8
 
    private:
 
+       Engine engine_;
+
       /// Object that implements the shell interface.
       ShellIntrf shell_intrf_;
 
@@ -38,9 +41,10 @@ namespace m8
       void HandleUserMove(std::vector<std::string> args_list);
 
       /// Handles the help command.
-      ///
-      /// @params args_list Arguments of the command inputed by the user.
       void HandleHelp();
+
+      /// Handles the display command.
+      void HandleDisplay();
    };
 
 }

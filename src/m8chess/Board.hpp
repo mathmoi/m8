@@ -10,6 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <string>
 
 #include "../m8common/m8common.hpp"
 
@@ -38,6 +39,9 @@ namespace m8
     const CastleType kQueenSideCastle = 1;
     const CastleType kKingSideCastle = 2;
     /// @}
+
+    /// FEN string representing the starting position
+    const std::string kStartingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     /// Type for the information used to unmake a move.
     typedef std::uint32_t UnmakeInfo;
@@ -300,6 +304,14 @@ namespace m8
         inline void UnmakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to);
 
     };
+
+    /// Overloading the << operator for an output stream and a Board. This 
+    /// allow to output a representation of the board on a stream.
+    ///
+    /// @param out   Stream
+    /// @param board Board to output
+    /// @returns     A reference to the stream received in parameter
+    std::ostream& operator<<(std::ostream& out, const Board& board);
 
     inline Piece Board::operator[](std::size_t index) const
     {
