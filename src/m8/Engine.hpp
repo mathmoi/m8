@@ -23,6 +23,11 @@ namespace m8
         /// @returns The board
         inline const Board& board() const { return board_; };
 
+        /// Set the board position using a fen string.
+        ///
+        /// @param fen XFen string representing the new position.
+        inline void set_fen(std::string fen) { board_ = Board(fen); };
+        
     private:
         Board board_;
     };

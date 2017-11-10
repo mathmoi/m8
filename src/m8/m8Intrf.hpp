@@ -45,6 +45,9 @@ namespace m8
 
       /// Handles the display command.
       void HandleDisplay();
+
+      /// Handled the fen command.
+      void HandleFen(std::vector<std::string> args_list);
    };
 
 }

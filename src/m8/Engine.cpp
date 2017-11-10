@@ -8,7 +8,6 @@
 namespace m8
 {
     Engine::Engine()
-        //: board_(kStartingPositionFEN)
-        : board_("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c4 0 1")
+        : board_(kStartingPositionFEN)
     {}
 }

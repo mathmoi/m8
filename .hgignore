@@ -5,6 +5,7 @@ regexp syntax
 ^VS/Debug/
 ^VS/.*/Debug/
 ^VS/.*/Release/
+^x64/
 \.opensdf$
 \.sdf$
 \.suo$

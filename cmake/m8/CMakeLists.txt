@@ -27,5 +27,6 @@ add_executable(m8
            ../../src/m8/m8Intrf.hpp
 		   ../../src/m8chess/Board.hpp
            ../../src/m8chess/Board.cpp
+		   ../../src/m8common/stringHelpers.hpp
            ../../src/m8common/Bb.cpp
            ${common_header_files})

@@ -148,6 +148,22 @@ namespace m8
         /// @param value New value for the half move clock.
         inline void set_half_move_clock(std::uint32_t value) { half_move_clock_ = value; };
 
+        /// Accessor for the full move clock.
+        ///
+        /// @returns The number of moves played.
+        inline std::uint32_t full_move_clock() const { return full_move_clock_; };
+
+        /// Mutator for the full move clock.
+        ///
+        /// @param value New value for the full move clock.
+        inline void set_full_move_clock(std::uint32_t value) { full_move_clock_ = value; };
+
+        /// <summary>
+        ///  Returns a fen string representing the current position on the board.
+        /// </summary>
+        /// <returns>A fen string</returns>
+        std::string fen() const;
+
         /// Add a piece to the board. The square where we add the piece must be 
         /// empty.
         ///
@@ -217,6 +233,11 @@ namespace m8
 
         /// Number of moves since the last pawn push or the last capture.
         std::uint32_t half_move_clock_;
+
+        /// <summary>
+        ///  Number of moves played.
+        /// </summary>
+        std::uint32_t full_move_clock_;
 
         /// Move a piece on the board.
         ///
@@ -302,6 +323,60 @@ namespace m8
         /// @param promote_to Indicate that what piece to promote to if the move is a 
         ///                   promotion.
         inline void UnmakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to);
+
+        /// <summary>
+        ///  Generate the piece placement part of fen string.
+        /// </summary>
+        /// <param name="out">
+        ///  Stream on which to generate the field.
+        /// </param>
+        void GenerateXFenPiecePlacement(std::ostream& out) const;
+
+        /// <summary>
+        ///  Generate the active colour field of a fen string
+        /// </summary>
+        /// <param name="out">
+        ///  Stream on which to generate the field.
+        /// </param>
+        void GenerateXFenActiveColour(std::ostream& out) const;
+
+        /// <summary>
+        ///  Generate one character of the castling field of a XFen string.
+        /// </summary>
+        /// <param name="out">
+        ///  Stream on which to generate the field.
+        /// </param>
+        /// <param name="color">Color of the castle to generate</param>
+        /// <param name="castle">Side of the castle to generate</param>
+        /// <returns>
+        ///  Returns true to indicate that the castling right was allowed, false 
+        ///  otherwise.
+        /// </returns>
+        bool GenerateXFenCastling(std::ostream& out, Color color, CastleType castle) const;
+
+        /// <summary>
+        ///  Generate the castling field of a fen string
+        /// </summary>
+        /// <param name="out">
+        ///  Stream on which to generate the field.
+        /// </param>
+        void GenerateXFenCastling(std::ostream& out) const;
+
+        /// <summary>
+        ///  Generate the en passant field of a fen string
+        /// </summary>
+        /// <param name="out">
+        ///  Stream on which to generate the field.
+        /// </param>
+        void GenerateXFenEnPassant(std::ostream& out) const;
+
+        /// <summary>
+        ///  Generate the halfmove clock and the fullmove number fields of a fen string
+        /// </summary>
+        /// <param name="out">
+        ///  Stream on which to generate the field.
+        /// </param>
+        void GenerateXFenClocks(std::ostream& out) const;
 
     };
 
@@ -547,6 +622,9 @@ namespace m8
 
         UnmakeInfo unmake_info = colmn_enpas_ << 24 | half_move_clock_;
 
+        // If the side to move is black increment the move number
+        full_move_clock_ += side_to_move_;
+
         ++half_move_clock_;
         colmn_enpas_ = kInvalColmn;
 
@@ -682,6 +760,9 @@ namespace m8
         }
 
         side_to_move_ = OpposColor(side_to_move_);
+
+        // If the side to move is black decrement the move number.
+        full_move_clock_ -= side_to_move_;
     }
 }
 
