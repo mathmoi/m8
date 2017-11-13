@@ -156,7 +156,7 @@ namespace m8
             Bb* attack;
             Bb mask;
             Bb magic;
-            std::uint32_t shift;
+            std::int32_t shift;
         };
 
         /// Type for an attack array for simples moves (knight and kings).
@@ -337,7 +337,7 @@ namespace m8
         attackers |= knight_attack_bb_[sq] & knights;
         attackers |= king_attack_bb_[sq] & kings;
 
-        Bb bb_sq = GetSingleBitBb(sq);
+        Bb bb_sq = Bb::GetSingleBitBb(sq);
         attackers |= (((bb_sq << 7) & ~GetColmnBb(kColmnH)) | ((bb_sq << 9) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kBlackPawn);
         attackers |= (((bb_sq >> 9) & ~GetColmnBb(kColmnH)) | ((bb_sq >> 7) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kWhitePawn);
 
@@ -348,10 +348,10 @@ namespace m8
     {
         Piece king = NewPiece(kKing, color);
         Bb bb_king = board_.bb_piece(king);
-        Sq king_position = GetLsb(bb_king);
+        Sq king_position = bb_king.GetLSB();
         Bb attackers = AttacksTo(king_position);
         Bb opponent_pieces = board_.bb_color(OpposColor(color));
-        return (attackers & opponent_pieces) != kEmptyBb;
+        return (attackers & opponent_pieces) != EmptyBb;
     }
 
     inline Bb MoveGen::GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
@@ -395,12 +395,12 @@ namespace m8
 
         while (bb_pieces)
         {
-            Sq from = RemoveLsb(bb_pieces);
+            Sq from = bb_pieces.RemoveLSB();
             Bb destinations = attack_array[from] & targets;
 
             while (destinations)
             {
-                Sq to = RemoveLsb(destinations);
+                Sq to = destinations.RemoveLSB();
                 *(next_move++) = NewMove(from, to, piece, board_[to]);
             }
         }
@@ -444,7 +444,7 @@ namespace m8
 
         while (target)
         {
-            Sq to = RemoveLsb(target);
+            Sq to = target.RemoveLSB();
             Sq from = to + from_delta;
             if (GetRow(to) != eighth_row)
             {
@@ -466,8 +466,8 @@ namespace m8
     {
         Piece piece = NewPiece(kPawn, color);
 
-        Bb target = board_.bb_piece(piece) & ~kBbColmn[ignored_colmn];
-        Shift(target, delta);
+        Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_colmn]); // TODO : Make row.Bb()
+        target.Shift(delta);
         target &= board_.bb_color(OpposColor(color));
         next_move = UnpackPawnMoves(color, target, -delta, next_move);
 
@@ -481,7 +481,7 @@ namespace m8
         int forward_move = 8 - 16 * color;
 
         Bb target = board_.bb_piece(piece) & kBbRow[seventh_row];
-        Shift(target, forward_move);
+        target.Shift(forward_move);
         target &= ~board_.bb_occupied();
         next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
 
@@ -499,7 +499,7 @@ namespace m8
         {
             Piece king = NewPiece(kKing, color);
             Bb bb_king = board_.bb_piece(king);
-            Sq king_position = GetLsb(bb_king);
+            Sq king_position = bb_king.GetLSB();
             Row row = GetRow(king_position);
             Sq king_final_position = NewSq(king_final_column, row);
             Sq rook_position = NewSq(rook_original_column, row);
@@ -510,21 +510,21 @@ namespace m8
 
             // Check if any of the travel squared is occupied.
             Bb occ = board_.bb_occupied();
-            occ ^= GetSingleBitBb(rook_position) | bb_king;
-            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != kEmptyBb;
+            occ ^= Bb::GetSingleBitBb(rook_position) | bb_king;
+            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != EmptyBb;
 
             if (!travel_occupied)
             {
                 // Check if any of the square traveled by the king or the origin or 
                 // destination of the king are under attack.
-                Bb bb_check_attack = bb_travel_king | bb_king | GetSingleBitBb(king_final_position);
+                Bb bb_check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position);
                 Bb bb_opponents = board_.bb_color(OpposColor(color));
 
                 bool attacked = false;
                 while (bb_check_attack && !attacked)
                 {
-                    Sq pos = RemoveLsb(bb_check_attack);
-                    attacked = (AttacksTo(pos) & bb_opponents) != kEmptyBb;
+                    Sq pos = bb_check_attack.RemoveLSB();
+                    attacked = (AttacksTo(pos) & bb_opponents) != EmptyBb;
                 }
 
                 if (!attacked)
@@ -554,13 +554,13 @@ namespace m8
 
         // Generate the standard one square forward moves. We need to exclude pawns on 
         // the 7th rank that will generate promotions.
-        Bb target = board_.bb_piece(piece) & ~kBbRow[seventh_row];
-        Shift(target, forward_move);
+        Bb target = board_.bb_piece(piece) & Bb(~kBbRow[seventh_row]); // TODO : Make row.Bb()
+        target.Shift(forward_move);
         target &= ~board_.bb_occupied();
 
         // Generate the two squares moves
         Bb target_dbl = target & kBbRow[third_row];
-        Shift(target_dbl, forward_move);
+        target_dbl.Shift(forward_move);
         target_dbl &= ~board_.bb_occupied();
 
         next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
@@ -587,9 +587,9 @@ namespace m8
 
         while (bb_from)
         {
-            Sq from = RemoveLsb(bb_from);
+            Sq from = bb_from.RemoveLSB();
             
-            Bb bb_to = kEmptyBb;
+            Bb bb_to = EmptyBb;
             if (slide_like_rook)
                 bb_to |= GenerateRookAttacks(board_.bb_occupied(), from);
             if (slide_like_bishop)
@@ -598,7 +598,7 @@ namespace m8
 
             while (bb_to)
             {
-                Sq to = RemoveLsb(bb_to);
+                Sq to = bb_to.RemoveLSB();
 
                 *(next_move++) = NewMove(from, to, piece, board_[to]);
             }

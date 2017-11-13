@@ -13,23 +13,6 @@ namespace m8
     std::array<Bb, 240> kBbBetweenArray;
     Bb* kBbBetween;
 
-    Bb DistributeBits(Bb bits, Bb mask)
-    {
-        Bb result = kEmptyBb;
-        uint64_t bits_count = GetPopct(mask);
-
-        for (uint32_t x = 0; x < bits_count; ++x)
-        {
-            uint32_t pos = RemoveLsb(mask);
-            if (GetBit(bits, x))
-            {
-                SetBit(result, pos);
-            }
-        }
-
-        return result;
-    }
-
     void InitializeBbBetween()
     {
         const std::uint8_t kA1 = 0;
@@ -46,7 +29,7 @@ namespace m8
         /* first initalize all entry to zero */
         for (std::ptrdiff_t x = 0; x < 240; ++x)
         {
-            kBbBetweenArray[x] = kEmptyBb;
+            kBbBetweenArray[x] = EmptyBb;
         }
 
         // We generate all the difference variation with a1 as the from square. For the
@@ -54,28 +37,31 @@ namespace m8
         // this way can also compute it's reverse by swaping the origin and destination 
         // square.
 
-        Bb between = kEmptyBb;
+        Bb between = EmptyBb;
         for (std::uint8_t to = kA3; to <= kA8; to += 8)
         {
-            SetBit(between, to - 8);
-            kBbBetween[CalculateOx88diff(kA1, to)] = between;
-            kBbBetween[CalculateOx88diff(to, kA1)] = RotateRight(between, to);
+            between.Set(to - 8);
+            kBbBetween[CalculateOx88diff(kA1, to)] = between;            
+            kBbBetween[CalculateOx88diff(to, kA1)] = between;
+            kBbBetween[CalculateOx88diff(to, kA1)].RotateRight(to);
         }
 
-        between = kEmptyBb;
+        between = EmptyBb;
         for (std::uint8_t to = kC3; to <= kH8; to += 9)
         {
-            SetBit(between, to - 9);
+            between.Set(to - 9);
             kBbBetween[CalculateOx88diff(kA1, to)] = between;
-            kBbBetween[CalculateOx88diff(to, kA1)] = RotateRight(between, to);
+            kBbBetween[CalculateOx88diff(to, kA1)] = between;
+            kBbBetween[CalculateOx88diff(to, kA1)].RotateRight(to);
         }
 
-        between = kEmptyBb;
+        between = EmptyBb;
         for (std::uint8_t to = kC1; to <= kH1; to += 1)
         {
-            SetBit(between, to - 1);
+            between.Set(to - 1);
             kBbBetween[CalculateOx88diff(kA1, to)] = between;
-            kBbBetween[CalculateOx88diff(to, kA1)] = RotateRight(between, to);
+            kBbBetween[CalculateOx88diff(to, kA1)] = between;
+            kBbBetween[CalculateOx88diff(to, kA1)].RotateRight(to);
         }
     }
 
@@ -84,25 +70,27 @@ namespace m8
         InitializeBbBetween();
     }
 
-	void DisplayBb(std::ostream& out, Bb bb)
-	{
+    std::ostream& operator <<(std::ostream& out, Bb bb)
+    {
         const std::uint8_t kRow8 = 7;
         const std::uint8_t kColmnA = 0;
         const std::uint8_t kColmnH = 8;
 
-		for (std::uint8_t row = kRow8; row < 8; --row)
-		{
-			out << '\t';
-			for (std::uint8_t colmn = kColmnA; colmn < 8; ++colmn)
-			{
-				std::uint8_t sq = (row << 3) + colmn;
-				out << (GetBit(bb, sq) ? 'X' : '-');
+        for (std::uint8_t row = kRow8; row < 8; --row)
+        {
+            out << '\t';
+            for (std::uint8_t colmn = kColmnA; colmn < 8; ++colmn)
+            {
+                std::uint8_t sq = (row << 3) + colmn;
+                out << (bb[sq] ? 'X' : '-');
 
-				if (colmn < kColmnH)
-					out << ' ';
-			}
+                if (colmn < kColmnH)
+                    out << ' ';
+            }
 
-			out << std::endl;
-		}
-	}
+            out << std::endl;
+        }
+
+        return out;
+    }
 }

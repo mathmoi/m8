@@ -127,18 +127,18 @@ namespace m8
 
                 if (*it == 'Q' || *it == 'q')
                 {
-                    sq_rook = GetLsb(bb_rook);
+                    sq_rook = bb_rook.GetLSB();
                     casle_right = kQueenSideCastle;
                 }
                 else if (*it == 'K' || *it == 'k')
                 {
-                    sq_rook = GetMsb(bb_rook);
+                    sq_rook = bb_rook.GetMSB();
                     casle_right = kKingSideCastle;
                 }
                 else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
                 {
                     sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
-                    sq_king = GetLsb(bb_piece(NewPiece(kKing, color)));
+                    sq_king = bb_piece(NewPiece(kKing, color)).GetLSB();
                     casle_right = (sq_rook < sq_king ? kQueenSideCastle : kKingSideCastle);
                 }
                 else
@@ -273,7 +273,7 @@ namespace m8
         {
             Bb candidate_rooks = this->bb_piece(NewPiece(kRook, color));
             candidate_rooks &= kBbRow[GetColorWiseRow(color, kRow1)];
-            Sq sq_outter_most_rook = (castle == kKingSideCastle ? GetMsb(candidate_rooks) : GetLsb(candidate_rooks));
+            Sq sq_outter_most_rook = (castle == kKingSideCastle ? candidate_rooks.GetMSB() : candidate_rooks.GetLSB());
             Colmn column_outter_most_rook = GetColmn(sq_outter_most_rook);
 
             char c;
@@ -367,13 +367,13 @@ namespace m8
             for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
             {
                 Piece piece = NewPiece(piece_type, color);
-                bb_piece_[piece] = kEmptyBb;
+                bb_piece_[piece] = EmptyBb;
             }
         }
 
         // Initialize the color bitboards
-        bb_color_[kWhite] = kEmptyBb;
-        bb_color_[kBlack] = kEmptyBb;
+        bb_color_[kWhite] = EmptyBb;
+        bb_color_[kBlack] = EmptyBb;
 
         // Initialize the castle columns. By default we use the regular chess columns.
         casle_colmn_[0] = kColmnA;

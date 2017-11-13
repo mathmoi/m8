@@ -32,44 +32,44 @@ namespace m8 {
             // Go north
             if (GetRow(sq) < kRow7)
                 for (Sq target = sq + 8; IsSqOnBoard(target) && GetRow(target) < kRow8; target += 8)
-                    SetBit(bb, target);
+                    bb.Set(target);
 
             // Go south
             if (GetRow(sq) > kRow2)
                 for (Sq target = sq - 8; IsSqOnBoard(target) && GetRow(target) > kRow1; target -= 8)
-                    SetBit(bb, target);
+                    bb.Set(target);
 
             // Go west
             if (GetColmn(sq) > kColmnB)
                 for (Sq target = sq - 1; IsSqOnBoard(target) && GetColmn(target) > kColmnA; target -= 1)
-                    SetBit(bb, target);
+                    bb.Set( target);
 
             // Go east
             if (GetColmn(sq) < kColmnG)
                 for (Sq target = sq + 1; IsSqOnBoard(target) && GetColmn(target) < kColmnH; target += 1)
-                    SetBit(bb, target);
+                    bb.Set(target);
         }
         else
         {
             // Go northeast
             if (GetColmn(sq) < kColmnG && GetRow(sq) < kRow7)
                 for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < kColmnH && GetRow(target) < kRow8; target += 9)
-                    SetBit(bb, target);
+                    bb.Set(target);
 
             // Go southeast
             if (GetColmn(sq) < kColmnG && GetRow(sq) > kRow2)
                 for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < kColmnH && GetRow(target) > kRow1; target -= 7)
-                    SetBit(bb, target);
+                    bb.Set(target);
 
             // Go southwest
             if (GetColmn(sq) > kColmnB && GetRow(sq) > kRow2)
                 for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > kColmnA && GetRow(target) > kRow1; target -= 9)
-                    SetBit(bb, target);
+                    bb.Set(target);
 
             // Go northwest
             if (GetColmn(sq) > kColmnB && GetRow(sq) < kRow7)
                 for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > kColmnA && GetRow(target) < kRow8; target += 7)
-                    SetBit(bb, target);
+                    bb.Set(target);
         }
         return bb;
     }
@@ -83,14 +83,14 @@ namespace m8 {
     Bb DistributeBits(std::uint32_t bits, Bb mask)
     {
         Bb result = BB_C(0);
-        std::uint64_t bit_count = GetPopct(mask);
+        std::uint64_t bit_count = mask.GetPopct();
 
         for (std::uint32_t x = 0; x < bit_count; ++x)
         {
-            std::uint32_t pos = RemoveLsb(mask);
+            std::uint32_t pos = mask.RemoveLSB();
             if ((bits & (1 << x)) != 0)
             {
-                SetBit(result, pos);
+                result.Set(pos);
             }
         }
 
@@ -105,7 +105,7 @@ namespace m8 {
     /// @return A vector of bitboard containing all occupancies variations.
     std::vector<Bb> GenerateOccupancyVariation(Bb mask)
     {
-        std::uint64_t bit_count = GetPopct(mask);
+        std::uint64_t bit_count = mask.GetPopct();
         std::uint32_t num_variation = 1 << bit_count;
         std::vector<Bb> occupancies;
 
@@ -134,44 +134,44 @@ namespace m8 {
         Bb bb;
         
         // Go north
-        bb = occupancy & kBbColmn[GetColmn(sq)] & ~(GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbColmn[GetColmn(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetLsb(bb));
+            attack_set.Set(bb.GetLSB());
 
         // Go south
-        bb = occupancy & kBbColmn[GetColmn(sq)] & (GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbColmn[GetColmn(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetMsb(bb));
+            attack_set.Set(bb.GetMSB());
 
         // Go west
-        bb = occupancy & kBbRow[GetRow(sq)] & (GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbRow[GetRow(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetMsb(bb));
+            attack_set.Set(bb.GetMSB());
 
         // Go east
-        bb = occupancy & kBbRow[GetRow(sq)] & ~(GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbRow[GetRow(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetLsb(bb));
+            attack_set.Set(bb.GetLSB());
 
         // Go northeast
-        bb = occupancy & kBbDiag[GetDiag(sq)] & ~(GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbDiag[GetDiag(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1);
         if (bb)
-            SetBit(attack_set, GetLsb(bb));
+            attack_set.Set(bb.GetLSB());
 
         // Go southeast
-        bb = occupancy & kBbAntiDiag[GetAntiDiag(sq)] & (GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbAntiDiag[GetAntiDiag(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetMsb(bb));
+            attack_set.Set(bb.GetMSB());
 
         // Go southwest
-        bb = occupancy & kBbDiag[GetDiag(sq)] & (GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbDiag[GetDiag(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetMsb(bb));
+            attack_set.Set(bb.GetMSB());
 
         // Go northwest
-        bb = occupancy & kBbAntiDiag[GetAntiDiag(sq)] & ~(GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbAntiDiag[GetAntiDiag(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
-            SetBit(attack_set, GetLsb(bb));
+            attack_set.Set(bb.GetLSB());
 
         return attack_set;
     }
@@ -204,7 +204,7 @@ namespace m8 {
         do
         {
             random = uniform_distr(rng) & uniform_distr(rng) & uniform_distr(rng);
-        } while (GetPopct(random) > 6);
+        } while (Bb(random).GetPopct() > 6);
         
 
         return random;
@@ -216,7 +216,7 @@ namespace m8 {
     /// @param magic     Magic number.
     /// @param shift     Number of position to right shift.
     /// @return Magic index.
-    Bb CalculateMagicIndex(Bb occupancy, Bb magic, std::uint32_t shift)
+    Bb CalculateMagicIndex(Bb occupancy, Bb magic, std::int32_t shift)
     {
         return (occupancy * magic) >> shift;
     }
@@ -234,7 +234,7 @@ namespace m8 {
         std::mt19937_64 rng(rd());
 
         m8::Bb mask = GenerateMask(sq, is_rook);
-        std::uint32_t num_bits = static_cast<std::uint32_t>(GetPopct(mask));
+        std::uint32_t num_bits = static_cast<std::uint32_t>(mask.GetPopct());
         shift = 64 - num_bits;
 
         auto occupancies = GenerateOccupancyVariation(mask);

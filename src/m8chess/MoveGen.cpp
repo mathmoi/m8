@@ -183,28 +183,28 @@ namespace m8
             Row row = GetRow(sq);
 
             if (col <= kColmnG && row <= kRow6)
-                SetBit(mask, sq + 17);
+                mask.Set(sq + 17);
 
             if (col <= kColmnF && row <= kRow7)
-                SetBit(mask, sq + 10);
+                mask.Set(sq + 10);
 
             if (col <= kColmnF && row >= kRow2)
-                SetBit(mask, sq - 6);
+                mask.Set(sq - 6);
 
             if (col <= kColmnG && row >= kRow3)
-                SetBit(mask, sq - 15);
+                mask.Set(sq - 15);
 
             if (col >= kColmnB && row >= kRow3)
-                SetBit(mask, sq - 17);
+                mask.Set(sq - 17);
 
             if (col >= kColmnC && row >= kRow2)
-                SetBit(mask, sq - 10);
+                mask.Set(sq - 10);
 
             if (col >= kColmnC && row <= kRow7)
-                SetBit(mask, sq + 6);
+                mask.Set(sq + 6);
 
             if (col >= kColmnB && row <= kRow6)
-                SetBit(mask, sq + 15);
+                mask.Set(sq + 15);
 
             knight_attack_bb_[sq] = mask;
         }
@@ -219,28 +219,28 @@ namespace m8
             Row row = GetRow(sq);
 
             if (row < kRow8)
-                SetBit(mask, sq + 8);
+                mask.Set(sq + 8);
 
             if (col < kColmnH && row < kRow8)
-                SetBit(mask, sq + 9);
+                mask.Set(sq + 9);
 
             if (col < kColmnH)
-                SetBit(mask, sq + 1);
+                mask.Set(sq + 1);
 
             if (col < kColmnH && row > kRow1)
-                SetBit(mask, sq -7);
+                mask.Set(sq -7);
 
             if (row > kRow1)
-                SetBit(mask, sq - 8);
+                mask.Set(sq - 8);
 
             if (col > kColmnA && row > kRow1)
-                SetBit(mask, sq - 9);
+                mask.Set(sq - 9);
 
             if (col > kColmnA)
-                SetBit(mask, sq - 1);
+                mask.Set(sq - 1);
 
             if (col > kColmnA && row < kRow8)
-                SetBit(mask, sq + 7);
+                mask.Set(sq + 7);
 
             king_attack_bb_[sq] = mask;
         }
@@ -248,38 +248,38 @@ namespace m8
 
     Bb MoveGen::GenerateRookAttackForOccupancy(Sq from, Bb occupation)
     {
-        Bb bb_attack = kEmptyBb;
+        Bb bb_attack = EmptyBb;
         Sq sq;
 
         /* go north */
         sq = from;
-        while (GetRow(sq) < kRow8 && !GetBit(occupation, sq))
+        while (GetRow(sq) < kRow8 && !occupation[sq])
         {
-            SetBit(bb_attack, sq + 8);
+            bb_attack.Set(sq + 8);
             sq += 8;
         }
 
         /* go south */
         sq = from;
-        while (GetRow(sq) > kRow1 && !GetBit(occupation, sq))
+        while (GetRow(sq) > kRow1 && !occupation[sq])
         {
-            SetBit(bb_attack, sq - 8);
+            bb_attack.Set(sq - 8);
             sq -= 8;
         }
 
         /* go west */
         sq = from;
-        while (GetColmn(sq) > kColmnA && !GetBit(occupation, sq))
+        while (GetColmn(sq) > kColmnA && !occupation[sq])
         {
-            SetBit(bb_attack, sq - 1);
+            bb_attack.Set(sq - 1);
             sq -= 1;
         }
 
         /* go est */
         sq = from;
-        while (GetColmn(sq) < kColmnH && !GetBit(occupation, sq))
+        while (GetColmn(sq) < kColmnH && !occupation[sq])
         {
-            SetBit(bb_attack, sq + 1);
+            bb_attack.Set(sq + 1);
             sq += 1;
         }
 
@@ -289,10 +289,10 @@ namespace m8
     void MoveGen::InitializeRookAttack(Sq sq, MoveGen::Magic& magic)
     {
         /* For each variation of occupation of the mask */
-        std::uint64_t nbr_bits = GetPopct(magic.mask);
-        for (Bb occ_index = kEmptyBb; occ_index < (BB_C(1) << nbr_bits); ++occ_index)
+        std::uint64_t nbr_bits = magic.mask.GetPopct();
+        for (Bb occ_index = EmptyBb; occ_index < (BB_C(1) << nbr_bits); ++occ_index)
         {
-            Bb mask = DistributeBits(occ_index, magic.mask);
+            Bb mask = Bb::DistributeBits(occ_index, magic.mask);
             std::ptrdiff_t index = (std::ptrdiff_t)((mask * magic.magic) >> magic.shift);
             magic.attack[index] = GenerateRookAttackForOccupancy(sq, mask);
         }
@@ -311,7 +311,7 @@ namespace m8
             magic.attack = ptr_attack;
             magic.mask = ((kBbRow[row] & ~(kBbColmn[kColmnA] | kBbColmn[kColmnH])) |
                           (kBbColmn[col] & ~(kBbRow[kRow1] | kBbRow[kRow8]))) &
-                          ~ GetSingleBitBb(sq);
+                          ~ Bb::GetSingleBitBb(sq);
             magic.magic = kRookMagics[sq];
             magic.shift = kRookMagicShifts[sq];
 
@@ -323,16 +323,16 @@ namespace m8
 
     Bb MoveGen::GenerateBishopAttackForOccupancy(Sq from, Bb occupation)
     {
-        Bb bb_attack = kEmptyBb;
+        Bb bb_attack = EmptyBb;
         Sq sq;
 
         /* go northest */
         sq = from;
         while (GetRow(sq) < kRow8 &&
                GetColmn(sq) < kColmnH &&
-               !GetBit(occupation, sq))
+               !occupation[sq])
         {
-            SetBit(bb_attack, sq + 9);
+            bb_attack.Set(sq + 9);
             sq += 9;
         }
 
@@ -340,9 +340,9 @@ namespace m8
         sq = from;
         while (GetRow(sq) > kRow1 &&
                GetColmn(sq) < kColmnH &&
-               !GetBit(occupation, sq))
+               !occupation[sq])
         {
-            SetBit(bb_attack, sq - 7);
+            bb_attack.Set(sq - 7);
             sq -= 7;
         }
 
@@ -350,9 +350,9 @@ namespace m8
         sq = from;
         while (GetRow(sq) > kRow1 &&
                GetColmn(sq) > kColmnA &&
-               !GetBit(occupation, sq))
+               !occupation[sq])
         {
-            SetBit(bb_attack, sq - 9);
+            bb_attack.Set(sq - 9);
             sq -= 9;
         }
 
@@ -360,9 +360,9 @@ namespace m8
         sq = from;
         while (GetRow(sq) < kRow8 &&
                GetColmn(sq) > kColmnA &&
-               !GetBit(occupation, sq))
+               !occupation[sq])
         {
-            SetBit(bb_attack, sq + 7);
+            bb_attack.Set(sq + 7);
             sq += 7;
         }
 
@@ -372,10 +372,10 @@ namespace m8
     void MoveGen::InitializeBishopAttack(Sq sq, MoveGen::Magic& magic)
     {
         /* For each variation of occupation of the mask */
-        uint64_t nbr_bits = GetPopct(magic.mask);
-        for (Bb occ_index = kEmptyBb; occ_index < (BB_C(1) << nbr_bits); ++occ_index)
+        uint64_t nbr_bits = magic.mask.GetPopct();
+        for (Bb occ_index = EmptyBb; occ_index < (BB_C(1) << nbr_bits); ++occ_index)
         {
-            Bb mask = DistributeBits(occ_index, magic.mask);
+            Bb mask = Bb::DistributeBits(occ_index, magic.mask);
             std::ptrdiff_t index = (std::ptrdiff_t)((mask * magic.magic) >> magic.shift);
             magic.attack[index] = GenerateBishopAttackForOccupancy(sq, mask);
         }

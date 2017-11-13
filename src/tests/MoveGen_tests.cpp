@@ -655,7 +655,7 @@ TEST_CASE("AttacksTo__lots_of_squares_attack_e5__nothings_attack_a1")
 
     Bb attacks = move_gen.AttacksTo(kA1);
 
-    REQUIRE(attacks == kEmptyBb);
+    REQUIRE(attacks == EmptyBb);
 }
 
 TEST_CASE("AttacksTo__both_kings_attack_e5__both_attacks_identified")

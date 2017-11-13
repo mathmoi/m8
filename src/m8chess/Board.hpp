@@ -462,10 +462,10 @@ namespace m8
 
         board_[sq] = piece;
 
-        SetBit(bb_piece_[piece], sq);
+        bb_piece_[piece].Set(sq);
 
         Color color = GetColor(piece);
-        SetBit(bb_color_[color], sq);
+        bb_color_[color].Set(sq);
     }
 
     inline void Board::RemovePiece(Sq sq)
@@ -475,9 +475,9 @@ namespace m8
         assert(IsPiece(board_[sq]));
 
         Color color = GetColor(board_[sq]);
-        UnsetBit(bb_color_[color], sq);
+        bb_color_[color].Unset(sq);
 
-        UnsetBit(bb_piece_[board_[sq]], sq);
+        bb_piece_[board_[sq]].Unset(sq);
 
         board_[sq] = kNoPiece;
     }
@@ -494,11 +494,11 @@ namespace m8
         board_[from] = kNoPiece;
         board_[to] = piece;
 
-        Bb diff = GetSingleBitBb(from);
-        SetBit(diff, to);
+        Bb diff = Bb::GetSingleBitBb(from);
+        diff.Set(to);
 
-        bb_color_[GetColor(piece)] ^= diff;
-        bb_piece_[piece] ^= diff;
+        bb_color_[GetColor(piece)] = bb_color_[GetColor(piece)] ^ diff;
+        bb_piece_[piece] = bb_piece_[piece] ^ diff;
     }
 
     inline void Board::MovePiece(Sq from, Sq to)

@@ -28,12 +28,12 @@ TEST_CASE("Test Board()")
    {
       for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
       {
-         REQUIRE(board.bb_piece(NewPiece(piece_type, color)) == kEmptyBb);
+         REQUIRE(board.bb_piece(NewPiece(piece_type, color)) == EmptyBb);
       }
    }
 
-   REQUIRE(board.bb_color(kWhite) == kEmptyBb);
-   REQUIRE(board.bb_color(kBlack) == kEmptyBb);
+   REQUIRE(board.bb_color(kWhite) == EmptyBb);
+   REQUIRE(board.bb_color(kBlack) == EmptyBb);
 
    REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
    REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
@@ -262,27 +262,27 @@ TEST_CASE("Test AddPiece()")
    REQUIRE(board[kD8] == black_queen);
 
    bb = Bb(0);
-   SetBit(bb, kB2);
+   bb.Set(kB2);
    REQUIRE(board.bb_color(kWhite) == bb);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
    bb = Bb(0);
-   SetBit(bb, kD8);
+   bb.Set(kD8);
    REQUIRE(board.bb_color(kBlack) == bb);
    REQUIRE(board.bb_piece(black_queen) == bb);
 
    board.AddPiece(kA2, white_pawn);
 
    bb = Bb(0);
-   SetBit(bb, kB2);
-   SetBit(bb, kA2);
+   bb.Set(kB2);
+   bb.Set(kA2);
    REQUIRE(board.bb_color(kWhite) == bb);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
    board.AddPiece(kC2, white_queen);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
-   SetBit(bb, kC2);
+   bb.Set(kC2);
    REQUIRE(board.bb_color(kWhite) == bb);
 }
 
@@ -298,8 +298,8 @@ TEST_CASE("Test RemovePiece()")
    board.RemovePiece(kB2);
 
    REQUIRE(board[kB2] == kNoPiece);
-   REQUIRE(GetBit(board.bb_color(kWhite), kB2) == false);
-   REQUIRE(GetBit(board.bb_piece(white_pawn), kB2) == false);
+   REQUIRE(board.bb_color(kWhite)[kB2] == false);
+   REQUIRE(board.bb_piece(white_pawn)[kB2] == false);
 }
 
 TEST_CASE("Test MovePiece()")
@@ -311,12 +311,12 @@ TEST_CASE("Test MovePiece()")
    board.MovePiece(kA2, kA3);
 
    REQUIRE(board[kA2] == kNoPiece);
-   REQUIRE(GetBit(board.bb_color(kWhite), kA2) == false);
-   REQUIRE(GetBit(board.bb_piece(white_pawn), kA2) == false);
+   REQUIRE(board.bb_color(kWhite)[kA2] == false);
+   REQUIRE(board.bb_piece(white_pawn)[kA2] == false);
 
    REQUIRE(board[kA3] == white_pawn);
-   REQUIRE(GetBit(board.bb_color(kWhite), kA3) == true);
-   REQUIRE(GetBit(board.bb_piece(white_pawn), kA3) == true);
+   REQUIRE(board.bb_color(kWhite)[kA3] == true);
+   REQUIRE(board.bb_piece(white_pawn)[kA3] == true);
 }
 
 TEST_CASE("Make__simple_move__piece_is_moved")
