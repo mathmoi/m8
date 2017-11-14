@@ -34,9 +34,6 @@
 #  define M8_64_BITS_COMPILE
 #endif
 
-// This next define allows the creation of literals bitboards.
-#define BB_C(x) UINT64_C(x)
-
 namespace m8
 {
     /// <summary>
@@ -172,6 +169,8 @@ namespace m8
         
         friend std::ostream& operator <<(std::ostream& out, Bb bb);
 
+        inline static Bb Empty() { return Bb(UINT64_C(0)); };
+
     private:
 
         /// <summary>
@@ -179,10 +178,7 @@ namespace m8
         /// </summary>
         std::uint64_t value_;
     };
-
-    /// Empty bitboard constant
-    const Bb EmptyBb = BB_C(0);
-
+    
     inline Bb operator ^ (Bb lhs, Bb rhs) { lhs ^= rhs; return lhs; }
     inline Bb operator | (Bb lhs, Bb rhs) { lhs |= rhs; return lhs; }
     inline Bb operator & (Bb lhs, Bb rhs) { lhs &= rhs; return lhs; }
@@ -392,64 +388,64 @@ namespace m8
     }
 
     /// Bitboards with bits sets for each column
-    const std::array<const Bb, 8> kBbColmn = { BB_C(0x0101010101010101),
-                                               BB_C(0x0202020202020202),
-                                               BB_C(0x0404040404040404),
-                                               BB_C(0x0808080808080808),
-                                               BB_C(0x1010101010101010),
-                                               BB_C(0x2020202020202020),
-                                               BB_C(0x4040404040404040),
-                                               BB_C(0x8080808080808080) };
+    const std::array<const Bb, 8> kBbColmn = { UINT64_C(0x0101010101010101),
+                                               UINT64_C(0x0202020202020202),
+                                               UINT64_C(0x0404040404040404),
+                                               UINT64_C(0x0808080808080808),
+                                               UINT64_C(0x1010101010101010),
+                                               UINT64_C(0x2020202020202020),
+                                               UINT64_C(0x4040404040404040),
+                                               UINT64_C(0x8080808080808080) };
 
     /// Bitboards with bits sets for each row
-    const std::array<const Bb, 8> kBbRow = { BB_C(0x00000000000000FF),
-                                             BB_C(0x000000000000FF00),
-                                             BB_C(0x0000000000FF0000),
-                                             BB_C(0x00000000FF000000),
-                                             BB_C(0x000000FF00000000),
-                                             BB_C(0x0000FF0000000000),
-                                             BB_C(0x00FF000000000000),
-                                             BB_C(0xFF00000000000000) };
+    const std::array<const Bb, 8> kBbRow = { UINT64_C(0x00000000000000FF),
+                                             UINT64_C(0x000000000000FF00),
+                                             UINT64_C(0x0000000000FF0000),
+                                             UINT64_C(0x00000000FF000000),
+                                             UINT64_C(0x000000FF00000000),
+                                             UINT64_C(0x0000FF0000000000),
+                                             UINT64_C(0x00FF000000000000),
+                                             UINT64_C(0xFF00000000000000) };
 
     /// Bitboards with bits sets for each diagonal.
     ///
     /// Diagonals are in the a8-h1 orientation and the first one at index zero contains 
     /// only the a1 square. The second one contains the a2 and b1 squares.
-    const std::array<const Bb, 15> kBbDiag = { BB_C(0x0000000000000080),
-                                               BB_C(0x0000000000008040),
-                                               BB_C(0x0000000000804020),
-                                               BB_C(0x0000000080402010),
-                                               BB_C(0x0000008040201008),
-                                               BB_C(0x0000804020100804),
-                                               BB_C(0x0080402010080402),
-                                               BB_C(0x8040201008040201),
-                                               BB_C(0x4020100804020100),
-                                               BB_C(0x2010080402010000),
-                                               BB_C(0x1008040201000000),
-                                               BB_C(0x0804020100000000),
-                                               BB_C(0x0402010000000000),
-                                               BB_C(0x0201000000000000),
-                                               BB_C(0x0100000000000000) };
+    const std::array<const Bb, 15> kBbDiag = { UINT64_C(0x0000000000000080),
+                                               UINT64_C(0x0000000000008040),
+                                               UINT64_C(0x0000000000804020),
+                                               UINT64_C(0x0000000080402010),
+                                               UINT64_C(0x0000008040201008),
+                                               UINT64_C(0x0000804020100804),
+                                               UINT64_C(0x0080402010080402),
+                                               UINT64_C(0x8040201008040201),
+                                               UINT64_C(0x4020100804020100),
+                                               UINT64_C(0x2010080402010000),
+                                               UINT64_C(0x1008040201000000),
+                                               UINT64_C(0x0804020100000000),
+                                               UINT64_C(0x0402010000000000),
+                                               UINT64_C(0x0201000000000000),
+                                               UINT64_C(0x0100000000000000) };
 
     /// Bitboards with bits sets for each anti-diagonal.
     ///
     /// Anti-diagonals are in the a1-h8 orientation and the first one at index zero contains 
     /// only the h1 square. The second one contains the g1 and h2 squares.
-    const std::array<const Bb, 15> kBbAntiDiag = { BB_C(0x0000000000000001),
-                                                   BB_C(0x0000000000000102),
-                                                   BB_C(0x0000000000010204),
-                                                   BB_C(0x0000000001020408),
-                                                   BB_C(0x0000000102040810),
-                                                   BB_C(0x0000010204081020),
-                                                   BB_C(0x0001020408102040),
-                                                   BB_C(0x0102040810204080),
-                                                   BB_C(0x0204081020408000),
-                                                   BB_C(0x0408102040800000),
-                                                   BB_C(0x0810204080000000),
-                                                   BB_C(0x1020408000000000),
-                                                   BB_C(0x2040800000000000),
-                                                   BB_C(0x4080000000000000),
-                                                   BB_C(0x8000000000000000) };
+    const std::array<const Bb, 15> kBbAntiDiag = { UINT64_C(0x0000000000000001),
+                                                   UINT64_C(0x0000000000000102),
+                                                   UINT64_C(0x0000000000010204),
+                                                   UINT64_C(0x0000000001020408),
+                                                   UINT64_C(0x0000000102040810),
+                                                   UINT64_C(0x0000010204081020),
+                                                   UINT64_C(0x0001020408102040),
+                                                   UINT64_C(0x0102040810204080),
+                                                   UINT64_C(0x0204081020408000),
+                                                   UINT64_C(0x0408102040800000),
+                                                   UINT64_C(0x0810204080000000),
+                                                   UINT64_C(0x1020408000000000),
+                                                   UINT64_C(0x2040800000000000),
+                                                   UINT64_C(0x4080000000000000),
+                                                   UINT64_C(0x8000000000000000) };
 
     /// Array containing bitboards with bits set for the squares between two squared 
     /// indexed by 0x88 difference.

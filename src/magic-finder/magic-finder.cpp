@@ -25,7 +25,7 @@ namespace m8 {
     /// relevant to generate the moves of the piece on the squared received in parameter.
     Bb GenerateMask(Sq sq, bool is_rook)
     {
-        Bb bb = BB_C(0);
+        Bb bb = UINT64_C(0);
 
         if (is_rook)
         {
@@ -82,7 +82,7 @@ namespace m8 {
     /// @return A bitboard.
     Bb DistributeBits(std::uint32_t bits, Bb mask)
     {
-        Bb result = BB_C(0);
+        Bb result = UINT64_C(0);
         std::uint64_t bit_count = mask.GetPopct();
 
         for (std::uint32_t x = 0; x < bit_count; ++x)
@@ -130,7 +130,7 @@ namespace m8 {
     {
         assert(IsSqOnBoard(sq));
 
-        Bb attack_set = BB_C(0);
+        Bb attack_set = UINT64_C(0);
         Bb bb;
         
         // Go north
@@ -249,7 +249,7 @@ namespace m8 {
         {
             magic = GenerateRndFewBits(rng);
             fail = false;
-            used->fill(BB_C(0));
+            used->fill(UINT64_C(0));
 
             std::uint32_t index_occup = 0;
             while (!fail && index_occup < occupancies.size())
@@ -309,7 +309,7 @@ namespace m8 {
 
         for (auto x = 0; x < 64; ++x)
         {
-            out << "    BB_C(0x" << std::setw(16) << magics[x] << ')';
+            out << "    UINT64_C(0x" << std::setw(16) << magics[x] << ')';
 
             if (x < 63)
                 out << ',';

@@ -454,32 +454,32 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
 
 TEST_CASE("GenerateRookAttacks_called_ReturnExpectedValue")
 {
-    Bb occ = BB_C(0xFFDFEF20EFCFAF7F);
+    Bb occ = UINT64_C(0xFFDFEF20EFCFAF7F);
     Bb result;
 
     result = MoveGen::GenerateRookAttacks(occ, kE5);
 
-    REQUIRE(BB_C(0x0010102F10101010) == result);
+    REQUIRE(UINT64_C(0x0010102F10101010) == result);
 }
 
 TEST_CASE("m8_rook_attacks__empty_board__return_expected_value")
 {
-    Bb occ = BB_C(0x0000000000000080);
+    Bb occ = UINT64_C(0x0000000000000080);
     Bb result;
 
     result = MoveGen::GenerateRookAttacks(occ, kH1);
 
-    REQUIRE(BB_C(0x808080808080807F) == result);
+    REQUIRE(UINT64_C(0x808080808080807F) == result);
 }
 
 TEST_CASE("m8_bishop_attacks__called__return_expected_value")
 {
-    Bb occ = BB_C(0xFFDFEB20EFCFAF7F);
+    Bb occ = UINT64_C(0xFFDFEB20EFCFAF7F);
     Bb result;
 
     result = MoveGen::GenerateBishopAttacks(occ, kD5);
 
-    REQUIRE(BB_C(0x4022140014204080) == result);
+    REQUIRE(UINT64_C(0x4022140014204080) == result);
 }
 
 TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_rook_moves")
@@ -644,7 +644,7 @@ TEST_CASE("AttacksTo__lots_of_squares_attack_e5__all_attacks_identified")
 
     Bb attacks = move_gen.AttacksTo(kE5);
 
-    REQUIRE(attacks == BB_C(0x003C64824C289000));
+    REQUIRE(attacks == UINT64_C(0x003C64824C289000));
 }
 
 TEST_CASE("AttacksTo__lots_of_squares_attack_e5__nothings_attack_a1")
@@ -655,7 +655,7 @@ TEST_CASE("AttacksTo__lots_of_squares_attack_e5__nothings_attack_a1")
 
     Bb attacks = move_gen.AttacksTo(kA1);
 
-    REQUIRE(attacks == EmptyBb);
+    REQUIRE(attacks == Bb::Empty());
 }
 
 TEST_CASE("AttacksTo__both_kings_attack_e5__both_attacks_identified")
@@ -666,7 +666,7 @@ TEST_CASE("AttacksTo__both_kings_attack_e5__both_attacks_identified")
 
     Bb attacks = move_gen.AttacksTo(kE5);
 
-    REQUIRE(attacks == BB_C(0x0000100010000000));
+    REQUIRE(attacks == UINT64_C(0x0000100010000000));
 }
 
 TEST_CASE("IsInCheck__white_king_attack_by_rook__return_true")

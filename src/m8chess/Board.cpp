@@ -367,13 +367,13 @@ namespace m8
             for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
             {
                 Piece piece = NewPiece(piece_type, color);
-                bb_piece_[piece] = EmptyBb;
+                bb_piece_[piece] = Bb::Empty();
             }
         }
 
         // Initialize the color bitboards
-        bb_color_[kWhite] = EmptyBb;
-        bb_color_[kBlack] = EmptyBb;
+        UINT64_Color_[kWhite] = Bb::Empty();
+        UINT64_Color_[kBlack] = Bb::Empty();
 
         // Initialize the castle columns. By default we use the regular chess columns.
         casle_colmn_[0] = kColmnA;

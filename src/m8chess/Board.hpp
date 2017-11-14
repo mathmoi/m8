@@ -93,7 +93,7 @@ namespace m8
         /// @param color Color for wich we want to retreive the bitboard.
         /// @returns A bitboard with bits to 1 for every position where there is
         ///          a piece of the color specified in parameter.
-        inline Bb bb_color(Color color) const;
+        inline Bb UINT64_Color(Color color) const;
 
         /// Accessor for the bitboard of all occupied squares
         ///
@@ -210,7 +210,7 @@ namespace m8
         std::array<Bb, kMaxPiece + 1> bb_piece_;
 
         /// Bitboard for each color
-        std::array<Bb, 2> bb_color_;
+        std::array<Bb, 2> UINT64_Color_;
 
         /// Original column of the two rooks. This is used to determine which 
         /// rook can castle because in Chess960 the rook may not start on 
@@ -412,17 +412,17 @@ namespace m8
         return bb_piece_[piece];
     }
 
-    inline Bb Board::bb_color(Color color) const
+    inline Bb Board::UINT64_Color(Color color) const
     {
         // A : The color is valid
         assert(IsColor(color));
 
-        return bb_color_[color];
+        return UINT64_Color_[color];
     }
 
     inline Bb Board::bb_occupied() const
     {
-        return bb_color_[kWhite] | bb_color_[kBlack];
+        return UINT64_Color_[kWhite] | UINT64_Color_[kBlack];
     }
 
     inline bool Board::casle(Color color, std::uint8_t casle_right) const
@@ -465,7 +465,7 @@ namespace m8
         bb_piece_[piece].Set(sq);
 
         Color color = GetColor(piece);
-        bb_color_[color].Set(sq);
+        UINT64_Color_[color].Set(sq);
     }
 
     inline void Board::RemovePiece(Sq sq)
@@ -475,7 +475,7 @@ namespace m8
         assert(IsPiece(board_[sq]));
 
         Color color = GetColor(board_[sq]);
-        bb_color_[color].Unset(sq);
+        UINT64_Color_[color].Unset(sq);
 
         bb_piece_[board_[sq]].Unset(sq);
 
@@ -497,7 +497,7 @@ namespace m8
         Bb diff = Bb::GetSingleBitBb(from);
         diff.Set(to);
 
-        bb_color_[GetColor(piece)] = bb_color_[GetColor(piece)] ^ diff;
+        UINT64_Color_[GetColor(piece)] = UINT64_Color_[GetColor(piece)] ^ diff;
         bb_piece_[piece] = bb_piece_[piece] ^ diff;
     }
 

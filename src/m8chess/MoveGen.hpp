@@ -350,8 +350,8 @@ namespace m8
         Bb bb_king = board_.bb_piece(king);
         Sq king_position = bb_king.GetLSB();
         Bb attackers = AttacksTo(king_position);
-        Bb opponent_pieces = board_.bb_color(OpposColor(color));
-        return (attackers & opponent_pieces) != EmptyBb;
+        Bb opponent_pieces = board_.UINT64_Color(OpposColor(color));
+        return (attackers & opponent_pieces) != Bb::Empty();
     }
 
     inline Bb MoveGen::GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
@@ -377,7 +377,7 @@ namespace m8
     {
         Bb targets;
         if (is_captures)
-            targets = board_.bb_color(OpposColor(color));
+            targets = board_.UINT64_Color(OpposColor(color));
         else
             targets = ~board_.bb_occupied();
 
@@ -468,7 +468,7 @@ namespace m8
 
         Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_colmn]); // TODO : Make row.Bb()
         target.Shift(delta);
-        target &= board_.bb_color(OpposColor(color));
+        target &= board_.UINT64_Color(OpposColor(color));
         next_move = UnpackPawnMoves(color, target, -delta, next_move);
 
         return next_move;
@@ -511,20 +511,20 @@ namespace m8
             // Check if any of the travel squared is occupied.
             Bb occ = board_.bb_occupied();
             occ ^= Bb::GetSingleBitBb(rook_position) | bb_king;
-            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != EmptyBb;
+            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != Bb::Empty();
 
             if (!travel_occupied)
             {
                 // Check if any of the square traveled by the king or the origin or 
                 // destination of the king are under attack.
-                Bb bb_check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position);
-                Bb bb_opponents = board_.bb_color(OpposColor(color));
+                Bb UINT64_Check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position);
+                Bb bb_opponents = board_.UINT64_Color(OpposColor(color));
 
                 bool attacked = false;
-                while (bb_check_attack && !attacked)
+                while (UINT64_Check_attack && !attacked)
                 {
-                    Sq pos = bb_check_attack.RemoveLSB();
-                    attacked = (AttacksTo(pos) & bb_opponents) != EmptyBb;
+                    Sq pos = UINT64_Check_attack.RemoveLSB();
+                    attacked = (AttacksTo(pos) & bb_opponents) != Bb::Empty();
                 }
 
                 if (!attacked)
@@ -589,7 +589,7 @@ namespace m8
         {
             Sq from = bb_from.RemoveLSB();
             
-            Bb bb_to = EmptyBb;
+            Bb bb_to = Bb::Empty();
             if (slide_like_rook)
                 bb_to |= GenerateRookAttacks(board_.bb_occupied(), from);
             if (slide_like_bishop)

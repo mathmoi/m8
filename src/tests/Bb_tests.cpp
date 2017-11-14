@@ -114,7 +114,7 @@ TEST_CASE("Test RemoveLsb")
 
 TEST_CASE("Shift_ZeroLength_BitboardIsUnchanged")
 {
-    Bb original = BB_C(0);
+    Bb original = UINT64_C(0);
     original.Set(10);
     original.Set(19);
     original.Set(54);
@@ -127,12 +127,12 @@ TEST_CASE("Shift_ZeroLength_BitboardIsUnchanged")
 
 TEST_CASE("Shift_PositiveLength_BitboardIsShiftedLeft")
 {
-    Bb bb = BB_C(0);
+    Bb bb = UINT64_C(0);
     bb.Set(10);
     bb.Set(19);
     bb.Set(54);
 
-    Bb expected = BB_C(0);
+    Bb expected = UINT64_C(0);
     expected.Set(13);
     expected.Set(22);
     expected.Set(57);
@@ -144,12 +144,12 @@ TEST_CASE("Shift_PositiveLength_BitboardIsShiftedLeft")
 
 TEST_CASE("Shift_NegateiveLength_BitboardIsShiftedRight")
 {
-    Bb bb = BB_C(0);
+    Bb bb = UINT64_C(0);
     bb.Set(10);
     bb.Set(19);
     bb.Set(54);
 
-    Bb expected = BB_C(0);
+    Bb expected = UINT64_C(0);
     expected.Set(5);
     expected.Set(14);
     expected.Set(49);
@@ -162,7 +162,7 @@ TEST_CASE("Shift_NegateiveLength_BitboardIsShiftedRight")
 TEST_CASE("BbBetween__c2_to_g6__d2_e4_f5_returned")
 {
     Bb between = BbBetween(kC2, kG6);
-    REQUIRE(between == BB_C(0x0000002010080000));
+    REQUIRE(between == UINT64_C(0x0000002010080000));
 }
 
 TEST_CASE("BbBetween__g6_to_c2__d2_e4_f5_returned")
@@ -170,13 +170,13 @@ TEST_CASE("BbBetween__g6_to_c2__d2_e4_f5_returned")
     using namespace std;
     Bb between = BbBetween(kG6, kC2);
 
-    REQUIRE(between == BB_C(0x0000002010080000));
+    REQUIRE(between == UINT64_C(0x0000002010080000));
 }
 
-TEST_CASE("BbBetween__g6_to_c1__EmptyBb_returned")
+TEST_CASE("BbBetween__g6_to_c1__Bb::Empty()_returned")
 {
     using namespace std;
     Bb between = BbBetween(kG6, kC1);
 
-    REQUIRE(between == EmptyBb);
+    REQUIRE(between == Bb::Empty());
 }

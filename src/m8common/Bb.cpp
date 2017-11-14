@@ -29,7 +29,7 @@ namespace m8
         /* first initalize all entry to zero */
         for (std::ptrdiff_t x = 0; x < 240; ++x)
         {
-            kBbBetweenArray[x] = EmptyBb;
+            kBbBetweenArray[x] = Bb::Empty();
         }
 
         // We generate all the difference variation with a1 as the from square. For the
@@ -37,7 +37,7 @@ namespace m8
         // this way can also compute it's reverse by swaping the origin and destination 
         // square.
 
-        Bb between = EmptyBb;
+        Bb between = Bb::Empty();
         for (std::uint8_t to = kA3; to <= kA8; to += 8)
         {
             between.Set(to - 8);
@@ -46,7 +46,7 @@ namespace m8
             kBbBetween[CalculateOx88diff(to, kA1)].RotateRight(to);
         }
 
-        between = EmptyBb;
+        between = Bb::Empty();
         for (std::uint8_t to = kC3; to <= kH8; to += 9)
         {
             between.Set(to - 9);
@@ -55,7 +55,7 @@ namespace m8
             kBbBetween[CalculateOx88diff(to, kA1)].RotateRight(to);
         }
 
-        between = EmptyBb;
+        between = Bb::Empty();
         for (std::uint8_t to = kC1; to <= kH1; to += 1)
         {
             between.Set(to - 1);
