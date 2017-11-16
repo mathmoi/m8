@@ -73,18 +73,18 @@ namespace m8
     std::ostream& operator <<(std::ostream& out, Bb bb)
     {
         const std::uint8_t kRow8 = 7;
-        const std::uint8_t kColmnA = 0;
-        const std::uint8_t kColmnH = 8;
+        const std::uint8_t kColumnA = 0;
+        const std::uint8_t kColumnH = 8;
 
         for (std::uint8_t row = kRow8; row < 8; --row)
         {
             out << '\t';
-            for (std::uint8_t colmn = kColmnA; colmn < 8; ++colmn)
+            for (std::uint8_t colmn = kColumnA; colmn < 8; ++colmn)
             {
                 std::uint8_t sq = (row << 3) + colmn;
                 out << (bb[sq] ? 'X' : '-');
 
-                if (colmn < kColmnH)
+                if (colmn < kColumnH)
                     out << ' ';
             }
 

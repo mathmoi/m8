@@ -271,11 +271,11 @@ namespace m8
         /// Generate pawn side captures.
         ///
         /// @param color         Color of the pawn to generate the moves for.
-        /// @param ignored_colmn Column that should be ignored.
+        /// @param ignored_Column Column that should be ignored.
         /// @param delta         Delta applied between the from and to squares.
         /// @param next_move     Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
-        inline Move* GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const;
+        inline Move* GeneratePawnSideCaptures(Color color, Column ignored_Column, int delta, Move* next_move) const;
 
         /// Generate pawn promotions
         ///
@@ -304,9 +304,9 @@ namespace m8
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GenerateCastlingMoves(Color color,
                                            std::uint8_t castling_side,
-                                           Colmn king_final_column,
-                                           Colmn rook_original_column,
-                                           Colmn rook_final_column,
+                                           Column king_final_column,
+                                           Column rook_original_column,
+                                           Column rook_final_column,
                                            Move* next_move) const;
 
         static const std::array<const Bb, 64> kRookMagics;
@@ -338,8 +338,8 @@ namespace m8
         attackers |= king_attack_bb_[sq] & kings;
 
         Bb bb_sq = Bb::GetSingleBitBb(sq);
-        attackers |= (((bb_sq << 7) & ~GetColmnBb(kColmnH)) | ((bb_sq << 9) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kBlackPawn);
-        attackers |= (((bb_sq >> 9) & ~GetColmnBb(kColmnH)) | ((bb_sq >> 7) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kWhitePawn);
+        attackers |= (((bb_sq << 7) & ~kBbColmn[Column::H().Value()]) | ((bb_sq << 9) & ~kBbColmn[Column::A().Value()])) & board_.bb_piece(kBlackPawn);
+        attackers |= (((bb_sq >> 9) & ~kBbColmn[Column::H().Value()]) | ((bb_sq >> 7) & ~kBbColmn[Column::A().Value()])) & board_.bb_piece(kWhitePawn);
 
         return attackers;
     }
@@ -462,11 +462,11 @@ namespace m8
         return next_move;
     }
 
-    inline Move* MoveGen::GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const
+    inline Move* MoveGen::GeneratePawnSideCaptures(Color color, Column ignored_column, int delta, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
 
-        Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_colmn]); // TODO : Make row.Bb()
+        Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_column.Value()]); // TODO : Make row.Bb()
         target.Shift(delta);
         target &= board_.UINT64_Color(OpposColor(color));
         next_move = UnpackPawnMoves(color, target, -delta, next_move);
@@ -490,9 +490,9 @@ namespace m8
 
     inline Move* MoveGen::GenerateCastlingMoves(Color color,
                                                 std::uint8_t castling_side,
-                                                Colmn king_final_column,
-                                                Colmn rook_original_column,
-                                                Colmn rook_final_column,
+                                                Column king_final_column,
+                                                Column rook_original_column,
+                                                Column rook_final_column,
                                                 Move* next_move) const
     {
         if (board_.casle(color, castling_side))
@@ -539,8 +539,8 @@ namespace m8
 
     inline Move* MoveGen::GenerateCastlingMoves(Color color, Move* next_move) const
     {
-        next_move = GenerateCastlingMoves(color, kKingSideCastle, kColmnG, board_.casle_colmn(1), kColmnF, next_move);
-        next_move = GenerateCastlingMoves(color, kQueenSideCastle, kColmnC, board_.casle_colmn(0), kColmnD, next_move);
+        next_move = GenerateCastlingMoves(color, kKingSideCastle, Column::G(), board_.casle_colmn(1), Column::F(), next_move);
+        next_move = GenerateCastlingMoves(color, kQueenSideCastle, Column::C(), board_.casle_colmn(0), Column::D(), next_move);
 
         return next_move;
     }
@@ -574,8 +574,8 @@ namespace m8
         int forward_left = 7 - 16 * color;
         int forward_right = 9 - 16 * color;
 
-        next_move = GeneratePawnSideCaptures(color, kColmnA, forward_left, next_move);
-        next_move = GeneratePawnSideCaptures(color, kColmnH, forward_right, next_move);
+        next_move = GeneratePawnSideCaptures(color, Column::A(), forward_left, next_move);
+        next_move = GeneratePawnSideCaptures(color, Column::H(), forward_right, next_move);
         next_move = GeneratePawnPromotions(color, next_move);
 
         return next_move;

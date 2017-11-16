@@ -11,17 +11,14 @@ using namespace m8;
 
 TEST_CASE("Test IsColmnOnBoard")
 {
-   REQUIRE(kNumColmnOnBoard == 8);
+   REQUIRE(Column::NumColumnOnBoard == 8);
 
-   for (Colmn colmn = 0; colmn < kNumColmnOnBoard; ++colmn)
+   for (Column colmn = 0; colmn < Column::NumColumnOnBoard; colmn.MoveNext())
    {
-      REQUIRE(IsColmnOnBoard(colmn) == true);
+      REQUIRE(colmn.IsOnBoard() == true);
    }
 
-   REQUIRE(IsColmnOnBoard(kColmnA - 1) == false);
-   REQUIRE(IsColmnOnBoard(kColmnH + 1) == false);
-
-   REQUIRE(IsColmnOnBoard(kInvalColmn) == false);
+   REQUIRE(Column::Invalid().IsOnBoard() == false);
 }
 
 
@@ -66,13 +63,13 @@ TEST_CASE("Test GetRow")
 
 TEST_CASE("Test GetColmn")
 {
-   REQUIRE(GetColmn(kA1) == kColmnA);
-   REQUIRE(GetColmn(kH1) == kColmnH);
-   REQUIRE(GetColmn(kA8) == kColmnA);
-   REQUIRE(GetColmn(kH8) == kColmnH);
+   REQUIRE(GetColmn(kA1) == Column::A());
+   REQUIRE(GetColmn(kH1) == Column::H());
+   REQUIRE(GetColmn(kA8) == Column::A());
+   REQUIRE(GetColmn(kH8) == Column::H());
 
-   REQUIRE(GetColmn(kB1) == kColmnB);
-   REQUIRE(GetColmn(kD3) == kColmnD);
-   REQUIRE(GetColmn(kF5) == kColmnF);
-   REQUIRE(GetColmn(kG8) == kColmnG);
+   REQUIRE(GetColmn(kB1) == Column::B());
+   REQUIRE(GetColmn(kD3) == Column::D());
+   REQUIRE(GetColmn(kF5) == Column::F());
+   REQUIRE(GetColmn(kG8) == Column::G());
 }

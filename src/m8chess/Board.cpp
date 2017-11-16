@@ -25,7 +25,7 @@ namespace m8
         std::string::const_iterator it = fen.begin();
 
         // First we consume the piece placement section
-        Colmn colmn = kColmnA;
+        Column column = Column::A();
         Row row = kRow8;
         while (it < fen.end() && *it != ' ')
         {
@@ -33,7 +33,7 @@ namespace m8
             // digit value.
             if (*it >= '0' && *it <= '9')
             {
-                colmn += *it - '0';
+                column += *it - '0';
             }
             else
             {
@@ -43,21 +43,21 @@ namespace m8
                 if (it_piece != char_to_piece_map.end())
                 {
                     // If the current position is invalid we throw an exception
-                    if (!IsColmnOnBoard(colmn) || !IsRowOnBoard(row))
+                    if (!column.IsOnBoard() || !IsRowOnBoard(row))
                     {
                         throw InvalFenError("Invalid piece placement section in fen string");
                     }
 
-                    Sq sq = NewSq(colmn, row);
+                    Sq sq = NewSq(column, row);
                     AddPiece(sq, it_piece->second);
-                    ++colmn;
+                    column.MoveNext();
                 }
                 else
                 {
                     // If the character is a '/' we move to the next row
                     if (*it == '/')
                     {
-                        colmn = kColmnA;
+                        column = Column::A();
                         --row;
                     }
                     else
@@ -116,7 +116,7 @@ namespace m8
             if (*it != '-')
             {
                 Color color;
-                Colmn colmn;
+                Column column;
                 uint8_t casle_right;
                 Bb bb_rook;
                 Sq sq_rook;
@@ -147,8 +147,8 @@ namespace m8
                     throw InvalFenError("Unable to read the castinling rights from the fen string.");
                 }
 
-                colmn = GetColmn(sq_rook);
-                casle_colmn_[casle_right == kQueenSideCastle ? 0 : 1] = colmn;
+                column = GetColmn(sq_rook);
+                casle_colmn_[casle_right == kQueenSideCastle ? 0 : 1] = column;
                 set_casle(color, casle_right, true);
             }
 
@@ -226,9 +226,9 @@ namespace m8
 
         for (Row row = kRow8; IsRowOnBoard(row); --row)
         {
-            for (Colmn colmn = kColmnA; IsColmnOnBoard(colmn); ++colmn)
+            for (Column column = Column::A(); column.IsOnBoard(); column.MoveNext())
             {
-                Sq sq = NewSq(colmn, row);
+                Sq sq = NewSq(column, row);
                 Piece piece = (*this)[sq];
                 if (IsPiece(piece))
                 {
@@ -274,7 +274,7 @@ namespace m8
             Bb candidate_rooks = this->bb_piece(NewPiece(kRook, color));
             candidate_rooks &= kBbRow[GetColorWiseRow(color, kRow1)];
             Sq sq_outter_most_rook = (castle == kKingSideCastle ? candidate_rooks.GetMSB() : candidate_rooks.GetLSB());
-            Colmn column_outter_most_rook = GetColmn(sq_outter_most_rook);
+            Column column_outter_most_rook = GetColmn(sq_outter_most_rook);
 
             char c;
             if (this->casle_colmn(castle_index) == column_outter_most_rook)
@@ -283,7 +283,7 @@ namespace m8
             }
             else
             {
-                c = static_cast<char>('A' + this->casle_colmn(castle_index));
+                c = static_cast<char>('A' + this->casle_colmn(castle_index).Value());
             }
 
             if (color == kBlack)
@@ -313,9 +313,9 @@ namespace m8
 
     void Board::GenerateXFenEnPassant(std::ostream& out) const
     {
-        if (IsColmnOnBoard(colmn_enpas_))
+        if (colmn_enpas_.IsOnBoard())
         {
-            out << static_cast<char>('a' + colmn_enpas_)
+            out << static_cast<char>('a' + colmn_enpas_.Value())
                 << static_cast<char>('1' + GetColorWiseRow(side_to_move_, kRow5));
         }
         else
@@ -376,13 +376,13 @@ namespace m8
         UINT64_Color_[kBlack] = Bb::Empty();
 
         // Initialize the castle columns. By default we use the regular chess columns.
-        casle_colmn_[0] = kColmnA;
-        casle_colmn_[1] = kColmnH;
+        casle_colmn_[0] = Column::A();
+        casle_colmn_[1] = Column::H();
 
         // Initialize the castle flags, the column of the en-passant capture and 
         // the half move clock.
         casle_flag_ = 0;
-        colmn_enpas_ = kInvalColmn;
+        colmn_enpas_ = Column::Invalid();
         half_move_clock_ = 0;
         full_move_clock_ = 0;
     }
@@ -401,7 +401,7 @@ namespace m8
         auto row = GetRow(sq);
         auto column = GetColmn(sq);
 
-        if (((row & 1) == 1) == ((column & 1) == 1))
+        if (((row & 1) == 1) == ((column.Value() & 1) == 1))
         {
             out << " . ";
         }
@@ -429,7 +429,7 @@ namespace m8
     void DisplayColorRow(std::ostream& out, const Board& board, Color color)
     {
         out << (board.side_to_move() == color ? "=>" : "  ");
-        for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
+        for (auto column = Column::A(); column.IsOnBoard(); column.MoveNext())
         {
             out << "+-"
                 << ((board.casle_colmn(0) == column && board.casle(color, kQueenSideCastle))
@@ -441,10 +441,10 @@ namespace m8
 
     void DisplayPriseEnPassantIndicator(std::ostream& out, const Board& board)
     {
-        Colmn enpas = board.colmn_enpas();
-        if (IsColmnOnBoard(enpas))
+        Column enpas = board.colmn_enpas();
+        if (enpas.IsOnBoard())
         {
-            auto spaces = 4 + enpas * 4;
+            auto spaces = 4 + enpas.Value() * 4;
             for (int x = 0; x < spaces; ++x)
             {
                 out << ' ';
@@ -465,7 +465,7 @@ namespace m8
         {
             out << GetRowNumber(row) << ' ';
 
-            for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
+            for (auto column = Column::A(); column.IsOnBoard(); column.MoveNext())
             {
                 out << '|';
 

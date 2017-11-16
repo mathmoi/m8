@@ -44,7 +44,7 @@ namespace m8
     const std::string kStartingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     /// Type for the information used to unmake a move.
-    typedef std::uint32_t UnmakeInfo;
+    typedef std::uint32_t UnmakeInfo; // TODO : Make a class?
 
     /// Represent the state of a chess board. This include the pieces positions,
     /// the side to move next, the castling rights and the en-passant square.
@@ -122,20 +122,20 @@ namespace m8
         ///             side castling column and the king side castling columns 
         ///             respectively.
         /// @returns A column.
-        inline Colmn casle_colmn(std::size_t indx) const;
+        inline Column casle_colmn(std::size_t indx) const;
 
         /// Accessor for the column of the pawn that can be captured en passant.
         ///
         /// @returns A column. If no piece can be captured en passant an invalid 
         ///          column is returned.
-        inline Colmn colmn_enpas() const { return colmn_enpas_; };
+        inline Column colmn_enpas() const { return colmn_enpas_; };
 
         /// Mutator for the column en passant.
         ///
         /// @param colmn_enpass Column of the piece that can be captured en 
         ///        passant or an invalid column if no piece can be captured en 
         ///        passant.
-        inline void set_colmn_enpas(Colmn colmn_enpas) { colmn_enpas_ = colmn_enpas; };
+        inline void set_colmn_enpas(Column colmn_enpas) { colmn_enpas_ = colmn_enpas; };
 
         /// Accessor for the half move clock.
         ///
@@ -215,7 +215,7 @@ namespace m8
         /// Original column of the two rooks. This is used to determine which 
         /// rook can castle because in Chess960 the rook may not start on 
         /// the column a and h.
-        std::array<Colmn, 2> casle_colmn_;
+        std::array<Column, 2> casle_colmn_;
 
         /// Integer containing flags indicating the remaining castling privileges.
         /// 
@@ -229,7 +229,7 @@ namespace m8
 
         /// Column of the piece that can be captured en-passant. IF no piece can 
         /// be captured en passant col_enpas_ has an invalid column value.
-        Colmn colmn_enpas_;
+        Column colmn_enpas_;
 
         /// Number of moves since the last pawn push or the last capture.
         std::uint32_t half_move_clock_;
@@ -444,7 +444,7 @@ namespace m8
         casle_flag_ ^= (-static_cast<std::uint8_t>(value) ^ casle_flag_) & mask;
     }
 
-    inline Colmn Board::casle_colmn(std::size_t indx) const
+    inline Column Board::casle_colmn(std::size_t indx) const
     {
         // A : The index is 0 or 1.
         assert(indx == 0 || indx == 1);
@@ -568,10 +568,10 @@ namespace m8
         assert(side_to_move_ == GetColor(piece));
 
         Piece rook = NewPiece(kRook, side_to_move_);
-        Colmn rook_colmn = casle_colmn_[castle - 1];
+        Column rook_colmn = casle_colmn_[castle - 1];
         Row row = GetRow(piece);
         Sq rook_from = NewSq(rook_colmn, row);
-        Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
+        Sq rook_to = NewSq(castle == kKingSideCastle ? Column::F() : Column::D(), row);
 
         MovePiece(from, to, piece);
         MovePiece(rook_from, rook_to, rook);
@@ -620,13 +620,13 @@ namespace m8
         Piece taken = GetPieceTaken(move);
         PieceType piece_type = GetPieceType(piece);
 
-        UnmakeInfo unmake_info = colmn_enpas_ << 24 | half_move_clock_;
+        UnmakeInfo unmake_info = colmn_enpas_.Value() << 24 | half_move_clock_;
 
         // If the side to move is black increment the move number
         full_move_clock_ += side_to_move_;
 
         ++half_move_clock_;
-        colmn_enpas_ = kInvalColmn;
+        colmn_enpas_ = Column::Invalid();
 
         switch (piece_type)
         {
@@ -677,7 +677,7 @@ namespace m8
     inline void Board::UnmakeCastlingMove(Sq from, Sq to, Piece piece, CastleType castle)
     {
         Piece rook = NewPiece(kRook, OpposColor(side_to_move_));
-        Colmn rook_colmn = casle_colmn_[castle - 1];
+        Column rook_colmn = casle_colmn_[castle - 1];
         Row row = GetRow(piece);
         Sq rook_from = NewSq(rook_colmn, row);
         Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
@@ -702,7 +702,7 @@ namespace m8
     {
         Row row_enpas = GetColorWiseRow(OpposColor(side_to_move_), kRow6);
 
-        if (IsColmnOnBoard(colmn_enpas_) &&
+        if (colmn_enpas_.IsOnBoard() &&
             taken == NewPiece(kPawn, side_to_move_) &&
             to == NewSq(colmn_enpas_, row_enpas))
         {

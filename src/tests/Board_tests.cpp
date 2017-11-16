@@ -40,7 +40,7 @@ TEST_CASE("Test Board()")
    REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
    REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
 
-   REQUIRE(IsColmnOnBoard(board.colmn_enpas()) == false);
+   REQUIRE(board.colmn_enpas().IsOnBoard() == false);
 }
 
 TEST_CASE("Test Board(fen)")
@@ -68,7 +68,7 @@ TEST_CASE("Test Board(fen)")
 
    for (Row row = kRow6; row >= kRow3; --row)
    {
-      for (Colmn colmn = kColmnA; IsColmnOnBoard(colmn); ++colmn)
+      for (Column colmn = Column::A(); colmn.IsOnBoard(); colmn.MoveNext())
       {
          Sq sq = NewSq(colmn, row);
          REQUIRE(board[sq] == kNoPiece);
@@ -100,10 +100,10 @@ TEST_CASE("Test Board(fen)")
    REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
    REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
 
-   REQUIRE(board.casle_colmn(0) == kColmnA);
-   REQUIRE(board.casle_colmn(1) == kColmnH);
+   REQUIRE(board.casle_colmn(0) == Column::A());
+   REQUIRE(board.casle_colmn(1) == Column::H());
 
-   REQUIRE(board.colmn_enpas() == kInvalColmn);
+   REQUIRE(board.colmn_enpas() == Column::Invalid());
 }
 
 TEST_CASE("Test Board(fen) 2")
@@ -116,8 +116,8 @@ TEST_CASE("Test Board(fen) 2")
    REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
    REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
 
-   REQUIRE(board.casle_colmn(0) == kColmnA);
-   REQUIRE(board.casle_colmn(1) == kColmnG);
+   REQUIRE(board.casle_colmn(0) == Column::A());
+   REQUIRE(board.casle_colmn(1) == Column::G());
 
    REQUIRE(board.half_move_clock() == 4);
 }
@@ -127,7 +127,7 @@ TEST_CASE("Test Board(fen) 3")
    // Chess360 castling test
    Board board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
 
-   REQUIRE(board.colmn_enpas() == kColmnE);
+   REQUIRE(board.colmn_enpas() == Column::E());
 }
 
 TEST_CASE("Test Board(fen) 4")
@@ -161,13 +161,13 @@ TEST_CASE("Test colmn_enpas()")
 {
    Board board;
 
-   REQUIRE(!IsColmnOnBoard(board.colmn_enpas()));
+   REQUIRE(!board.colmn_enpas().IsOnBoard());
 
-   board.set_colmn_enpas(kColmnD);
-   REQUIRE(board.colmn_enpas() == kColmnD);
+   board.set_colmn_enpas(Column::D());
+   REQUIRE(board.colmn_enpas() == Column::D());
 
-   board.set_colmn_enpas(kInvalColmn);
-   REQUIRE(!IsColmnOnBoard(board.colmn_enpas()));
+   board.set_colmn_enpas(Column::Invalid());
+   REQUIRE(!board.colmn_enpas().IsOnBoard());
 }
 
 TEST_CASE("Test casle()")
@@ -328,7 +328,7 @@ TEST_CASE("Make__simple_move__piece_is_moved")
 
     REQUIRE(board[kF3] == kNoPiece);
     REQUIRE(board[kG4] == kWhiteQueen);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -342,7 +342,7 @@ TEST_CASE("Make__simple_capture__piece_is_moved")
 
     REQUIRE(board[kE5] == kNoPiece);
     REQUIRE(board[kF7] == kWhiteKnight);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -358,7 +358,7 @@ TEST_CASE("Make__king_side_castling__piece_are_moved")
     REQUIRE(board[kH1] == kNoPiece);
     REQUIRE(board[kG1] == kWhiteKing);
     REQUIRE(board[kF1] == kWhiteRook);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -374,7 +374,7 @@ TEST_CASE("Make__queen_side_castling__piece_are_moved")
     REQUIRE(board[kA1] == kNoPiece);
     REQUIRE(board[kC1] == kWhiteKing);
     REQUIRE(board[kD1] == kWhiteRook);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -388,7 +388,7 @@ TEST_CASE("Make__pawn_move__piece_is_moved")
 
     REQUIRE(board[kD5] == kNoPiece);
     REQUIRE(board[kD6] == kWhitePawn);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -402,7 +402,7 @@ TEST_CASE("Make__pawn_moved_two_square__piece_is_moved_and_en_passant_flag_set")
 
     REQUIRE(board[kA2] == kNoPiece);
     REQUIRE(board[kA4] == kWhitePawn);
-    REQUIRE(board.colmn_enpas() == kColmnA);
+    REQUIRE(board.colmn_enpas() == Column::A());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -416,7 +416,7 @@ TEST_CASE("Make__pawn_capture__piece_are_moved")
 
     REQUIRE(board[kD5] == kNoPiece);
     REQUIRE(board[kE6] == kWhitePawn);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -431,7 +431,7 @@ TEST_CASE("Make__pawn_capture_en_passant__piece_are_moved")
     REQUIRE(board[kB4] == kNoPiece);
     REQUIRE(board[kA3] == kBlackPawn);
     REQUIRE(board[kA4] == kNoPiece);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -445,7 +445,7 @@ TEST_CASE("Make__pawn_promotion__piece_is_promoted")
 
     REQUIRE(board[kG2] == kNoPiece);
     REQUIRE(board[kH1] == kBlackKnight);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -459,7 +459,7 @@ TEST_CASE("Make__king_move__castling_flags_are_cleared")
 
     REQUIRE(board[kE1] == kNoPiece);
     REQUIRE(board[kF1] == kWhiteKing);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
     REQUIRE(!board.casle(kWhite, kQueenSideCastle));
@@ -475,7 +475,7 @@ TEST_CASE("Make__king_side_rook_move__king_side_castling_flag_cleared")
 
     REQUIRE(board[kH1] == kNoPiece);
     REQUIRE(board[kG1] == kWhiteRook);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
     REQUIRE(board.casle(kWhite, kQueenSideCastle));
@@ -491,7 +491,7 @@ TEST_CASE("Make__queen_side_rook_move__queen_side_castling_flag_cleared")
 
     REQUIRE(board[kA1] == kNoPiece);
     REQUIRE(board[kB1] == kWhiteRook);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
     REQUIRE(!board.casle(kWhite, kQueenSideCastle));
@@ -509,7 +509,7 @@ TEST_CASE("Unmake__simple_move__piece_is_replaced")
 
     REQUIRE(board[kF3] == kWhiteQueen);
     REQUIRE(board[kG4] == kNoPiece);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -525,7 +525,7 @@ TEST_CASE("Unmake__simple_capture__capture_is_unmade")
 
     REQUIRE(board[kE5] == kWhiteKnight);
     REQUIRE(board[kF7] == kBlackPawn);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -543,7 +543,7 @@ TEST_CASE("Unmake__king_side_castling__castling_is_unmade")
     REQUIRE(board[kH1] == kWhiteRook);
     REQUIRE(board[kG1] == kNoPiece);
     REQUIRE(board[kF1] == kNoPiece);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -561,7 +561,7 @@ TEST_CASE("Unmake__queen_side_castling__castling_is_unmade")
     REQUIRE(board[kA1] == kWhiteRook);
     REQUIRE(board[kC1] == kNoPiece);
     REQUIRE(board[kD1] == kNoPiece);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -577,7 +577,7 @@ TEST_CASE("Unmake__pawn_move__moved_is_unmade")
 
     REQUIRE(board[kD5] == kWhitePawn);
     REQUIRE(board[kD6] == kNoPiece);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -593,7 +593,7 @@ TEST_CASE("Unmake__pawn_moved_two_square__piece_is_moved")
 
     REQUIRE(board[kA2] == kWhitePawn);
     REQUIRE(board[kA4] == kNoPiece);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -609,7 +609,7 @@ TEST_CASE("Unmake__pawn_capture__piece_are_moved")
 
     REQUIRE(board[kD5] == kWhitePawn);
     REQUIRE(board[kE6] == kBlackPawn);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
 }
@@ -626,7 +626,7 @@ TEST_CASE("Unmake__pawn_capture_en_passant__piece_are_moved")
     REQUIRE(board[kB4] == kBlackPawn);
     REQUIRE(board[kA3] == kNoPiece);
     REQUIRE(board[kA4] == kWhitePawn);
-    REQUIRE(board.colmn_enpas() == kColmnA);
+    REQUIRE(board.colmn_enpas() == Column::A());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
 }
@@ -642,7 +642,7 @@ TEST_CASE("Unmake__pawn_promotion__board_is_restored")
 
     REQUIRE(board[kG2] == kBlackPawn);
     REQUIRE(board[kH1] == kWhiteRook);
-    REQUIRE(board.colmn_enpas() == kInvalColmn);
+    REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
 }

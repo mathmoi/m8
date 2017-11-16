@@ -40,35 +40,35 @@ namespace m8 {
                     bb.Set(target);
 
             // Go west
-            if (GetColmn(sq) > kColmnB)
-                for (Sq target = sq - 1; IsSqOnBoard(target) && GetColmn(target) > kColmnA; target -= 1)
+            if (GetColmn(sq) > Column::B())
+                for (Sq target = sq - 1; IsSqOnBoard(target) && GetColmn(target) > Column::A(); target -= 1)
                     bb.Set( target);
 
             // Go east
-            if (GetColmn(sq) < kColmnG)
-                for (Sq target = sq + 1; IsSqOnBoard(target) && GetColmn(target) < kColmnH; target += 1)
+            if (GetColmn(sq) < Column::G())
+                for (Sq target = sq + 1; IsSqOnBoard(target) && GetColmn(target) < Column::H(); target += 1)
                     bb.Set(target);
         }
         else
         {
             // Go northeast
-            if (GetColmn(sq) < kColmnG && GetRow(sq) < kRow7)
-                for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < kColmnH && GetRow(target) < kRow8; target += 9)
+            if (GetColmn(sq) < Column::G() && GetRow(sq) < kRow7)
+                for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) < kRow8; target += 9)
                     bb.Set(target);
 
             // Go southeast
-            if (GetColmn(sq) < kColmnG && GetRow(sq) > kRow2)
-                for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < kColmnH && GetRow(target) > kRow1; target -= 7)
+            if (GetColmn(sq) < Column::G() && GetRow(sq) > kRow2)
+                for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) > kRow1; target -= 7)
                     bb.Set(target);
 
             // Go southwest
-            if (GetColmn(sq) > kColmnB && GetRow(sq) > kRow2)
-                for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > kColmnA && GetRow(target) > kRow1; target -= 9)
+            if (GetColmn(sq) > Column::B() && GetRow(sq) > kRow2)
+                for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) > kRow1; target -= 9)
                     bb.Set(target);
 
             // Go northwest
-            if (GetColmn(sq) > kColmnB && GetRow(sq) < kRow7)
-                for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > kColmnA && GetRow(target) < kRow8; target += 7)
+            if (GetColmn(sq) > Column::B() && GetRow(sq) < kRow7)
+                for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) < kRow8; target += 7)
                     bb.Set(target);
         }
         return bb;
@@ -134,12 +134,12 @@ namespace m8 {
         Bb bb;
         
         // Go north
-        bb = occupancy & Bb(kBbColmn[GetColmn(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbColmn[GetColmn(sq).Value()]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetLSB());
 
         // Go south
-        bb = occupancy & Bb(kBbColmn[GetColmn(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbColmn[GetColmn(sq).Value()]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 

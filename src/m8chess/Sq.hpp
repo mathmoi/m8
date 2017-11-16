@@ -11,42 +11,10 @@
 #include <cassert>
 
 #include "Color.hpp"
+#include "Column.hpp"
 
 namespace m8
 {
-   ////////////////////////////////////////////////////////////////////////////
-   //                                Columns                                 //
-   ////////////////////////////////////////////////////////////////////////////
-
-   /// Type that represent a Column on a chess board.
-   typedef std::uint8_t Colmn;
-
-   /// Number of columns on a chess board
-   const std::uint8_t kNumColmnOnBoard = 8;
-
-   /// @name Columns constants
-   /// Constants for the columns of the chessboard
-   /// @{
-   const Colmn kColmnA = 0;
-   const Colmn kColmnB = 1;
-   const Colmn kColmnC = 2;
-   const Colmn kColmnD = 3;
-   const Colmn kColmnE = 4;
-   const Colmn kColmnF = 5;
-   const Colmn kColmnG = 6;
-   const Colmn kColmnH = 7;
-   const Colmn kInvalColmn = 255;
-   /// @}
-
-   /// Indicate if a given column is on the board.
-   ///
-   /// @param colmn The column to test.
-   /// @return True if the column is on the board.
-   inline bool IsColmnOnBoard(Colmn colmn) { return colmn < kNumColmnOnBoard; }
-
-   /// Returns the character representing the column.
-   inline char GetColumnChar(Colmn colmn) { assert(IsColmnOnBoard(colmn));  return 'a' + colmn; }
-
    ////////////////////////////////////////////////////////////////////////////
    //                                  Rows                                  //
    ////////////////////////////////////////////////////////////////////////////
@@ -197,25 +165,25 @@ namespace m8
    /// @param colmn Column of the square.
    /// @param row Row of the square.
    /// @return A square.
-   inline Sq NewSq(Colmn colmn, Row row)
+   inline Sq NewSq(Column colmn, Row row)
    { 
       // A : The column and row are valid
-      assert(IsColmnOnBoard(colmn));
+      assert(colmn.IsOnBoard());
       assert(IsRowOnBoard(row));
 
-      return (row << 3) + colmn;
+      return (row << 3) + colmn.Value();
    }
 
    /// Get the column of a square.
    ///
    /// @param sq The square.
    /// @return The column of the square.
-   inline Colmn GetColmn(Sq sq)
+   inline Column GetColmn(Sq sq)
    {
       // A : The square is valid
       assert(IsSqOnBoard(sq));
 
-      return sq & 7; 
+      return Column(sq & 7); 
    }
 
    /// Get the row of a square.
@@ -239,7 +207,7 @@ namespace m8
        // A : The square is valid
        assert(IsSqOnBoard(sq));
 
-       return 7 - GetColmn(sq) + GetRow(sq);
+       return 7 - GetColmn(sq).Value() + GetRow(sq);
    }
 
    /// Get the index of the anti-diagonals the square is on.
@@ -251,7 +219,7 @@ namespace m8
        // A : The square is valid
        assert(IsSqOnBoard(sq));
 
-       return GetColmn(sq) + GetRow(sq);
+       return GetColmn(sq).Value() + GetRow(sq);
    }
 }
 

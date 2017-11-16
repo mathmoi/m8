@@ -32,12 +32,12 @@ namespace m8
    ///
    /// @param colmn The column
    /// @return A bitboard
-   inline Bb GetColmnBb(Colmn colmn) 
+   inline Bb GetColmnBb(Column colmn) 
    {
       // A : The column is valid
-      assert(IsColmnOnBoard(colmn));
+      assert(colmn.IsOnBoard());
 
-      return UINT64_C(0x101010101010101) << colmn;
+      return UINT64_C(0x101010101010101) << colmn.Value();
    }
 }
 

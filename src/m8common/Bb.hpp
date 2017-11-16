@@ -165,7 +165,7 @@ namespace m8
         inline Bb& operator -= (std::int32_t rhs) { value_ -= rhs; return *this; };
         inline Bb& operator ++ () { ++value_; return *this; };
         
-        inline Bb operator ~ () { return ~value_; };
+        inline Bb operator ~ () const { return ~value_; };
         
         friend std::ostream& operator <<(std::ostream& out, Bb bb);
 
