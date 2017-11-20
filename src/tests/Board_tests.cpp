@@ -66,7 +66,7 @@ TEST_CASE("Test Board(fen)")
    REQUIRE(board[kG7] == kBlackPawn);
    REQUIRE(board[kH7] == kBlackPawn);
 
-   for (Row row = kRow6; row >= kRow3; --row)
+   for (Row row = Row::_6(); row >= Row::_3(); row.MovePrevious())
    {
       for (Column colmn = Column::A(); colmn.IsOnBoard(); colmn.MoveNext())
       {

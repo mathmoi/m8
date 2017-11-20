@@ -30,13 +30,13 @@ namespace m8 {
         if (is_rook)
         {
             // Go north
-            if (GetRow(sq) < kRow7)
-                for (Sq target = sq + 8; IsSqOnBoard(target) && GetRow(target) < kRow8; target += 8)
+            if (GetRow(sq) < Row::_7())
+                for (Sq target = sq + 8; IsSqOnBoard(target) && GetRow(target) < Row::_8(); target += 8)
                     bb.Set(target);
 
             // Go south
-            if (GetRow(sq) > kRow2)
-                for (Sq target = sq - 8; IsSqOnBoard(target) && GetRow(target) > kRow1; target -= 8)
+            if (GetRow(sq) > Row::_2())
+                for (Sq target = sq - 8; IsSqOnBoard(target) && GetRow(target) > Row::_1(); target -= 8)
                     bb.Set(target);
 
             // Go west
@@ -52,23 +52,23 @@ namespace m8 {
         else
         {
             // Go northeast
-            if (GetColmn(sq) < Column::G() && GetRow(sq) < kRow7)
-                for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) < kRow8; target += 9)
+            if (GetColmn(sq) < Column::G() && GetRow(sq) < Row::_7())
+                for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) < Row::_8(); target += 9)
                     bb.Set(target);
 
             // Go southeast
-            if (GetColmn(sq) < Column::G() && GetRow(sq) > kRow2)
-                for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) > kRow1; target -= 7)
+            if (GetColmn(sq) < Column::G() && GetRow(sq) > Row::_2())
+                for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) > Row::_1(); target -= 7)
                     bb.Set(target);
 
             // Go southwest
-            if (GetColmn(sq) > Column::B() && GetRow(sq) > kRow2)
-                for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) > kRow1; target -= 9)
+            if (GetColmn(sq) > Column::B() && GetRow(sq) > Row::_2())
+                for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) > Row::_1(); target -= 9)
                     bb.Set(target);
 
             // Go northwest
-            if (GetColmn(sq) > Column::B() && GetRow(sq) < kRow7)
-                for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) < kRow8; target += 7)
+            if (GetColmn(sq) > Column::B() && GetRow(sq) < Row::_7())
+                for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) < Row::_8(); target += 7)
                     bb.Set(target);
         }
         return bb;
@@ -134,22 +134,22 @@ namespace m8 {
         Bb bb;
         
         // Go north
-        bb = occupancy & Bb(kBbColmn[GetColmn(sq).Value()]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbColmn[GetColmn(sq).value()]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetLSB());
 
         // Go south
-        bb = occupancy & Bb(kBbColmn[GetColmn(sq).Value()]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbColmn[GetColmn(sq).value()]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 
         // Go west
-        bb = occupancy & Bb(kBbRow[GetRow(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbRow[GetRow(sq).value()]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 
         // Go east
-        bb = occupancy & Bb(kBbRow[GetRow(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbRow[GetRow(sq).value()]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetLSB());
 

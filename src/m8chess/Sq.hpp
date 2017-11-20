@@ -12,52 +12,10 @@
 
 #include "Color.hpp"
 #include "Column.hpp"
+#include "Row.hpp"
 
 namespace m8
-{
-   ////////////////////////////////////////////////////////////////////////////
-   //                                  Rows                                  //
-   ////////////////////////////////////////////////////////////////////////////
-   
-   /// Type that represent a row on a chess board.
-   typedef std::uint8_t Row;
-
-   /// Number of rows on a chess board
-   const std::uint8_t kNumRowOnBoard = 8;
-
-   /// @name Row constants
-   /// Constants for the row of the chessboard
-   /// @{
-   const Row kRow1 = 0;
-   const Row kRow2 = 1;
-   const Row kRow3 = 2;
-   const Row kRow4 = 3;
-   const Row kRow5 = 4;
-   const Row kRow6 = 5;
-   const Row kRow7 = 6;
-   const Row kRow8 = 7;
-   const Row kInvalRow = 255;
-   /// @}
-
-   /// Indicate if a given row is on the board.
-   ///
-   /// @param row The row to test.
-   /// @return True if the row is on the board.
-   inline bool IsRowOnBoard(Row row) { return row < kNumRowOnBoard; }
-
-   /// Returns the character representing the number of a row.
-   inline char GetRowNumber(Row row) { assert(IsRowOnBoard(row));  return '1' + row; }
-
-   /// Returns a row relative to each color. For exemple, the first row for black is the
-   /// 8th row while to first row for white is the 1st row.
-   ///
-   /// @param color Color
-   /// @param row   Index of the row (0 to 7).
-   /// @return 
-   inline Row GetColorWiseRow(Color color, Row row) { 
-       return (row * OpposColor(color)) + ((7 - row) * color);
-   }
-   
+{   
    ////////////////////////////////////////////////////////////////////////////
    //                              Diagonals                                 //
    ////////////////////////////////////////////////////////////////////////////
@@ -169,9 +127,9 @@ namespace m8
    { 
       // A : The column and row are valid
       assert(colmn.IsOnBoard());
-      assert(IsRowOnBoard(row));
+      assert(row.IsOnBoard());
 
-      return (row << 3) + colmn.Value();
+      return (row.value() << 3) + colmn.value();
    }
 
    /// Get the column of a square.
@@ -207,7 +165,7 @@ namespace m8
        // A : The square is valid
        assert(IsSqOnBoard(sq));
 
-       return 7 - GetColmn(sq).Value() + GetRow(sq);
+       return 7 - GetColmn(sq).value() + GetRow(sq).value();
    }
 
    /// Get the index of the anti-diagonals the square is on.
@@ -219,7 +177,7 @@ namespace m8
        // A : The square is valid
        assert(IsSqOnBoard(sq));
 
-       return GetColmn(sq).Value() + GetRow(sq);
+       return GetColmn(sq).value() + GetRow(sq).value();
    }
 }
 

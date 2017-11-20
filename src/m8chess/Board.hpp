@@ -581,7 +581,7 @@ namespace m8
     {
         assert(GetPieceType(piece) == kRook);
 
-        Row first_row = GetColorWiseRow(side_to_move_, kRow1);
+        Row first_row = Row::_1().color_wise(side_to_move_);
 
         if (from == NewSq(casle_colmn_[0], first_row))
         {
@@ -620,7 +620,7 @@ namespace m8
         Piece taken = GetPieceTaken(move);
         PieceType piece_type = GetPieceType(piece);
 
-        UnmakeInfo unmake_info = colmn_enpas_.Value() << 24 | half_move_clock_;
+        UnmakeInfo unmake_info = colmn_enpas_.value() << 24 | half_move_clock_;
 
         // If the side to move is black increment the move number
         full_move_clock_ += side_to_move_;
@@ -700,14 +700,14 @@ namespace m8
 
     inline void Board::UnmakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to)
     {
-        Row row_enpas = GetColorWiseRow(OpposColor(side_to_move_), kRow6);
+        Row row_enpas = Row::_6().color_wise(OpposColor(side_to_move_));
 
         if (colmn_enpas_.IsOnBoard() &&
             taken == NewPiece(kPawn, side_to_move_) &&
             to == NewSq(colmn_enpas_, row_enpas))
         {
             UnmakeSimpleMove(from, to, piece, kNoPiece);
-            AddPiece(NewSq(colmn_enpas_, GetColorWiseRow(OpposColor(side_to_move_), kRow5)), taken);
+            AddPiece(NewSq(colmn_enpas_, Row::_5().color_wise(OpposColor(side_to_move_))), taken);
         }
         else if (IsPiece(promote_to))
         {

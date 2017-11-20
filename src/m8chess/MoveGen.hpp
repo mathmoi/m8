@@ -338,8 +338,8 @@ namespace m8
         attackers |= king_attack_bb_[sq] & kings;
 
         Bb bb_sq = Bb::GetSingleBitBb(sq);
-        attackers |= (((bb_sq << 7) & ~kBbColmn[Column::H().Value()]) | ((bb_sq << 9) & ~kBbColmn[Column::A().Value()])) & board_.bb_piece(kBlackPawn);
-        attackers |= (((bb_sq >> 9) & ~kBbColmn[Column::H().Value()]) | ((bb_sq >> 7) & ~kBbColmn[Column::A().Value()])) & board_.bb_piece(kWhitePawn);
+        attackers |= (((bb_sq << 7) & ~kBbColmn[Column::H().value()]) | ((bb_sq << 9) & ~kBbColmn[Column::A().value()])) & board_.bb_piece(kBlackPawn);
+        attackers |= (((bb_sq >> 9) & ~kBbColmn[Column::H().value()]) | ((bb_sq >> 7) & ~kBbColmn[Column::A().value()])) & board_.bb_piece(kWhitePawn);
 
         return attackers;
     }
@@ -466,7 +466,7 @@ namespace m8
     {
         Piece piece = NewPiece(kPawn, color);
 
-        Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_column.Value()]); // TODO : Make row.Bb()
+        Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_column.value()]); // TODO : Make row.Bb()
         target.Shift(delta);
         target &= board_.UINT64_Color(OpposColor(color));
         next_move = UnpackPawnMoves(color, target, -delta, next_move);
@@ -477,10 +477,10 @@ namespace m8
     inline Move* MoveGen::GeneratePawnPromotions(Color color, Move* next_move) const 
     {
         Piece piece = NewPiece(kPawn, color);
-        Row seventh_row = kRow7 - 5 * color;
+        Row seventh_row = Row::_7().color_wise(color);
         int forward_move = 8 - 16 * color;
 
-        Bb target = board_.bb_piece(piece) & kBbRow[seventh_row];
+        Bb target = board_.bb_piece(piece) & kBbRow[seventh_row.value()];
         target.Shift(forward_move);
         target &= ~board_.bb_occupied();
         next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
@@ -548,18 +548,18 @@ namespace m8
     inline Move* MoveGen::GeneratePawnMoves(Color color, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
-        Row third_row = kRow3 + 3 * color;
-        Row seventh_row = kRow7 - 5 * color;
+        Row third_row = Row::_3().color_wise(color);
+        Row seventh_row = Row::_7().color_wise(color);
         int forward_move = 8 - 16 * color;
 
         // Generate the standard one square forward moves. We need to exclude pawns on 
         // the 7th rank that will generate promotions.
-        Bb target = board_.bb_piece(piece) & Bb(~kBbRow[seventh_row]); // TODO : Make row.Bb()
+        Bb target = board_.bb_piece(piece) & Bb(~kBbRow[seventh_row.value()]); // TODO : Make row.Bb()
         target.Shift(forward_move);
         target &= ~board_.bb_occupied();
 
         // Generate the two squares moves
-        Bb target_dbl = target & kBbRow[third_row];
+        Bb target_dbl = target & kBbRow[third_row.value()];
         target_dbl.Shift(forward_move);
         target_dbl &= ~board_.bb_occupied();
 

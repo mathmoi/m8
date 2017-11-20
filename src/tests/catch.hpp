@@ -4018,7 +4018,7 @@ namespace Catch {
     inline void abortAfterFirst( ConfigData& config ) { config.abortAfter = 1; }
     inline void abortAfterX( ConfigData& config, int x ) {
         if( x < 1 )
-            throw std::runtime_error( "Value after -x or --abortAfter must be greater than zero" );
+            throw std::runtime_error( "value after -x or --abortAfter must be greater than zero" );
         config.abortAfter = x;
     }
     inline void addTestOrTags( ConfigData& config, std::string const& _testSpec ) { config.testsOrTags.push_back( _testSpec ); }

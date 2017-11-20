@@ -26,7 +26,7 @@ namespace m8
 
         // First we consume the piece placement section
         Column column = Column::A();
-        Row row = kRow8;
+        Row row = Row::_8();
         while (it < fen.end() && *it != ' ')
         {
             // If the character is a digit we increment the current column by this
@@ -43,7 +43,7 @@ namespace m8
                 if (it_piece != char_to_piece_map.end())
                 {
                     // If the current position is invalid we throw an exception
-                    if (!column.IsOnBoard() || !IsRowOnBoard(row))
+                    if (!column.IsOnBoard() || !row.IsOnBoard())
                     {
                         throw InvalFenError("Invalid piece placement section in fen string");
                     }
@@ -58,7 +58,7 @@ namespace m8
                     if (*it == '/')
                     {
                         column = Column::A();
-                        --row;
+                        row.MovePrevious();
                     }
                     else
                     {
@@ -123,7 +123,7 @@ namespace m8
                 Sq sq_king;
 
                 color = isupper(*it) ? kWhite : kBlack;
-                bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(color * kRow8);
+                bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(color * Row::_8().value());
 
                 if (*it == 'Q' || *it == 'q')
                 {
@@ -137,7 +137,7 @@ namespace m8
                 }
                 else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
                 {
-                    sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
+                    sq_rook = NewSq(tolower(*it) - 'a', Row::_8().color_wise(color));
                     sq_king = bb_piece(NewPiece(kKing, color)).GetLSB();
                     casle_right = (sq_rook < sq_king ? kQueenSideCastle : kKingSideCastle);
                 }
@@ -224,7 +224,7 @@ namespace m8
     {
         uint32_t emptySquares = 0;
 
-        for (Row row = kRow8; IsRowOnBoard(row); --row)
+        for (Row row = Row::_8(); row.IsOnBoard(); row.MovePrevious())
         {
             for (Column column = Column::A(); column.IsOnBoard(); column.MoveNext())
             {
@@ -252,7 +252,7 @@ namespace m8
                 emptySquares = 0;
             }
 
-            if (row > kRow1)
+            if (row > Row::_1())
             {
                 out << '/';
             }
@@ -272,7 +272,7 @@ namespace m8
         if (result)
         {
             Bb candidate_rooks = this->bb_piece(NewPiece(kRook, color));
-            candidate_rooks &= kBbRow[GetColorWiseRow(color, kRow1)];
+            candidate_rooks &= kBbRow[Row::_1().color_wise(color).value()];
             Sq sq_outter_most_rook = (castle == kKingSideCastle ? candidate_rooks.GetMSB() : candidate_rooks.GetLSB());
             Column column_outter_most_rook = GetColmn(sq_outter_most_rook);
 
@@ -283,7 +283,7 @@ namespace m8
             }
             else
             {
-                c = static_cast<char>('A' + this->casle_colmn(castle_index).Value());
+                c = static_cast<char>('A' + this->casle_colmn(castle_index).value());
             }
 
             if (color == kBlack)
@@ -315,8 +315,8 @@ namespace m8
     {
         if (colmn_enpas_.IsOnBoard())
         {
-            out << static_cast<char>('a' + colmn_enpas_.Value())
-                << static_cast<char>('1' + GetColorWiseRow(side_to_move_, kRow5));
+            out << static_cast<char>('a' + colmn_enpas_.value())
+                << static_cast<char>('1' + Row::_5().color_wise(side_to_move_).value());
         }
         else
         {
@@ -401,7 +401,7 @@ namespace m8
         auto row = GetRow(sq);
         auto column = GetColmn(sq);
 
-        if (((row & 1) == 1) == ((column.Value() & 1) == 1))
+        if (((row.value() & 1) == 1) == ((column.value() & 1) == 1))
         {
             out << " . ";
         }
@@ -444,7 +444,7 @@ namespace m8
         Column enpas = board.colmn_enpas();
         if (enpas.IsOnBoard())
         {
-            auto spaces = 4 + enpas.Value() * 4;
+            auto spaces = 4 + enpas.value() * 4;
             for (int x = 0; x < spaces; ++x)
             {
                 out << ' ';
@@ -461,9 +461,9 @@ namespace m8
 
     void DisplayBoardContent(std::ostream& out, const Board& board)
     {
-        for (auto row = kRow8; IsRowOnBoard(row); --row)
+        for (auto row = Row::_8(); row.IsOnBoard(); row.MovePrevious())
         {
-            out << GetRowNumber(row) << ' ';
+            out << row.number() << ' ';
 
             for (auto column = Column::A(); column.IsOnBoard(); column.MoveNext())
             {
@@ -475,7 +475,7 @@ namespace m8
             }
             out << "|\n";
 
-            if (kRow1 < row)
+            if (Row::_1() < row)
             {
                 out << "  +---+---+---+---+---+---+---+---+\n";
             }

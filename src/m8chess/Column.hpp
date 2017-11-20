@@ -32,7 +32,7 @@ namespace m8
         /// <summary>
         ///  Return the value of the column.
         /// </summary>
-        inline std::uint8_t Value() const { return value_; }
+        inline std::uint8_t value() const { return value_; }
         
         /// <summary>
         ///  Indicate if the current column is on the board.

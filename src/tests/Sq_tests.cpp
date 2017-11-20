@@ -24,15 +24,15 @@ TEST_CASE("Test IsColmnOnBoard")
 
 TEST_CASE("Test IsRowOnBoard")
 {
-   REQUIRE(kNumRowOnBoard == 8);
+   REQUIRE(Row::NumRowOnBoard == 8);
 
-   for (Row row = 0; row < kNumRowOnBoard; ++row)
+   for (Row row = 0; row < Row::NumRowOnBoard; row.MoveNext())
    {
-      REQUIRE(IsRowOnBoard(row) == true);
+      REQUIRE(row.IsOnBoard() == true);
    }
 
-   REQUIRE(IsRowOnBoard(kRow1 - 1) == false);
-   REQUIRE(IsRowOnBoard(kRow8 + 1) == false);
+   REQUIRE(Row::_1().MovePrevious().IsOnBoard() == false);
+   REQUIRE(Row::_8().MoveNext().IsOnBoard() == false);
 }
 
 TEST_CASE("Test IsSqOnBoard")
@@ -50,15 +50,15 @@ TEST_CASE("Test IsSqOnBoard")
 
 TEST_CASE("Test GetRow")
 {
-   REQUIRE(GetRow(kA1) == kRow1);
-   REQUIRE(GetRow(kH1) == kRow1);
-   REQUIRE(GetRow(kA8) == kRow8);
-   REQUIRE(GetRow(kH8) == kRow8);
+   REQUIRE(GetRow(kA1) == Row::_1());
+   REQUIRE(GetRow(kH1) == Row::_1());
+   REQUIRE(GetRow(kA8) == Row::_8());
+   REQUIRE(GetRow(kH8) == Row::_8());
 
-   REQUIRE(GetRow(kB1) == kRow1);
-   REQUIRE(GetRow(kD3) == kRow3);
-   REQUIRE(GetRow(kF5) == kRow5);
-   REQUIRE(GetRow(kG8) == kRow8);
+   REQUIRE(GetRow(kB1) == Row::_1());
+   REQUIRE(GetRow(kD3) == Row::_3());
+   REQUIRE(GetRow(kF5) == Row::_5());
+   REQUIRE(GetRow(kG8) == Row::_8());
 }
 
 TEST_CASE("Test GetColmn")
