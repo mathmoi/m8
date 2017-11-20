@@ -45,7 +45,7 @@ namespace m8
         ///  columns. The column must be valid before the move.
         /// </summary>
         /// <returns>A reference to the current object</returns>
-        inline Column& MoveNext() { assert(IsOnBoard()); ++value_; return *this; }
+        inline Column MoveRight() const { assert(IsOnBoard()); return Column(value_ + 1); }
         
         /// <summary>
         ///  Column a

@@ -334,10 +334,10 @@ namespace m8
 
         Bb attackers = GenerateRookAttacks(board_.bb_occupied(), sq) & (queens | rooks);
         attackers |= GenerateBishopAttacks(board_.bb_occupied(), sq) & (queens | bishops);
-        attackers |= knight_attack_bb_[sq] & knights;
-        attackers |= king_attack_bb_[sq] & kings;
+        attackers |= knight_attack_bb_[sq.value()] & knights;
+        attackers |= king_attack_bb_[sq.value()] & kings;
 
-        Bb bb_sq = Bb::GetSingleBitBb(sq);
+        Bb bb_sq = Bb::GetSingleBitBb(sq.value());
         attackers |= (((bb_sq << 7) & ~kBbColmn[Column::H().value()]) | ((bb_sq << 9) & ~kBbColmn[Column::A().value()])) & board_.bb_piece(kBlackPawn);
         attackers |= (((bb_sq >> 9) & ~kBbColmn[Column::H().value()]) | ((bb_sq >> 7) & ~kBbColmn[Column::A().value()])) & board_.bb_piece(kWhitePawn);
 
@@ -356,7 +356,7 @@ namespace m8
 
     inline Bb MoveGen::GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
     {
-        Magic&  magic = magics[sq];
+        Magic&  magic = magics[sq.value()];
         occ &=  magic.mask;
         occ *=  magic.magic;
         occ >>= magic.shift;
@@ -396,7 +396,7 @@ namespace m8
         while (bb_pieces)
         {
             Sq from = bb_pieces.RemoveLSB();
-            Bb destinations = attack_array[from] & targets;
+            Bb destinations = attack_array[from.value()] & targets;
 
             while (destinations)
             {
@@ -445,8 +445,8 @@ namespace m8
         while (target)
         {
             Sq to = target.RemoveLSB();
-            Sq from = to + from_delta;
-            if (GetRow(to) != eighth_row)
+            Sq from = to.value() + from_delta;
+            if (to.row() != eighth_row)
             {
                 *(next_move++) = NewMove(from, to, piece, board_[to]);
             }
@@ -500,24 +500,24 @@ namespace m8
             Piece king = NewPiece(kKing, color);
             Bb bb_king = board_.bb_piece(king);
             Sq king_position = bb_king.GetLSB();
-            Row row = GetRow(king_position);
-            Sq king_final_position = NewSq(king_final_column, row);
-            Sq rook_position = NewSq(rook_original_column, row);
-            Sq rook_final_position = NewSq(rook_final_column, row);
+            Row row = king_position.row();
+            Sq king_final_position(king_final_column, row);
+            Sq rook_position(rook_original_column, row);
+            Sq rook_final_position(rook_final_column, row);
 
-            Bb bb_travel_king = BbBetween(king_position, king_final_position);
-            Bb bb_travel_rook = BbBetween(rook_position, rook_final_position);
+            Bb bb_travel_king = BbBetween(king_position.value(), king_final_position.value());
+            Bb bb_travel_rook = BbBetween(rook_position.value(), rook_final_position.value());
 
             // Check if any of the travel squared is occupied.
             Bb occ = board_.bb_occupied();
-            occ ^= Bb::GetSingleBitBb(rook_position) | bb_king;
+            occ ^= Bb::GetSingleBitBb(rook_position.value()) | bb_king;
             bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != Bb::Empty();
 
             if (!travel_occupied)
             {
                 // Check if any of the square traveled by the king or the origin or 
                 // destination of the king are under attack.
-                Bb UINT64_Check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position);
+                Bb UINT64_Check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position.value());
                 Bb bb_opponents = board_.UINT64_Color(OpposColor(color));
 
                 bool attacked = false;

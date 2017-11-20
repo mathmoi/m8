@@ -67,9 +67,9 @@ namespace m8
 
         /// Index operator. Returns the piece that is on a given square.
         ///
-        /// @param index Index of the square we want to get the piece from.
+        /// @param sq Index of the square we want to get the piece from.
         /// @returns The piece that is on the square passed in parameter.
-        inline Piece operator[](std::size_t index) const;
+        inline Piece operator[](Sq sq) const;
 
         /// Accessor for the side to move.
         ///
@@ -201,7 +201,7 @@ namespace m8
         void Clear();
 
         /// Array containing the piece on each square of the board.
-        std::array<Piece, kNumSqOnBoard> board_;
+        std::array<Piece, Sq::NumSqOnBoard> board_;
 
         /// Color that has to move next
         Color side_to_move_;
@@ -388,12 +388,12 @@ namespace m8
     /// @returns     A reference to the stream received in parameter
     std::ostream& operator<<(std::ostream& out, const Board& board);
 
-    inline Piece Board::operator[](std::size_t index) const
+    inline Piece Board::operator[](Sq sq) const
     {
         // A : l'index est valide
-        assert(0 <= index && index < kNumSqOnBoard);
+        assert(sq.IsOnBoard());
 
-        return board_[index];
+        return board_[sq.value()];
     }
 
     inline void Board::set_side_to_move(Color side_to_move)
@@ -456,46 +456,46 @@ namespace m8
     {
         // A : sq is a valid square, piece is a valid piece and the destination
         //     square is empty
-        assert(IsSqOnBoard(sq));
+        assert(sq.IsOnBoard());
         assert(IsPiece(piece));
-        assert(board_[sq] == kNoPiece);
+        assert((*this)[sq] == kNoPiece);
 
-        board_[sq] = piece;
+        board_[sq.value()] = piece;
 
-        bb_piece_[piece].Set(sq);
+        bb_piece_[piece].Set(sq.value());
 
         Color color = GetColor(piece);
-        UINT64_Color_[color].Set(sq);
+        UINT64_Color_[color].Set(sq.value());
     }
 
     inline void Board::RemovePiece(Sq sq)
     {
         // A : sq is a valid square and the square is not empty.
-        assert(IsSqOnBoard(sq));
-        assert(IsPiece(board_[sq]));
+        assert(sq.IsOnBoard());
+        assert(IsPiece((*this)[sq]));
 
-        Color color = GetColor(board_[sq]);
-        UINT64_Color_[color].Unset(sq);
+        Color color = GetColor((*this)[sq]);
+        UINT64_Color_[color].Unset(sq.value());
 
-        bb_piece_[board_[sq]].Unset(sq);
+        bb_piece_[(*this)[sq]].Unset(sq.value());
 
-        board_[sq] = kNoPiece;
+        board_[sq.value()] = kNoPiece;
     }
 
     inline void Board::MovePiece(Sq from, Sq to, Piece piece)
     {
         // A : from and to are valid squares. From contains a piece and to is empty.
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
-        assert(IsPiece(board_[from]));
-        assert(board_[from] == piece);
-        assert(board_[to] == kNoPiece);
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
+        assert(IsPiece(board_[from.value()]));
+        assert(board_[from.value()] == piece);
+        assert(board_[to.value()] == kNoPiece);
 
-        board_[from] = kNoPiece;
-        board_[to] = piece;
+        board_[from.value()] = kNoPiece;
+        board_[to.value()] = piece;
 
-        Bb diff = Bb::GetSingleBitBb(from);
-        diff.Set(to);
+        Bb diff = Bb::GetSingleBitBb(from.value());
+        diff.Set(to.value());
 
         UINT64_Color_[GetColor(piece)] = UINT64_Color_[GetColor(piece)] ^ diff;
         bb_piece_[piece] = bb_piece_[piece] ^ diff;
@@ -503,17 +503,17 @@ namespace m8
 
     inline void Board::MovePiece(Sq from, Sq to)
     {
-        Piece piece = board_[from];
+        Piece piece = board_[from.value()];
         MovePiece(from, to, piece);
     }
 
     inline void Board::MakeSimpleMove(Sq from, Sq to, Piece piece, Piece taken)
     {
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
         assert(IsPiece(piece));
-        assert(board_[from] == piece);
-        assert(board_[to] == taken);
+        assert(board_[from.value()] == piece);
+        assert(board_[to.value()] == taken);
 
         if (taken != kNoPiece)
         {
@@ -529,13 +529,13 @@ namespace m8
         half_move_clock_ = 0;
 
         // If the piece taken is not on the target square it must be a prise-en-passant
-        if (board_[to] != taken)
+        if (board_[to.value()] != taken)
         {
-            assert(board_[to] == kNoPiece);
+            assert(board_[to.value()] == kNoPiece);
 
-            Sq pos_taken = NewSq(GetColmn(to), GetRow(from));
+            Sq pos_taken(to.column(), from.row());
 
-            assert(board_[pos_taken] == NewPiece(kPawn, OpposColor(GetColor(piece))));
+            assert(board_[pos_taken.value()] == NewPiece(kPawn, OpposColor(GetColor(piece))));
 
             RemovePiece(pos_taken);
             MakeSimpleMove(from, to, piece, kNoPiece);
@@ -555,9 +555,9 @@ namespace m8
         }
 
         // If the move is a two square move we need to set the en-passant column.
-        if (std::abs(to - from) == 16)
+        if (std::abs(to.value() - from.value()) == 16)
         {
-            colmn_enpas_ = GetColmn(to);
+            colmn_enpas_ = to.column();
         }
     }
 
@@ -569,9 +569,9 @@ namespace m8
 
         Piece rook = NewPiece(kRook, side_to_move_);
         Column rook_colmn = casle_colmn_[castle - 1];
-        Row row = GetRow(piece);
-        Sq rook_from = NewSq(rook_colmn, row);
-        Sq rook_to = NewSq(castle == kKingSideCastle ? Column::F() : Column::D(), row);
+        Row row = from.row();
+        Sq rook_from(rook_colmn, row);
+        Sq rook_to(castle == kKingSideCastle ? Column::F() : Column::D(), row);
 
         MovePiece(from, to, piece);
         MovePiece(rook_from, rook_to, rook);
@@ -583,11 +583,11 @@ namespace m8
 
         Row first_row = Row::_1().color_wise(side_to_move_);
 
-        if (from == NewSq(casle_colmn_[0], first_row))
+        if (from == Sq(casle_colmn_[0], first_row))
         {
             set_casle(side_to_move_, kQueenSideCastle, false);
         }
-        else if (from == NewSq(casle_colmn_[1], first_row))
+        else if (from == Sq(casle_colmn_[1], first_row))
         {
             set_casle(side_to_move_, kKingSideCastle, false);
         }
@@ -660,11 +660,11 @@ namespace m8
 
     inline void Board::UnmakeSimpleMove(Sq from, Sq to, Piece piece, Piece taken)
     {
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
         assert(IsPiece(piece));
-        assert(board_[to] == piece);
-        assert(board_[from] == kNoPiece);
+        assert(board_[to.value()] == piece);
+        assert(board_[from.value()] == kNoPiece);
 
         MovePiece(to, from, piece);
 
@@ -678,9 +678,9 @@ namespace m8
     {
         Piece rook = NewPiece(kRook, OpposColor(side_to_move_));
         Column rook_colmn = casle_colmn_[castle - 1];
-        Row row = GetRow(piece);
-        Sq rook_from = NewSq(rook_colmn, row);
-        Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
+        Row row = from.row();
+        Sq rook_from(rook_colmn, row);
+        Sq rook_to(castle == kKingSideCastle ? Column::F() : Column::D(), row);
 
         MovePiece(to, from, piece);
         MovePiece(rook_to, rook_from, rook);
@@ -704,10 +704,10 @@ namespace m8
 
         if (colmn_enpas_.IsOnBoard() &&
             taken == NewPiece(kPawn, side_to_move_) &&
-            to == NewSq(colmn_enpas_, row_enpas))
+            to == Sq(colmn_enpas_, row_enpas))
         {
             UnmakeSimpleMove(from, to, piece, kNoPiece);
-            AddPiece(NewSq(colmn_enpas_, Row::_5().color_wise(OpposColor(side_to_move_))), taken);
+            AddPiece(Sq(colmn_enpas_, Row::_5().color_wise(OpposColor(side_to_move_))), taken);
         }
         else if (IsPiece(promote_to))
         {

@@ -161,14 +161,14 @@ TEST_CASE("Shift_NegateiveLength_BitboardIsShiftedRight")
 
 TEST_CASE("BbBetween__c2_to_g6__d2_e4_f5_returned")
 {
-    Bb between = BbBetween(kC2, kG6);
+    Bb between = BbBetween(Sq::C2().value(), Sq::G6().value());
     REQUIRE(between == UINT64_C(0x0000002010080000));
 }
 
 TEST_CASE("BbBetween__g6_to_c2__d2_e4_f5_returned")
 {
     using namespace std;
-    Bb between = BbBetween(kG6, kC2);
+    Bb between = BbBetween(Sq::G6().value(), Sq::C2().value());
 
     REQUIRE(between == UINT64_C(0x0000002010080000));
 }
@@ -176,7 +176,7 @@ TEST_CASE("BbBetween__g6_to_c2__d2_e4_f5_returned")
 TEST_CASE("BbBetween__g6_to_c1__Bb::Empty()_returned")
 {
     using namespace std;
-    Bb between = BbBetween(kG6, kC1);
+    Bb between = BbBetween(Sq::G6().value(), Sq::C1().value());
 
     REQUIRE(between == Bb::Empty());
 }

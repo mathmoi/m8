@@ -176,73 +176,73 @@ namespace m8
 
     void MoveGen::InitializeKnightAttackBb()
     {
-        for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
+        for (Sq sq = Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
         {
             Bb mask = UINT64_C(0);
-            Column col = GetColmn(sq);
-            Row row = GetRow(sq);
+            Column col = sq.column();
+            Row row = sq.row();
 
             if (col <= Column::G() && row <= Row::_6())
-                mask.Set(sq + 17);
+                mask.Set(sq.MoveUp().MoveUp().MoveRight().value());
 
             if (col <= Column::F() && row <= Row::_7())
-                mask.Set(sq + 10);
+                mask.Set(sq.MoveUp().MoveRight().MoveRight().value());
 
             if (col <= Column::F() && row >= Row::_2())
-                mask.Set(sq - 6);
+                mask.Set(sq.MoveDown().MoveRight().MoveRight().value());
 
             if (col <= Column::G() && row >= Row::_3())
-                mask.Set(sq - 15);
+                mask.Set(sq.MoveDown().MoveDown().MoveRight().value());
 
             if (col >= Column::B() && row >= Row::_3())
-                mask.Set(sq - 17);
+                mask.Set(sq.MoveDown().MoveDown().MoveLeft().value());
 
             if (col >= Column::C() && row >= Row::_2())
-                mask.Set(sq - 10);
+                mask.Set(sq.MoveDown().MoveLeft().MoveLeft().value());
 
             if (col >= Column::C() && row <= Row::_7())
-                mask.Set(sq + 6);
+                mask.Set(sq.MoveUp().MoveLeft().MoveLeft().value());
 
             if (col >= Column::B() && row <= Row::_6())
-                mask.Set(sq + 15);
+                mask.Set(sq.MoveUp().MoveUp().MoveLeft().value());
 
-            knight_attack_bb_[sq] = mask;
+            knight_attack_bb_[sq.value()] = mask;
         }
     }
 
     void MoveGen::InitializeKingAttackBb()
     {
-        for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
+        for (Sq sq = Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
         {
             Bb mask = UINT64_C(0);
-            Column col = GetColmn(sq);
-            Row row = GetRow(sq);
+            Column col = sq.column();
+            Row row = sq.row();
 
             if (row < Row::_8())
-                mask.Set(sq + 8);
+                mask.Set(sq.MoveUp().value());
 
             if (col < Column::H() && row < Row::_8())
-                mask.Set(sq + 9);
+                mask.Set(sq.MoveUp().MoveRight().value());
 
             if (col < Column::H())
-                mask.Set(sq + 1);
+                mask.Set(sq.MoveRight().value());
 
             if (col < Column::H() && row > Row::_1())
-                mask.Set(sq -7);
+                mask.Set(sq.MoveDown().MoveRight().value());
 
             if (row > Row::_1())
-                mask.Set(sq - 8);
+                mask.Set(sq.MoveDown().value());
 
             if (col > Column::A() && row > Row::_1())
-                mask.Set(sq - 9);
+                mask.Set(sq.MoveDown().MoveLeft().value());
 
             if (col > Column::A())
-                mask.Set(sq - 1);
+                mask.Set(sq.MoveLeft().value());
 
             if (col > Column::A() && row < Row::_8())
-                mask.Set(sq + 7);
+                mask.Set(sq.MoveUp().MoveLeft().value());
 
-            king_attack_bb_[sq] = mask;
+            king_attack_bb_[sq.value()] = mask;
         }
     }
 
@@ -253,34 +253,34 @@ namespace m8
 
         /* go north */
         sq = from;
-        while (GetRow(sq) < Row::_8() && !occupation[sq])
+        while (sq.row() < Row::_8() && !occupation[sq.value()])
         {
-            bb_attack.Set(sq + 8);
-            sq += 8;
+            sq = sq.MoveUp();
+            bb_attack.Set(sq.value());
         }
 
         /* go south */
         sq = from;
-        while (GetRow(sq) > Row::_1() && !occupation[sq])
+        while (sq.row() > Row::_1() && !occupation[sq.value()])
         {
-            bb_attack.Set(sq - 8);
-            sq -= 8;
+            sq = sq.MoveDown();
+            bb_attack.Set(sq.value());
         }
 
         /* go west */
         sq = from;
-        while (GetColmn(sq) > Column::A() && !occupation[sq])
+        while (sq.column() > Column::A() && !occupation[sq.value()])
         {
-            bb_attack.Set(sq - 1);
-            sq -= 1;
+            sq = sq.MoveLeft();
+            bb_attack.Set(sq.value());
         }
 
         /* go est */
         sq = from;
-        while (GetColmn(sq) < Column::H() && !occupation[sq])
+        while (sq.column() < Column::H() && !occupation[sq.value()])
         {
-            bb_attack.Set(sq + 1);
-            sq += 1;
+            sq = sq.MoveRight();
+            bb_attack.Set(sq.value());
         }
 
         return bb_attack;
@@ -302,18 +302,18 @@ namespace m8
     {
         Bb* ptr_attack = rook_attack_bb_.data();
 
-        for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
+        for (Sq sq = Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
         {
-            Row row = GetRow(sq);
-            Column col = GetColmn(sq);
-            Magic& magic = rook_magic_[sq];
+            Row row = sq.row();
+            Column col = sq.column();
+            Magic& magic = rook_magic_[sq.value()];
 
             magic.attack = ptr_attack;
             magic.mask = ((kBbRow[row.value()] & ~(kBbColmn[Column::A().value()] | kBbColmn[Column::H().value()])) |
                           (kBbColmn[col.value()] & ~(kBbRow[Row::_1().value()] | kBbRow[Row::_8().value()]))) &
-                          ~ Bb::GetSingleBitBb(sq);
-            magic.magic = kRookMagics[sq];
-            magic.shift = kRookMagicShifts[sq];
+                          ~ Bb::GetSingleBitBb(sq.value());
+            magic.magic = kRookMagics[sq.value()];
+            magic.shift = kRookMagicShifts[sq.value()];
 
             InitializeRookAttack(sq, magic);
 
@@ -328,42 +328,42 @@ namespace m8
 
         /* go northest */
         sq = from;
-        while (GetRow(sq) < Row::_8() &&
-               GetColmn(sq) < Column::H() &&
-               !occupation[sq])
+        while (sq.row() < Row::_8() &&
+               sq.column() < Column::H() &&
+               !occupation[sq.value()])
         {
-            bb_attack.Set(sq + 9);
-            sq += 9;
+            sq = sq.MoveUp().MoveRight();
+            bb_attack.Set(sq.value());
         }
 
         /* go southest */
         sq = from;
-        while (GetRow(sq) > Row::_1() &&
-               GetColmn(sq) < Column::H() &&
-               !occupation[sq])
+        while (sq.row() > Row::_1() &&
+               sq.column() < Column::H() &&
+               !occupation[sq.value()])
         {
-            bb_attack.Set(sq - 7);
-            sq -= 7;
+            sq = sq.MoveDown().MoveRight();
+            bb_attack.Set(sq.value());
         }
 
         /* go southwest */
         sq = from;
-        while (GetRow(sq) > Row::_1() &&
-               GetColmn(sq) > Column::A() &&
-               !occupation[sq])
+        while (sq.row() > Row::_1() &&
+               sq.column() > Column::A() &&
+               !occupation[sq.value()])
         {
-            bb_attack.Set(sq - 9);
-            sq -= 9;
+            sq = sq.MoveDown().MoveLeft();
+            bb_attack.Set(sq.value());
         }
 
         /* go northwest */
         sq = from;
-        while (GetRow(sq) < Row::_8() &&
-               GetColmn(sq) > Column::A() &&
-               !occupation[sq])
+        while (sq.row() < Row::_8() &&
+               sq.column() > Column::A() &&
+               !occupation[sq.value()])
         {
-            bb_attack.Set(sq + 7);
-            sq += 7;
+            sq = sq.MoveUp().MoveLeft();
+            bb_attack.Set(sq.value());
         }
 
         return bb_attack;
@@ -389,16 +389,16 @@ namespace m8
 
         Bb* ptr_attack = bishop_attack_bb_.data();
 
-        for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
+        for (Sq sq = Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
         {
-            Diagonal diag = GetDiag(sq);
-            Diagonal anti_diag = GetAntiDiag(sq);
-            Magic& magic = bishop_magic_[sq];
+            Diagonal diag = sq.diag();
+            Diagonal anti_diag = sq.anti_diag();
+            Magic& magic = bishop_magic_[sq.value()];
 
             magic.attack = ptr_attack;
             magic.mask = (kBbDiag[diag] ^ kBbAntiDiag[anti_diag]) & ~border;
-            magic.magic =  kBishopMagics[sq];
-            magic.shift = kBishopMagicShifts[sq];
+            magic.magic =  kBishopMagics[sq.value()];
+            magic.shift = kBishopMagicShifts[sq.value()];
 
             InitializeBishopAttack(sq, magic);
 

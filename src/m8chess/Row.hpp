@@ -54,14 +54,14 @@ namespace m8
         ///  The row must be valid before the move.
         /// </summary>
         /// <returns>A reference to the current object</returns>
-        inline Row& MoveNext() { assert(IsOnBoard()); ++value_; return *this; }
+        inline Row MoveUp() const { assert(IsOnBoard()); return value_ + 1; }
 
         /// <summary>
         ///  Modify the row to the previous row. This can be used to iterate on all rows.
         ///  The row must be valid before the move.
         /// </summary>
         /// <returns>A reference to the current object</returns>
-        inline Row& MovePrevious() { assert(IsOnBoard()); --value_; return *this; }
+        inline Row MoveDown() const { assert(IsOnBoard()); return value_ - 1; }
         
         /// <summary>
         ///  Returns a row relative to each color. For exemple, the first row for black

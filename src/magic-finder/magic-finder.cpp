@@ -30,46 +30,46 @@ namespace m8 {
         if (is_rook)
         {
             // Go north
-            if (GetRow(sq) < Row::_7())
-                for (Sq target = sq + 8; IsSqOnBoard(target) && GetRow(target) < Row::_8(); target += 8)
-                    bb.Set(target);
+            if (sq.row() < Row::_7())
+                for (Sq target = sq.MoveUp(); target.IsOnBoard() && target.row() < Row::_8(); target.MoveUp())
+                    bb.Set(target.value());
 
             // Go south
-            if (GetRow(sq) > Row::_2())
-                for (Sq target = sq - 8; IsSqOnBoard(target) && GetRow(target) > Row::_1(); target -= 8)
-                    bb.Set(target);
+            if (sq.row() > Row::_2())
+                for (Sq target = sq.MoveDown(); target.IsOnBoard() && target.row() > Row::_1(); target = target.MoveDown())
+                    bb.Set(target.value());
 
             // Go west
-            if (GetColmn(sq) > Column::B())
-                for (Sq target = sq - 1; IsSqOnBoard(target) && GetColmn(target) > Column::A(); target -= 1)
-                    bb.Set( target);
+            if (sq.column() > Column::B())
+                for (Sq target = sq.MoveLeft(); target.IsOnBoard() && target.column() > Column::A(); target = target.MoveLeft())
+                    bb.Set( target.value());
 
             // Go east
-            if (GetColmn(sq) < Column::G())
-                for (Sq target = sq + 1; IsSqOnBoard(target) && GetColmn(target) < Column::H(); target += 1)
-                    bb.Set(target);
+            if (sq.column() < Column::G())
+                for (Sq target = sq.MoveRight(); target.IsOnBoard() && target.column() < Column::H(); target = target.MoveRight())
+                    bb.Set(target.value());
         }
         else
         {
             // Go northeast
-            if (GetColmn(sq) < Column::G() && GetRow(sq) < Row::_7())
-                for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) < Row::_8(); target += 9)
-                    bb.Set(target);
+            if (sq.column() < Column::G() && sq.row() < Row::_7())
+                for (Sq target = sq.MoveUp().MoveRight(); target.IsOnBoard() && target.column() < Column::H() && target.row() < Row::_8(); target = target.MoveUp().MoveRight())
+                    bb.Set(target.value());
 
             // Go southeast
-            if (GetColmn(sq) < Column::G() && GetRow(sq) > Row::_2())
-                for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < Column::H() && GetRow(target) > Row::_1(); target -= 7)
-                    bb.Set(target);
+            if (sq.column() < Column::G() && sq.row() > Row::_2())
+                for (Sq target = sq.MoveDown().MoveRight(); target.IsOnBoard() && target.column() < Column::H() && target.row() > Row::_1(); target = target.MoveDown().MoveRight())
+                    bb.Set(target.value());
 
             // Go southwest
-            if (GetColmn(sq) > Column::B() && GetRow(sq) > Row::_2())
-                for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) > Row::_1(); target -= 9)
-                    bb.Set(target);
+            if (sq.column() > Column::B() && sq.row() > Row::_2())
+                for (Sq target = sq.MoveDown().MoveLeft(); target.IsOnBoard() && target.column() > Column::A() && target.row() > Row::_1(); target = target.MoveDown().MoveLeft())
+                    bb.Set(target.value());
 
             // Go northwest
-            if (GetColmn(sq) > Column::B() && GetRow(sq) < Row::_7())
-                for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > Column::A() && GetRow(target) < Row::_8(); target += 7)
-                    bb.Set(target);
+            if (sq.column() > Column::B() && sq.row() < Row::_7())
+                for (Sq target = sq.MoveUp().MoveLeft(); target.IsOnBoard() && target.column() > Column::A() && target.row() < Row::_8(); target = target.MoveUp().MoveLeft())
+                    bb.Set(target.value());
         }
         return bb;
     }
@@ -128,48 +128,48 @@ namespace m8 {
     ///         attacking piece.
     Bb GenerateAttackSet(Bb occupancy, Sq sq)
     {
-        assert(IsSqOnBoard(sq));
+        assert(sq.IsOnBoard());
 
         Bb attack_set = UINT64_C(0);
         Bb bb;
         
         // Go north
-        bb = occupancy & Bb(kBbColmn[GetColmn(sq).value()]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbColmn[sq.column().value()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetLSB());
 
         // Go south
-        bb = occupancy & Bb(kBbColmn[GetColmn(sq).value()]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbColmn[sq.column().value()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 
         // Go west
-        bb = occupancy & Bb(kBbRow[GetRow(sq).value()]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbRow[sq.row().value()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 
         // Go east
-        bb = occupancy & Bb(kBbRow[GetRow(sq).value()]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbRow[sq.row().value()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetLSB());
 
         // Go northeast
-        bb = occupancy & Bb(kBbDiag[GetDiag(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1);
+        bb = occupancy & Bb(kBbDiag[sq.diag()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1);
         if (bb)
             attack_set.Set(bb.GetLSB());
 
         // Go southeast
-        bb = occupancy & Bb(kBbAntiDiag[GetAntiDiag(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbAntiDiag[sq.anti_diag()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 
         // Go southwest
-        bb = occupancy & Bb(kBbDiag[GetDiag(sq)]) & (Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbDiag[sq.diag()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetMSB());
 
         // Go northwest
-        bb = occupancy & Bb(kBbAntiDiag[GetAntiDiag(sq)]) & ~(Bb::GetSingleBitBb(sq) - 1); // TODO : Make col.Bb()
+        bb = occupancy & Bb(kBbAntiDiag[sq.anti_diag()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
         if (bb)
             attack_set.Set(bb.GetLSB());
 
@@ -281,7 +281,7 @@ namespace m8 {
     /// @param shifts  Returns the shifts associated with the magic numbers.
     void GenerateMagics(bool is_rook, std::vector<std::uint64_t>& magics, std::vector<std::uint8_t>& shifts)
     {
-        for (m8::Sq sq = m8::kA1; m8::IsSqOnBoard(sq); ++sq)
+        for (m8::Sq sq = m8::Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
         {
             std::uint64_t magic;
             std::uint32_t shift;

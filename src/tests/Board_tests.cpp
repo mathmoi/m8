@@ -19,7 +19,7 @@ TEST_CASE("Test Board()")
 
    REQUIRE(board.side_to_move() == kWhite);
 
-   for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
+   for (Sq sq = Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
    {
       REQUIRE(board[sq] == kNoPiece);
    }
@@ -48,50 +48,50 @@ TEST_CASE("Test Board(fen)")
    // Initial postion test
    Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-   REQUIRE(board[kA8] == kBlackRook);
-   REQUIRE(board[kB8] == kBlackKnight);
-   REQUIRE(board[kC8] == kBlackBishop);
-   REQUIRE(board[kD8] == kBlackQueen);
-   REQUIRE(board[kE8] == kBlackKing);
-   REQUIRE(board[kF8] == kBlackBishop);
-   REQUIRE(board[kG8] == kBlackKnight);
-   REQUIRE(board[kH8] == kBlackRook);
+   REQUIRE(board[Sq::A8()] == kBlackRook);
+   REQUIRE(board[Sq::B8()] == kBlackKnight);
+   REQUIRE(board[Sq::C8()] == kBlackBishop);
+   REQUIRE(board[Sq::D8()] == kBlackQueen);
+   REQUIRE(board[Sq::E8()] == kBlackKing);
+   REQUIRE(board[Sq::F8()] == kBlackBishop);
+   REQUIRE(board[Sq::G8()] == kBlackKnight);
+   REQUIRE(board[Sq::H8()] == kBlackRook);
 
-   REQUIRE(board[kA7] == kBlackPawn);
-   REQUIRE(board[kB7] == kBlackPawn);
-   REQUIRE(board[kC7] == kBlackPawn);
-   REQUIRE(board[kD7] == kBlackPawn);
-   REQUIRE(board[kE7] == kBlackPawn);
-   REQUIRE(board[kF7] == kBlackPawn);
-   REQUIRE(board[kG7] == kBlackPawn);
-   REQUIRE(board[kH7] == kBlackPawn);
+   REQUIRE(board[Sq::A7()] == kBlackPawn);
+   REQUIRE(board[Sq::B7()] == kBlackPawn);
+   REQUIRE(board[Sq::C7()] == kBlackPawn);
+   REQUIRE(board[Sq::D7()] == kBlackPawn);
+   REQUIRE(board[Sq::E7()] == kBlackPawn);
+   REQUIRE(board[Sq::F7()] == kBlackPawn);
+   REQUIRE(board[Sq::G7()] == kBlackPawn);
+   REQUIRE(board[Sq::H7()] == kBlackPawn);
 
-   for (Row row = Row::_6(); row >= Row::_3(); row.MovePrevious())
+   for (Row row = Row::_6(); row >= Row::_3(); row = row.MoveDown())
    {
-      for (Column colmn = Column::A(); colmn.IsOnBoard(); colmn.MoveNext())
+      for (Column colmn = Column::A(); colmn.IsOnBoard(); colmn = colmn.MoveRight())
       {
-         Sq sq = NewSq(colmn, row);
+         Sq sq(colmn, row);
          REQUIRE(board[sq] == kNoPiece);
       }
    }
 
-   REQUIRE(board[kA2] == kWhitePawn);
-   REQUIRE(board[kB2] == kWhitePawn);
-   REQUIRE(board[kC2] == kWhitePawn);
-   REQUIRE(board[kD2] == kWhitePawn);
-   REQUIRE(board[kE2] == kWhitePawn);
-   REQUIRE(board[kF2] == kWhitePawn);
-   REQUIRE(board[kG2] == kWhitePawn);
-   REQUIRE(board[kH2] == kWhitePawn);
+   REQUIRE(board[Sq::A2()] == kWhitePawn);
+   REQUIRE(board[Sq::B2()] == kWhitePawn);
+   REQUIRE(board[Sq::C2()] == kWhitePawn);
+   REQUIRE(board[Sq::D2()] == kWhitePawn);
+   REQUIRE(board[Sq::E2()] == kWhitePawn);
+   REQUIRE(board[Sq::F2()] == kWhitePawn);
+   REQUIRE(board[Sq::G2()] == kWhitePawn);
+   REQUIRE(board[Sq::H2()] == kWhitePawn);
 
-   REQUIRE(board[kA1] == kWhiteRook);
-   REQUIRE(board[kB1] == kWhiteKnight);
-   REQUIRE(board[kC1] == kWhiteBishop);
-   REQUIRE(board[kD1] == kWhiteQueen);
-   REQUIRE(board[kE1] == kWhiteKing);
-   REQUIRE(board[kF1] == kWhiteBishop);
-   REQUIRE(board[kG1] == kWhiteKnight);
-   REQUIRE(board[kH1] == kWhiteRook);
+   REQUIRE(board[Sq::A1()] == kWhiteRook);
+   REQUIRE(board[Sq::B1()] == kWhiteKnight);
+   REQUIRE(board[Sq::C1()] == kWhiteBishop);
+   REQUIRE(board[Sq::D1()] == kWhiteQueen);
+   REQUIRE(board[Sq::E1()] == kWhiteKing);
+   REQUIRE(board[Sq::F1()] == kWhiteBishop);
+   REQUIRE(board[Sq::G1()] == kWhiteKnight);
+   REQUIRE(board[Sq::H1()] == kWhiteRook);
 
    REQUIRE(board.side_to_move() == kWhite);
 
@@ -255,34 +255,34 @@ TEST_CASE("Test AddPiece()")
    Piece white_queen = NewPiece(kQueen, kWhite);
    Bb bb;
 
-   board.AddPiece(kB2, white_pawn);
-   board.AddPiece(kD8, black_queen);
+   board.AddPiece(Sq::B2(), white_pawn);
+   board.AddPiece(Sq::D8(), black_queen);
 
-   REQUIRE(board[kB2] == white_pawn);
-   REQUIRE(board[kD8] == black_queen);
+   REQUIRE(board[Sq::B2()] == white_pawn);
+   REQUIRE(board[Sq::D8()] == black_queen);
 
    bb = Bb(0);
-   bb.Set(kB2);
+   bb.Set(Sq::B2().value());
    REQUIRE(board.UINT64_Color(kWhite) == bb);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
    bb = Bb(0);
-   bb.Set(kD8);
+   bb.Set(Sq::D8().value());
    REQUIRE(board.UINT64_Color(kBlack) == bb);
    REQUIRE(board.bb_piece(black_queen) == bb);
 
-   board.AddPiece(kA2, white_pawn);
+   board.AddPiece(Sq::A2(), white_pawn);
 
    bb = Bb(0);
-   bb.Set(kB2);
-   bb.Set(kA2);
+   bb.Set(Sq::B2().value());
+   bb.Set(Sq::A2().value());
    REQUIRE(board.UINT64_Color(kWhite) == bb);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
-   board.AddPiece(kC2, white_queen);
+   board.AddPiece(Sq::C2(), white_queen);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
-   bb.Set(kC2);
+   bb.Set(Sq::C2().value());
    REQUIRE(board.UINT64_Color(kWhite) == bb);
 }
 
@@ -291,15 +291,15 @@ TEST_CASE("Test RemovePiece()")
    Board board;
    Piece white_pawn = NewPiece(kPawn, kWhite);
 
-   board.AddPiece(kA2, white_pawn);
-   board.AddPiece(kB2, white_pawn);
-   board.AddPiece(kC2, white_pawn);
+   board.AddPiece(Sq::A2(), white_pawn);
+   board.AddPiece(Sq::B2(), white_pawn);
+   board.AddPiece(Sq::C2(), white_pawn);
 
-   board.RemovePiece(kB2);
+   board.RemovePiece(Sq::B2());
 
-   REQUIRE(board[kB2] == kNoPiece);
-   REQUIRE(board.UINT64_Color(kWhite)[kB2] == false);
-   REQUIRE(board.bb_piece(white_pawn)[kB2] == false);
+   REQUIRE(board[Sq::B2()] == kNoPiece);
+   REQUIRE(board.UINT64_Color(kWhite)[Sq::B2().value()] == false);
+   REQUIRE(board.bb_piece(white_pawn)[Sq::B2().value()] == false);
 }
 
 TEST_CASE("Test MovePiece()")
@@ -307,27 +307,27 @@ TEST_CASE("Test MovePiece()")
    Board board;
    Piece white_pawn = NewPiece(kPawn, kWhite);
 
-   board.AddPiece(kA2, white_pawn);
-   board.MovePiece(kA2, kA3);
+   board.AddPiece(Sq::A2(), white_pawn);
+   board.MovePiece(Sq::A2(), Sq::A3());
 
-   REQUIRE(board[kA2] == kNoPiece);
-   REQUIRE(board.UINT64_Color(kWhite)[kA2] == false);
-   REQUIRE(board.bb_piece(white_pawn)[kA2] == false);
+   REQUIRE(board[Sq::A2()] == kNoPiece);
+   REQUIRE(board.UINT64_Color(kWhite)[Sq::A2().value()] == false);
+   REQUIRE(board.bb_piece(white_pawn)[Sq::A2().value()] == false);
 
-   REQUIRE(board[kA3] == white_pawn);
-   REQUIRE(board.UINT64_Color(kWhite)[kA3] == true);
-   REQUIRE(board.bb_piece(white_pawn)[kA3] == true);
+   REQUIRE(board[Sq::A3()] == white_pawn);
+   REQUIRE(board.UINT64_Color(kWhite)[Sq::A3().value()] == true);
+   REQUIRE(board.bb_piece(white_pawn)[Sq::A3().value()] == true);
 }
 
 TEST_CASE("Make__simple_move__piece_is_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kF3, kG4, kWhiteQueen);
+    Move move = NewMove(Sq::F3(), Sq::G4(), kWhiteQueen);
     
     board.Make(move);
 
-    REQUIRE(board[kF3] == kNoPiece);
-    REQUIRE(board[kG4] == kWhiteQueen);
+    REQUIRE(board[Sq::F3()] == kNoPiece);
+    REQUIRE(board[Sq::G4()] == kWhiteQueen);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
@@ -336,12 +336,12 @@ TEST_CASE("Make__simple_move__piece_is_moved")
 TEST_CASE("Make__simple_capture__piece_is_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kE5, kF7, kWhiteKnight, kBlackPawn);
+    Move move = NewMove(Sq::E5(), Sq::F7(), kWhiteKnight, kBlackPawn);
     
     board.Make(move);
 
-    REQUIRE(board[kE5] == kNoPiece);
-    REQUIRE(board[kF7] == kWhiteKnight);
+    REQUIRE(board[Sq::E5()] == kNoPiece);
+    REQUIRE(board[Sq::F7()] == kWhiteKnight);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
@@ -350,14 +350,14 @@ TEST_CASE("Make__simple_capture__piece_is_moved")
 TEST_CASE("Make__king_side_castling__piece_are_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewCastlingMove(kE1, kG1, kWhiteKing, kKingSideCastle);
+    Move move = NewCastlingMove(Sq::E1(), Sq::G1(), kWhiteKing, kKingSideCastle);
     
     board.Make(move);
 
-    REQUIRE(board[kE1] == kNoPiece);
-    REQUIRE(board[kH1] == kNoPiece);
-    REQUIRE(board[kG1] == kWhiteKing);
-    REQUIRE(board[kF1] == kWhiteRook);
+    REQUIRE(board[Sq::E1()] == kNoPiece);
+    REQUIRE(board[Sq::H1()] == kNoPiece);
+    REQUIRE(board[Sq::G1()] == kWhiteKing);
+    REQUIRE(board[Sq::F1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
@@ -366,14 +366,14 @@ TEST_CASE("Make__king_side_castling__piece_are_moved")
 TEST_CASE("Make__queen_side_castling__piece_are_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
+    Move move = NewCastlingMove(Sq::E1(), Sq::C1(), kWhiteKing, kQueenSideCastle);
     
     board.Make(move);
 
-    REQUIRE(board[kE1] == kNoPiece);
-    REQUIRE(board[kA1] == kNoPiece);
-    REQUIRE(board[kC1] == kWhiteKing);
-    REQUIRE(board[kD1] == kWhiteRook);
+    REQUIRE(board[Sq::E1()] == kNoPiece);
+    REQUIRE(board[Sq::A1()] == kNoPiece);
+    REQUIRE(board[Sq::C1()] == kWhiteKing);
+    REQUIRE(board[Sq::D1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
@@ -382,12 +382,12 @@ TEST_CASE("Make__queen_side_castling__piece_are_moved")
 TEST_CASE("Make__pawn_move__piece_is_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kD5, kD6, kWhitePawn);
+    Move move = NewMove(Sq::D5(), Sq::D6(), kWhitePawn);
     
     board.Make(move);
 
-    REQUIRE(board[kD5] == kNoPiece);
-    REQUIRE(board[kD6] == kWhitePawn);
+    REQUIRE(board[Sq::D5()] == kNoPiece);
+    REQUIRE(board[Sq::D6()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
@@ -396,12 +396,12 @@ TEST_CASE("Make__pawn_move__piece_is_moved")
 TEST_CASE("Make__pawn_moved_two_square__piece_is_moved_and_en_passant_flag_set")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kA2, kA4, kWhitePawn);
+    Move move = NewMove(Sq::A2(), Sq::A4(), kWhitePawn);
     
     board.Make(move);
 
-    REQUIRE(board[kA2] == kNoPiece);
-    REQUIRE(board[kA4] == kWhitePawn);
+    REQUIRE(board[Sq::A2()] == kNoPiece);
+    REQUIRE(board[Sq::A4()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::A());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
@@ -410,12 +410,12 @@ TEST_CASE("Make__pawn_moved_two_square__piece_is_moved_and_en_passant_flag_set")
 TEST_CASE("Make__pawn_capture__piece_are_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kD5, kE6, kWhitePawn, kBlackPawn);
+    Move move = NewMove(Sq::D5(), Sq::E6(), kWhitePawn, kBlackPawn);
     
     board.Make(move);
 
-    REQUIRE(board[kD5] == kNoPiece);
-    REQUIRE(board[kE6] == kWhitePawn);
+    REQUIRE(board[Sq::D5()] == kNoPiece);
+    REQUIRE(board[Sq::E6()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
@@ -424,13 +424,13 @@ TEST_CASE("Make__pawn_capture__piece_are_moved")
 TEST_CASE("Make__pawn_capture_en_passant__piece_are_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q1p/1PPBBPPP/R3K2R b KQkq a3 0 1");
-    Move move = NewMove(kB4, kA3, kBlackPawn, kWhitePawn);
+    Move move = NewMove(Sq::B4(), Sq::A3(), kBlackPawn, kWhitePawn);
     
     board.Make(move);
 
-    REQUIRE(board[kB4] == kNoPiece);
-    REQUIRE(board[kA3] == kBlackPawn);
-    REQUIRE(board[kA4] == kNoPiece);
+    REQUIRE(board[Sq::B4()] == kNoPiece);
+    REQUIRE(board[Sq::A3()] == kBlackPawn);
+    REQUIRE(board[Sq::A4()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -439,12 +439,12 @@ TEST_CASE("Make__pawn_capture_en_passant__piece_are_moved")
 TEST_CASE("Make__pawn_promotion__piece_is_promoted")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q2/1PPBBPpP/R3K2R b KQkq - 0 2");
-    Move move = NewMove(kG2, kH1, kBlackPawn, kWhiteRook, kBlackKnight);
+    Move move = NewMove(Sq::G2(), Sq::H1(), kBlackPawn, kWhiteRook, kBlackKnight);
     
     board.Make(move);
 
-    REQUIRE(board[kG2] == kNoPiece);
-    REQUIRE(board[kH1] == kBlackKnight);
+    REQUIRE(board[Sq::G2()] == kNoPiece);
+    REQUIRE(board[Sq::H1()] == kBlackKnight);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -453,12 +453,12 @@ TEST_CASE("Make__pawn_promotion__piece_is_promoted")
 TEST_CASE("Make__king_move__castling_flags_are_cleared")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kE1, kF1, kWhiteKing);
+    Move move = NewMove(Sq::E1(), Sq::F1(), kWhiteKing);
     
     board.Make(move);
 
-    REQUIRE(board[kE1] == kNoPiece);
-    REQUIRE(board[kF1] == kWhiteKing);
+    REQUIRE(board[Sq::E1()] == kNoPiece);
+    REQUIRE(board[Sq::F1()] == kWhiteKing);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
@@ -469,12 +469,12 @@ TEST_CASE("Make__king_move__castling_flags_are_cleared")
 TEST_CASE("Make__king_side_rook_move__king_side_castling_flag_cleared")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kH1, kG1, kWhiteRook);
+    Move move = NewMove(Sq::H1(), Sq::G1(), kWhiteRook);
     
     board.Make(move);
 
-    REQUIRE(board[kH1] == kNoPiece);
-    REQUIRE(board[kG1] == kWhiteRook);
+    REQUIRE(board[Sq::H1()] == kNoPiece);
+    REQUIRE(board[Sq::G1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
@@ -485,12 +485,12 @@ TEST_CASE("Make__king_side_rook_move__king_side_castling_flag_cleared")
 TEST_CASE("Make__queen_side_rook_move__queen_side_castling_flag_cleared")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kA1, kB1, kWhiteRook);
+    Move move = NewMove(Sq::A1(), Sq::B1(), kWhiteRook);
     
     board.Make(move);
 
-    REQUIRE(board[kA1] == kNoPiece);
-    REQUIRE(board[kB1] == kWhiteRook);
+    REQUIRE(board[Sq::A1()] == kNoPiece);
+    REQUIRE(board[Sq::B1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
     REQUIRE(board.side_to_move() == kBlack);
@@ -501,14 +501,14 @@ TEST_CASE("Make__queen_side_rook_move__queen_side_castling_flag_cleared")
 TEST_CASE("Unmake__simple_move__piece_is_replaced")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kF3, kG4, kWhiteQueen);
+    Move move = NewMove(Sq::F3(), Sq::G4(), kWhiteQueen);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kF3] == kWhiteQueen);
-    REQUIRE(board[kG4] == kNoPiece);
+    REQUIRE(board[Sq::F3()] == kWhiteQueen);
+    REQUIRE(board[Sq::G4()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -517,14 +517,14 @@ TEST_CASE("Unmake__simple_move__piece_is_replaced")
 TEST_CASE("Unmake__simple_capture__capture_is_unmade")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kE5, kF7, kWhiteKnight, kBlackPawn);
+    Move move = NewMove(Sq::E5(), Sq::F7(), kWhiteKnight, kBlackPawn);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kE5] == kWhiteKnight);
-    REQUIRE(board[kF7] == kBlackPawn);
+    REQUIRE(board[Sq::E5()] == kWhiteKnight);
+    REQUIRE(board[Sq::F7()] == kBlackPawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -533,16 +533,16 @@ TEST_CASE("Unmake__simple_capture__capture_is_unmade")
 TEST_CASE("Unmake__king_side_castling__castling_is_unmade")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewCastlingMove(kE1, kG1, kWhiteKing, kKingSideCastle);
+    Move move = NewCastlingMove(Sq::E1(), Sq::G1(), kWhiteKing, kKingSideCastle);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kE1] == kWhiteKing);
-    REQUIRE(board[kH1] == kWhiteRook);
-    REQUIRE(board[kG1] == kNoPiece);
-    REQUIRE(board[kF1] == kNoPiece);
+    REQUIRE(board[Sq::E1()] == kWhiteKing);
+    REQUIRE(board[Sq::H1()] == kWhiteRook);
+    REQUIRE(board[Sq::G1()] == kNoPiece);
+    REQUIRE(board[Sq::F1()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -551,16 +551,16 @@ TEST_CASE("Unmake__king_side_castling__castling_is_unmade")
 TEST_CASE("Unmake__queen_side_castling__castling_is_unmade")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
+    Move move = NewCastlingMove(Sq::E1(), Sq::C1(), kWhiteKing, kQueenSideCastle);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kE1] == kWhiteKing);
-    REQUIRE(board[kA1] == kWhiteRook);
-    REQUIRE(board[kC1] == kNoPiece);
-    REQUIRE(board[kD1] == kNoPiece);
+    REQUIRE(board[Sq::E1()] == kWhiteKing);
+    REQUIRE(board[Sq::A1()] == kWhiteRook);
+    REQUIRE(board[Sq::C1()] == kNoPiece);
+    REQUIRE(board[Sq::D1()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -569,14 +569,14 @@ TEST_CASE("Unmake__queen_side_castling__castling_is_unmade")
 TEST_CASE("Unmake__pawn_move__moved_is_unmade")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kD5, kD6, kWhitePawn);
+    Move move = NewMove(Sq::D5(), Sq::D6(), kWhitePawn);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kD5] == kWhitePawn);
-    REQUIRE(board[kD6] == kNoPiece);
+    REQUIRE(board[Sq::D5()] == kWhitePawn);
+    REQUIRE(board[Sq::D6()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -585,14 +585,14 @@ TEST_CASE("Unmake__pawn_move__moved_is_unmade")
 TEST_CASE("Unmake__pawn_moved_two_square__piece_is_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kA2, kA4, kWhitePawn);
+    Move move = NewMove(Sq::A2(), Sq::A4(), kWhitePawn);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kA2] == kWhitePawn);
-    REQUIRE(board[kA4] == kNoPiece);
+    REQUIRE(board[Sq::A2()] == kWhitePawn);
+    REQUIRE(board[Sq::A4()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -601,14 +601,14 @@ TEST_CASE("Unmake__pawn_moved_two_square__piece_is_moved")
 TEST_CASE("Unmake__pawn_capture__piece_are_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    Move move = NewMove(kD5, kE6, kWhitePawn, kBlackPawn);
+    Move move = NewMove(Sq::D5(), Sq::E6(), kWhitePawn, kBlackPawn);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kD5] == kWhitePawn);
-    REQUIRE(board[kE6] == kBlackPawn);
+    REQUIRE(board[Sq::D5()] == kWhitePawn);
+    REQUIRE(board[Sq::E6()] == kBlackPawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kWhite);
@@ -617,15 +617,15 @@ TEST_CASE("Unmake__pawn_capture__piece_are_moved")
 TEST_CASE("Unmake__pawn_capture_en_passant__piece_are_moved")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q1p/1PPBBPPP/R3K2R b KQkq a3 0 1");
-    Move move = NewMove(kB4, kA3, kBlackPawn, kWhitePawn);
+    Move move = NewMove(Sq::B4(), Sq::A3(), kBlackPawn, kWhitePawn);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kB4] == kBlackPawn);
-    REQUIRE(board[kA3] == kNoPiece);
-    REQUIRE(board[kA4] == kWhitePawn);
+    REQUIRE(board[Sq::B4()] == kBlackPawn);
+    REQUIRE(board[Sq::A3()] == kNoPiece);
+    REQUIRE(board[Sq::A4()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::A());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);
@@ -634,14 +634,14 @@ TEST_CASE("Unmake__pawn_capture_en_passant__piece_are_moved")
 TEST_CASE("Unmake__pawn_promotion__board_is_restored")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/Pp2P3/2N2Q2/1PPBBPpP/R3K2R b KQkq - 0 2");
-    Move move = NewMove(kG2, kH1, kBlackPawn, kWhiteRook, kBlackKnight);
+    Move move = NewMove(Sq::G2(), Sq::H1(), kBlackPawn, kWhiteRook, kBlackKnight);
     UnmakeInfo unmake_info;
 
     unmake_info = board.Make(move);
     board.Unmake(move, unmake_info);
 
-    REQUIRE(board[kG2] == kBlackPawn);
-    REQUIRE(board[kH1] == kWhiteRook);
+    REQUIRE(board[Sq::G2()] == kBlackPawn);
+    REQUIRE(board[Sq::H1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
     REQUIRE(board.side_to_move() == kBlack);

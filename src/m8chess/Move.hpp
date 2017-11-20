@@ -61,17 +61,17 @@ namespace m8
     inline Move NewMove(Sq from, Sq to, Piece piece, Piece piece_taken, Piece promote_to)
     {
         // A : All the parameters are valids
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
         assert(IsPiece(piece));
         assert(!piece_taken || IsPiece(piece_taken));
         assert(!promote_to || IsPiece(promote_to));
 
-        return from        << kFromPos       |
-               to          << kToPos         |
-               piece       << kPiecePos      |
-               piece_taken << kPieceTakenPos |
-               promote_to  << kPromoteToPos;
+        return from.value() << kFromPos       |
+               to.value()   << kToPos         |
+               piece        << kPiecePos      |
+               piece_taken  << kPieceTakenPos |
+               promote_to   << kPromoteToPos;
     }
 
     /// Create a new move. This is an overload without promotion. The other NewMove
@@ -85,15 +85,15 @@ namespace m8
     inline Move NewMove(Sq from, Sq to, Piece piece, Piece piece_taken)
     {
         // A : All the parameters are valids
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
         assert(IsPiece(piece));
         assert(!piece_taken || IsPiece(piece_taken));
 
-        return from << kFromPos |
-               to << kToPos |
-               piece << kPiecePos |
-               piece_taken << kPieceTakenPos;
+        return from.value() << kFromPos |
+               to.value()   << kToPos |
+               piece        << kPiecePos |
+               piece_taken  << kPieceTakenPos;
     }
 
     /// Create a new move. This is an overload for castling moves. The other NewMove
@@ -107,15 +107,15 @@ namespace m8
     inline Move NewCastlingMove(Sq from, Sq to, Piece piece, std::uint8_t castling)
     {
         // A : All the parameters are valids
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
         assert(IsPiece(piece));
         assert(castling == 1 || castling == 2);
 
-        return from << kFromPos         |
-               to << kToPos             |
-               piece << kPiecePos       |
-               castling << kCastlingPos;
+        return from.value() << kFromPos    |
+               to.value()   << kToPos      |
+               piece        << kPiecePos   |
+               castling     << kCastlingPos;
     }
 
     /// Create a new move. This is an overload without piece taken or a promotion. The 
@@ -128,13 +128,13 @@ namespace m8
     inline Move NewMove(Sq from, Sq to, Piece piece)
     {
         // A : All the parameters are valids
-        assert(IsSqOnBoard(from));
-        assert(IsSqOnBoard(to));
+        assert(from.IsOnBoard());
+        assert(to.IsOnBoard());
         assert(IsPiece(piece));
 
-        return from << kFromPos |
-            to << kToPos |
-            piece << kPiecePos;
+        return from.value() << kFromPos |
+               to.value()   << kToPos   |
+               piece        << kPiecePos;
     }
 
     /// Extract the from square from a move.

@@ -13,8 +13,8 @@ using namespace m8;
 
 TEST_CASE("NewMove_NormalConditions_AllInformationsRetrievables")
 {
-    Sq from = kD7;
-    Sq to = kE8;
+    Sq from = Sq::D7();
+    Sq to = Sq::E8();
     Piece piece = kWhitePawn;
     Piece piece_taken = kBlackQueen;
     Piece promote_to = kWhiteQueen;
@@ -30,8 +30,8 @@ TEST_CASE("NewMove_NormalConditions_AllInformationsRetrievables")
 
 TEST_CASE("NewMove_NoPromoteTo_AllInformationRetrievableAndNoPromotion")
 {
-    Sq from = kD7;
-    Sq to = kE8;
+    Sq from = Sq::D7();
+    Sq to = Sq::E8();
     Piece piece = kWhitePawn;
     Piece piece_taken = kBlackQueen;
 
@@ -46,8 +46,8 @@ TEST_CASE("NewMove_NoPromoteTo_AllInformationRetrievableAndNoPromotion")
 
 TEST_CASE("NewMove_NoPromoteToAndNoPieceTaken_AllInformationRetrievableAndNoPromotionAndNoPieceTaken")
 {
-    Sq from = kD7;
-    Sq to = kE8;
+    Sq from = Sq::D7();
+    Sq to = Sq::E8();
     Piece piece = kWhitePawn;
 
     Move move = NewMove(from, to, piece);

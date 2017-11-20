@@ -13,7 +13,7 @@ TEST_CASE("Test IsColmnOnBoard")
 {
    REQUIRE(Column::NumColumnOnBoard == 8);
 
-   for (Column colmn = 0; colmn < Column::NumColumnOnBoard; colmn.MoveNext())
+   for (Column colmn = 0; colmn < Column::NumColumnOnBoard; colmn = colmn.MoveRight())
    {
       REQUIRE(colmn.IsOnBoard() == true);
    }
@@ -26,50 +26,50 @@ TEST_CASE("Test IsRowOnBoard")
 {
    REQUIRE(Row::NumRowOnBoard == 8);
 
-   for (Row row = 0; row < Row::NumRowOnBoard; row.MoveNext())
+   for (Row row = 0; row < Row::NumRowOnBoard; row = row.MoveUp())
    {
       REQUIRE(row.IsOnBoard() == true);
    }
 
-   REQUIRE(Row::_1().MovePrevious().IsOnBoard() == false);
-   REQUIRE(Row::_8().MoveNext().IsOnBoard() == false);
+   REQUIRE(Row::_1().MoveDown().IsOnBoard() == false);
+   REQUIRE(Row::_8().MoveUp().IsOnBoard() == false);
 }
 
 TEST_CASE("Test IsSqOnBoard")
 {
-   REQUIRE(kNumSqOnBoard == 64);
+   REQUIRE(Sq::NumSqOnBoard == 64);
 
-   for (Sq sq = 0; sq < kNumSqOnBoard; ++sq)
+   for (Sq sq = 0; sq.IsOnBoard(); sq = sq.MoveNext())
    {
-      REQUIRE(IsSqOnBoard(sq) == true);
+      REQUIRE(sq.IsOnBoard() == true);
    }
 
-   REQUIRE(IsSqOnBoard(kA1 - 1) == false);
-   REQUIRE(IsSqOnBoard(kH8 + 1) == false);
+   REQUIRE(Sq::A1().MoveDown().IsOnBoard() == false);
+   REQUIRE(Sq::H8().MoveUp().IsOnBoard() == false);
 }
 
 TEST_CASE("Test GetRow")
 {
-   REQUIRE(GetRow(kA1) == Row::_1());
-   REQUIRE(GetRow(kH1) == Row::_1());
-   REQUIRE(GetRow(kA8) == Row::_8());
-   REQUIRE(GetRow(kH8) == Row::_8());
+   REQUIRE(Sq::A1().row() == Row::_1());
+   REQUIRE(Sq::H1().row() == Row::_1());
+   REQUIRE(Sq::A8().row() == Row::_8());
+   REQUIRE(Sq::H8().row() == Row::_8());
 
-   REQUIRE(GetRow(kB1) == Row::_1());
-   REQUIRE(GetRow(kD3) == Row::_3());
-   REQUIRE(GetRow(kF5) == Row::_5());
-   REQUIRE(GetRow(kG8) == Row::_8());
+   REQUIRE(Sq::B1().row() == Row::_1());
+   REQUIRE(Sq::D3().row() == Row::_3());
+   REQUIRE(Sq::F5().row() == Row::_5());
+   REQUIRE(Sq::G8().row() == Row::_8());
 }
 
 TEST_CASE("Test GetColmn")
 {
-   REQUIRE(GetColmn(kA1) == Column::A());
-   REQUIRE(GetColmn(kH1) == Column::H());
-   REQUIRE(GetColmn(kA8) == Column::A());
-   REQUIRE(GetColmn(kH8) == Column::H());
+   REQUIRE(Sq::A1().column() == Column::A());
+   REQUIRE(Sq::H1().column() == Column::H());
+   REQUIRE(Sq::A8().column() == Column::A());
+   REQUIRE(Sq::H8().column() == Column::H());
 
-   REQUIRE(GetColmn(kB1) == Column::B());
-   REQUIRE(GetColmn(kD3) == Column::D());
-   REQUIRE(GetColmn(kF5) == Column::F());
-   REQUIRE(GetColmn(kG8) == Column::G());
+   REQUIRE(Sq::B1().column() == Column::B());
+   REQUIRE(Sq::D3().column() == Column::D());
+   REQUIRE(Sq::F5().column() == Column::F());
+   REQUIRE(Sq::G8().column() == Column::G());
 }
