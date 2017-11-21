@@ -11,239 +11,248 @@
 #include <cassert>
 
 #include "Color.hpp"
-#include "Column.hpp"
-#include "Row.hpp"
 
 namespace m8
 {
-    /// Type that represent the index of a diagonal (or anti-diagonal) on a chess board.
-    typedef std::int8_t Diagonal; // TODO : Something
+   ////////////////////////////////////////////////////////////////////////////
+   //                                Columns                                 //
+   ////////////////////////////////////////////////////////////////////////////
 
-    /// <summary>
-    ///  Squares on a chess board
-    /// </summary>
-    class Sq
-    {
-    private:
-        std::uint8_t value_;
+   /// Type that represent a Column on a chess board.
+   typedef std::uint8_t Colmn;
 
-    public:
-        /// <summary>
-        ///  Default constructor
-        /// </summary>
-        Sq() {}
+   /// Number of columns on a chess board
+   const std::uint8_t kNumColmnOnBoard = 8;
 
-        /// <summary>
-        ///  Constructor
-        /// </summary>
-        /// <param name="value">Value of the square</param>
-        Sq(std::uint8_t value)
-            : value_(value)
-        {};
+   /// @name Columns constants
+   /// Constants for the columns of the chessboard
+   /// @{
+   const Colmn kColmnA = 0;
+   const Colmn kColmnB = 1;
+   const Colmn kColmnC = 2;
+   const Colmn kColmnD = 3;
+   const Colmn kColmnE = 4;
+   const Colmn kColmnF = 5;
+   const Colmn kColmnG = 6;
+   const Colmn kColmnH = 7;
+   const Colmn kInvalColmn = 255;
+   /// @}
 
-        /// <summary>
-        ///  Create a new square from a column and a row
-        /// </summary>
-        /// <param name="column">Column</param>
-        /// <param name="row">Row</param>
-        Sq(Column column, Row row)
-        {
-            // A : The column and row are valid
-            assert(column.IsOnBoard());
-            assert(row.IsOnBoard());
+   /// Indicate if a given column is on the board.
+   ///
+   /// @param colmn The column to test.
+   /// @return True if the column is on the board.
+   inline bool IsColmnOnBoard(Colmn colmn) { return colmn < kNumColmnOnBoard; }
 
-            value_ = (row.value() << 3) + column.value();
-        }
+   /// Returns the character representing the column.
+   inline char GetColumnChar(Colmn colmn) { assert(IsColmnOnBoard(colmn));  return 'a' + colmn; }
 
-        /// <summary>
-        ///  Number of squares on a chess board
-        /// </summary>
-        static const std::uint8_t NumSqOnBoard = 64;
+   ////////////////////////////////////////////////////////////////////////////
+   //                                  Rows                                  //
+   ////////////////////////////////////////////////////////////////////////////
+   
+   /// Type that represent a row on a chess board.
+   typedef std::uint8_t Row;
 
-        /// <summary>
-        ///  Indicate if the current row is on the board.
-        /// </summary>
-        /// <returns>True if the row is valid.</returns>
-        inline bool IsOnBoard() const { return value_ < NumSqOnBoard; }
+   /// Number of rows on a chess board
+   const std::uint8_t kNumRowOnBoard = 8;
 
-        /// <summary>
-        ///  Return the value of the square.
-        /// </summary>
-        inline std::uint8_t value() const { return value_; }
-        
-        /// <summary>
-        ///  Get the column of the square
-        /// </summary>
-        inline Column column() const
-        {
-            // A : The square is valid
-            assert(IsOnBoard());
+   /// @name Row constants
+   /// Constants for the row of the chessboard
+   /// @{
+   const Row kRow1 = 0;
+   const Row kRow2 = 1;
+   const Row kRow3 = 2;
+   const Row kRow4 = 3;
+   const Row kRow5 = 4;
+   const Row kRow6 = 5;
+   const Row kRow7 = 6;
+   const Row kRow8 = 7;
+   const Row kInvalRow = 255;
+   /// @}
 
-            return Column(value_ & 7);
-        }
+   /// Indicate if a given row is on the board.
+   ///
+   /// @param row The row to test.
+   /// @return True if the row is on the board.
+   inline bool IsRowOnBoard(Row row) { return row < kNumRowOnBoard; }
 
-        /// <summary>
-        ///  Get the row of the square
-        /// </summary>
-        inline Row row() const
-        {
-            // A : The square is valid
-            assert(IsOnBoard());
+   /// Returns the character representing the number of a row.
+   inline char GetRowNumber(Row row) { assert(IsRowOnBoard(row));  return '1' + row; }
 
-            return Row(value_ >> 3);
-        }
+   /// Returns a row relative to each color. For exemple, the first row for black is the
+   /// 8th row while to first row for white is the 1st row.
+   ///
+   /// @param color Color
+   /// @param row   Index of the row (0 to 7).
+   /// @return 
+   inline Row GetColorWiseRow(Color color, Row row) { 
+       return (row * OpposColor(color)) + ((7 - row) * color);
+   }
+   
+   ////////////////////////////////////////////////////////////////////////////
+   //                              Diagonals                                 //
+   ////////////////////////////////////////////////////////////////////////////
 
-        /// <summary>
-        ///  Get the index of the diagonals the square is on.
-        /// </summary>
-        inline std::uint8_t diag() const
-        {
-            // A : The square is valid
-            assert(IsOnBoard());
+   /// Type that represent the index of a diagonal (or anti-diagonal) on a chess board.
+   typedef std::int8_t Diagonal;
 
-            return 7 - column().value() + row().value();
-        }
+   ////////////////////////////////////////////////////////////////////////////
+   //                               Square                                   //
+   ////////////////////////////////////////////////////////////////////////////
 
-        /// <summary>
-        ///  Get the index of the anti-diagonals the square is on.
-        /// </summary>
-        inline std::uint8_t anti_diag()
-        {
-            // A : The square is valid
-            assert(IsOnBoard());
+   /// Type that represents a square of the chess board.
+   typedef std::uint8_t Sq;
 
-            return column().value() + row().value();
-        }
+   /// Number of squares on a chess board
+   const std::uint8_t kNumSqOnBoard = 64;
 
-        /// <summary>
-        ///  Return the next squares in a sequence of all squares. Can be used to iterate
-        ///  over all squares.
-        /// </summary>
-        inline Sq MoveNext() const { assert(IsOnBoard()); return value_ + 1; };
+   /// @name Square constants
+   /// Constants for the row of the chessboard
+   /// @{
+   const Sq kA1 = 0;
+   const Sq kB1 = 1;
+   const Sq kC1 = 2;
+   const Sq kD1 = 3;
+   const Sq kE1 = 4;
+   const Sq kF1 = 5;
+   const Sq kG1 = 6;
+   const Sq kH1 = 7;
 
-        /// <summary>
-        ///  Return the square, one squares up from the current square.
-        /// </summary>
-        inline Sq MoveUp() const;
+   const Sq kA2 = 8;
+   const Sq kB2 = 9;
+   const Sq kC2 = 10;
+   const Sq kD2 = 11;
+   const Sq kE2 = 12;
+   const Sq kF2 = 13;
+   const Sq kG2 = 14;
+   const Sq kH2 = 15;
 
-        /// <summary>
-        ///  Return the square, one squares down from the current square.
-        /// </summary>
-        inline Sq MoveDown() const;
+   const Sq kA3 = 16;
+   const Sq kB3 = 17;
+   const Sq kC3 = 18;
+   const Sq kD3 = 19;
+   const Sq kE3 = 20;
+   const Sq kF3 = 21;
+   const Sq kG3 = 22;
+   const Sq kH3 = 23;
 
-        /// <summary>
-        ///  Return the square, one squares left from the current square.
-        /// </summary>
-        inline Sq MoveLeft() const;
+   const Sq kA4 = 24;
+   const Sq kB4 = 25;
+   const Sq kC4 = 26;
+   const Sq kD4 = 27;
+   const Sq kE4 = 28;
+   const Sq kF4 = 29;
+   const Sq kG4 = 30;
+   const Sq kH4 = 31;
 
-        /// <summary>
-        ///  Return the square, one squares right from the current square.
-        /// </summary>
-        inline Sq MoveRight() const;
+   const Sq kA5 = 32;
+   const Sq kB5 = 33;
+   const Sq kC5 = 34;
+   const Sq kD5 = 35;
+   const Sq kE5 = 36;
+   const Sq kF5 = 37;
+   const Sq kG5 = 38;
+   const Sq kH5 = 39;
 
-        inline static Sq A1() { return Sq(0); };
-        inline static Sq B1() { return Sq(1); };
-        inline static Sq C1() { return Sq(2); };
-        inline static Sq D1() { return Sq(3); };
-        inline static Sq E1() { return Sq(4); };
-        inline static Sq F1() { return Sq(5); };
-        inline static Sq G1() { return Sq(6); };
-        inline static Sq H1() { return Sq(7); };
+   const Sq kA6 = 40;
+   const Sq kB6 = 41;
+   const Sq kC6 = 42;
+   const Sq kD6 = 43;
+   const Sq kE6 = 44;
+   const Sq kF6 = 45;
+   const Sq kG6 = 46;
+   const Sq kH6 = 47;
 
-        inline static Sq A2() { return Sq(8); };
-        inline static Sq B2() { return Sq(9); };
-        inline static Sq C2() { return Sq(10); };
-        inline static Sq D2() { return Sq(11); };
-        inline static Sq E2() { return Sq(12); };
-        inline static Sq F2() { return Sq(13); };
-        inline static Sq G2() { return Sq(14); };
-        inline static Sq H2() { return Sq(15); };
+   const Sq kA7 = 48;
+   const Sq kB7 = 49;
+   const Sq kC7 = 50;
+   const Sq kD7 = 51;
+   const Sq kE7 = 52;
+   const Sq kF7 = 53;
+   const Sq kG7 = 54;
+   const Sq kH7 = 55;
 
-        inline static Sq A3() { return Sq(16); };
-        inline static Sq B3() { return Sq(17); };
-        inline static Sq C3() { return Sq(18); };
-        inline static Sq D3() { return Sq(19); };
-        inline static Sq E3() { return Sq(20); };
-        inline static Sq F3() { return Sq(21); };
-        inline static Sq G3() { return Sq(22); };
-        inline static Sq H3() { return Sq(23); };
+   const Sq kA8 = 56;
+   const Sq kB8 = 57;
+   const Sq kC8 = 58;
+   const Sq kD8 = 59;
+   const Sq kE8 = 60;
+   const Sq kF8 = 61;
+   const Sq kG8 = 62;
+   const Sq kH8 = 63;
+   /// @}
 
-        inline static Sq A4() { return Sq(24); };
-        inline static Sq B4() { return Sq(25); };
-        inline static Sq C4() { return Sq(26); };
-        inline static Sq D4() { return Sq(27); };
-        inline static Sq E4() { return Sq(28); };
-        inline static Sq F4() { return Sq(29); };
-        inline static Sq G4() { return Sq(30); };
-        inline static Sq H4() { return Sq(31); };
+   /// Value of an invalid square.
+   const Sq kInvalSq = 255;
 
-        inline static Sq A5() { return Sq(32); };
-        inline static Sq B5() { return Sq(33); };
-        inline static Sq C5() { return Sq(34); };
-        inline static Sq D5() { return Sq(35); };
-        inline static Sq E5() { return Sq(36); };
-        inline static Sq F5() { return Sq(37); };
-        inline static Sq G5() { return Sq(38); };
-        inline static Sq H5() { return Sq(39); };
+   /// Indicate if a given square is on the board.
+   ///
+   /// @param sq The square to test.
+   /// @return True if the square is on the board.
+   inline bool IsSqOnBoard(Sq sq) { return sq < kNumSqOnBoard; }
 
-        inline static Sq A6() { return Sq(40); };
-        inline static Sq B6() { return Sq(41); };
-        inline static Sq C6() { return Sq(42); };
-        inline static Sq D6() { return Sq(43); };
-        inline static Sq E6() { return Sq(44); };
-        inline static Sq F6() { return Sq(45); };
-        inline static Sq G6() { return Sq(46); };
-        inline static Sq H6() { return Sq(47); };
+   /// Create a square from a colmn and row.
+   ///
+   /// @param colmn Column of the square.
+   /// @param row Row of the square.
+   /// @return A square.
+   inline Sq NewSq(Colmn colmn, Row row)
+   { 
+      // A : The column and row are valid
+      assert(IsColmnOnBoard(colmn));
+      assert(IsRowOnBoard(row));
 
-        inline static Sq A7() { return Sq(48); };
-        inline static Sq B7() { return Sq(49); };
-        inline static Sq C7() { return Sq(50); };
-        inline static Sq D7() { return Sq(51); };
-        inline static Sq E7() { return Sq(52); };
-        inline static Sq F7() { return Sq(53); };
-        inline static Sq G7() { return Sq(54); };
-        inline static Sq H7() { return Sq(55); };
+      return (row << 3) + colmn;
+   }
 
-        inline static Sq A8() { return Sq(56); };
-        inline static Sq B8() { return Sq(57); };
-        inline static Sq C8() { return Sq(58); };
-        inline static Sq D8() { return Sq(59); };
-        inline static Sq E8() { return Sq(60); };
-        inline static Sq F8() { return Sq(61); };
-        inline static Sq G8() { return Sq(62); };
-        inline static Sq H8() { return Sq(63); };
+   /// Get the column of a square.
+   ///
+   /// @param sq The square.
+   /// @return The column of the square.
+   inline Colmn GetColmn(Sq sq)
+   {
+      // A : The square is valid
+      assert(IsSqOnBoard(sq));
 
-        inline static Sq Invalid() { return Sq(255); };
+      return sq & 7; 
+   }
 
-        friend bool operator==(Sq lhs, Sq rhs);
-    };
+   /// Get the row of a square.
+   ///
+   /// @param sq The square.
+   /// @return The row of the square.
+   inline Row GetRow(Sq sq)
+   {
+      // A : The square is valid
+      assert(IsSqOnBoard(sq));
 
-    inline bool operator==(Sq lhs, Sq rhs) { return lhs.value_ == rhs.value_; }
-    inline bool operator!=(Sq lhs, Sq rhs) { return !(lhs == rhs); }
+      return sq >> 3;
+   }
 
-    inline Sq Sq::MoveUp() const
-    {
-        assert(IsOnBoard());
-        return value_ + 8;
-    }
+   /// Get the index of the diagonals the square is on.
+   ///
+   /// @param sq The square.
+   /// @return the index of the diagonal the square is on.
+   inline std::uint8_t GetDiag(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
 
-    inline Sq Sq::MoveDown() const
-    {
-        assert(IsOnBoard());
-        return value_ - 8;
-    }
+       return 7 - GetColmn(sq) + GetRow(sq);
+   }
 
-    inline Sq Sq::MoveLeft() const
-    {
-        assert(IsOnBoard());
-        return value_ - 1;
-    }
+   /// Get the index of the anti-diagonals the square is on.
+   ///
+   /// @param sq The square.
+   /// @return the index of the anti-diagonal the square is on.
+   inline std::uint8_t GetAntiDiag(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
 
-    inline Sq Sq::MoveRight() const
-    {
-        assert(IsOnBoard());
-        return value_ + 1;
-    }
+       return GetColmn(sq) + GetRow(sq);
+   }
 }
 
 #endif // M8_SQ_HPP_

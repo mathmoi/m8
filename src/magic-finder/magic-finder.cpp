@@ -25,51 +25,51 @@ namespace m8 {
     /// relevant to generate the moves of the piece on the squared received in parameter.
     Bb GenerateMask(Sq sq, bool is_rook)
     {
-        Bb bb = UINT64_C(0);
+        Bb bb = BB_C(0);
 
         if (is_rook)
         {
             // Go north
-            if (sq.row() < Row::_7())
-                for (Sq target = sq.MoveUp(); target.IsOnBoard() && target.row() < Row::_8(); target.MoveUp())
-                    bb.Set(target.value());
+            if (GetRow(sq) < kRow7)
+                for (Sq target = sq + 8; IsSqOnBoard(target) && GetRow(target) < kRow8; target += 8)
+                    SetBit(bb, target);
 
             // Go south
-            if (sq.row() > Row::_2())
-                for (Sq target = sq.MoveDown(); target.IsOnBoard() && target.row() > Row::_1(); target = target.MoveDown())
-                    bb.Set(target.value());
+            if (GetRow(sq) > kRow2)
+                for (Sq target = sq - 8; IsSqOnBoard(target) && GetRow(target) > kRow1; target -= 8)
+                    SetBit(bb, target);
 
             // Go west
-            if (sq.column() > Column::B())
-                for (Sq target = sq.MoveLeft(); target.IsOnBoard() && target.column() > Column::A(); target = target.MoveLeft())
-                    bb.Set( target.value());
+            if (GetColmn(sq) > kColmnB)
+                for (Sq target = sq - 1; IsSqOnBoard(target) && GetColmn(target) > kColmnA; target -= 1)
+                    SetBit(bb, target);
 
             // Go east
-            if (sq.column() < Column::G())
-                for (Sq target = sq.MoveRight(); target.IsOnBoard() && target.column() < Column::H(); target = target.MoveRight())
-                    bb.Set(target.value());
+            if (GetColmn(sq) < kColmnG)
+                for (Sq target = sq + 1; IsSqOnBoard(target) && GetColmn(target) < kColmnH; target += 1)
+                    SetBit(bb, target);
         }
         else
         {
             // Go northeast
-            if (sq.column() < Column::G() && sq.row() < Row::_7())
-                for (Sq target = sq.MoveUp().MoveRight(); target.IsOnBoard() && target.column() < Column::H() && target.row() < Row::_8(); target = target.MoveUp().MoveRight())
-                    bb.Set(target.value());
+            if (GetColmn(sq) < kColmnG && GetRow(sq) < kRow7)
+                for (Sq target = sq + 9; IsSqOnBoard(target) && GetColmn(target) < kColmnH && GetRow(target) < kRow8; target += 9)
+                    SetBit(bb, target);
 
             // Go southeast
-            if (sq.column() < Column::G() && sq.row() > Row::_2())
-                for (Sq target = sq.MoveDown().MoveRight(); target.IsOnBoard() && target.column() < Column::H() && target.row() > Row::_1(); target = target.MoveDown().MoveRight())
-                    bb.Set(target.value());
+            if (GetColmn(sq) < kColmnG && GetRow(sq) > kRow2)
+                for (Sq target = sq - 7; IsSqOnBoard(target) && GetColmn(target) < kColmnH && GetRow(target) > kRow1; target -= 7)
+                    SetBit(bb, target);
 
             // Go southwest
-            if (sq.column() > Column::B() && sq.row() > Row::_2())
-                for (Sq target = sq.MoveDown().MoveLeft(); target.IsOnBoard() && target.column() > Column::A() && target.row() > Row::_1(); target = target.MoveDown().MoveLeft())
-                    bb.Set(target.value());
+            if (GetColmn(sq) > kColmnB && GetRow(sq) > kRow2)
+                for (Sq target = sq - 9; IsSqOnBoard(target) && GetColmn(target) > kColmnA && GetRow(target) > kRow1; target -= 9)
+                    SetBit(bb, target);
 
             // Go northwest
-            if (sq.column() > Column::B() && sq.row() < Row::_7())
-                for (Sq target = sq.MoveUp().MoveLeft(); target.IsOnBoard() && target.column() > Column::A() && target.row() < Row::_8(); target = target.MoveUp().MoveLeft())
-                    bb.Set(target.value());
+            if (GetColmn(sq) > kColmnB && GetRow(sq) < kRow7)
+                for (Sq target = sq + 7; IsSqOnBoard(target) && GetColmn(target) > kColmnA && GetRow(target) < kRow8; target += 7)
+                    SetBit(bb, target);
         }
         return bb;
     }
@@ -82,15 +82,15 @@ namespace m8 {
     /// @return A bitboard.
     Bb DistributeBits(std::uint32_t bits, Bb mask)
     {
-        Bb result = UINT64_C(0);
-        std::uint64_t bit_count = mask.GetPopct();
+        Bb result = BB_C(0);
+        std::uint64_t bit_count = GetPopct(mask);
 
         for (std::uint32_t x = 0; x < bit_count; ++x)
         {
-            std::uint32_t pos = mask.RemoveLSB();
+            std::uint32_t pos = RemoveLsb(mask);
             if ((bits & (1 << x)) != 0)
             {
-                result.Set(pos);
+                SetBit(result, pos);
             }
         }
 
@@ -105,7 +105,7 @@ namespace m8 {
     /// @return A vector of bitboard containing all occupancies variations.
     std::vector<Bb> GenerateOccupancyVariation(Bb mask)
     {
-        std::uint64_t bit_count = mask.GetPopct();
+        std::uint64_t bit_count = GetPopct(mask);
         std::uint32_t num_variation = 1 << bit_count;
         std::vector<Bb> occupancies;
 
@@ -128,50 +128,50 @@ namespace m8 {
     ///         attacking piece.
     Bb GenerateAttackSet(Bb occupancy, Sq sq)
     {
-        assert(sq.IsOnBoard());
+        assert(IsSqOnBoard(sq));
 
-        Bb attack_set = UINT64_C(0);
+        Bb attack_set = BB_C(0);
         Bb bb;
         
         // Go north
-        bb = occupancy & Bb(kBbColmn[sq.column().value()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbColmn[GetColmn(sq)] & ~(GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetLSB());
+            SetBit(attack_set, GetLsb(bb));
 
         // Go south
-        bb = occupancy & Bb(kBbColmn[sq.column().value()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbColmn[GetColmn(sq)] & (GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetMSB());
+            SetBit(attack_set, GetMsb(bb));
 
         // Go west
-        bb = occupancy & Bb(kBbRow[sq.row().value()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbRow[GetRow(sq)] & (GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetMSB());
+            SetBit(attack_set, GetMsb(bb));
 
         // Go east
-        bb = occupancy & Bb(kBbRow[sq.row().value()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbRow[GetRow(sq)] & ~(GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetLSB());
+            SetBit(attack_set, GetLsb(bb));
 
         // Go northeast
-        bb = occupancy & Bb(kBbDiag[sq.diag()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1);
+        bb = occupancy & kBbDiag[GetDiag(sq)] & ~(GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetLSB());
+            SetBit(attack_set, GetLsb(bb));
 
         // Go southeast
-        bb = occupancy & Bb(kBbAntiDiag[sq.anti_diag()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbAntiDiag[GetAntiDiag(sq)] & (GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetMSB());
+            SetBit(attack_set, GetMsb(bb));
 
         // Go southwest
-        bb = occupancy & Bb(kBbDiag[sq.diag()]) & (Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbDiag[GetDiag(sq)] & (GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetMSB());
+            SetBit(attack_set, GetMsb(bb));
 
         // Go northwest
-        bb = occupancy & Bb(kBbAntiDiag[sq.anti_diag()]) & ~(Bb::GetSingleBitBb(sq.value()) - 1); // TODO : Make col.Bb()
+        bb = occupancy & kBbAntiDiag[GetAntiDiag(sq)] & ~(GetSingleBitBb(sq) - 1);
         if (bb)
-            attack_set.Set(bb.GetLSB());
+            SetBit(attack_set, GetLsb(bb));
 
         return attack_set;
     }
@@ -204,7 +204,7 @@ namespace m8 {
         do
         {
             random = uniform_distr(rng) & uniform_distr(rng) & uniform_distr(rng);
-        } while (Bb(random).GetPopct() > 6);
+        } while (GetPopct(random) > 6);
         
 
         return random;
@@ -216,7 +216,7 @@ namespace m8 {
     /// @param magic     Magic number.
     /// @param shift     Number of position to right shift.
     /// @return Magic index.
-    Bb CalculateMagicIndex(Bb occupancy, Bb magic, std::int32_t shift)
+    Bb CalculateMagicIndex(Bb occupancy, Bb magic, std::uint32_t shift)
     {
         return (occupancy * magic) >> shift;
     }
@@ -234,7 +234,7 @@ namespace m8 {
         std::mt19937_64 rng(rd());
 
         m8::Bb mask = GenerateMask(sq, is_rook);
-        std::uint32_t num_bits = static_cast<std::uint32_t>(mask.GetPopct());
+        std::uint32_t num_bits = static_cast<std::uint32_t>(GetPopct(mask));
         shift = 64 - num_bits;
 
         auto occupancies = GenerateOccupancyVariation(mask);
@@ -249,7 +249,7 @@ namespace m8 {
         {
             magic = GenerateRndFewBits(rng);
             fail = false;
-            used->fill(UINT64_C(0));
+            used->fill(BB_C(0));
 
             std::uint32_t index_occup = 0;
             while (!fail && index_occup < occupancies.size())
@@ -281,7 +281,7 @@ namespace m8 {
     /// @param shifts  Returns the shifts associated with the magic numbers.
     void GenerateMagics(bool is_rook, std::vector<std::uint64_t>& magics, std::vector<std::uint8_t>& shifts)
     {
-        for (m8::Sq sq = m8::Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
+        for (m8::Sq sq = m8::kA1; m8::IsSqOnBoard(sq); ++sq)
         {
             std::uint64_t magic;
             std::uint32_t shift;
@@ -309,7 +309,7 @@ namespace m8 {
 
         for (auto x = 0; x < 64; ++x)
         {
-            out << "    UINT64_C(0x" << std::setw(16) << magics[x] << ')';
+            out << "    BB_C(0x" << std::setw(16) << magics[x] << ')';
 
             if (x < 63)
                 out << ',';

@@ -156,7 +156,7 @@ namespace m8
             Bb* attack;
             Bb mask;
             Bb magic;
-            std::int32_t shift;
+            std::uint32_t shift;
         };
 
         /// Type for an attack array for simples moves (knight and kings).
@@ -271,11 +271,11 @@ namespace m8
         /// Generate pawn side captures.
         ///
         /// @param color         Color of the pawn to generate the moves for.
-        /// @param ignored_Column Column that should be ignored.
+        /// @param ignored_colmn Column that should be ignored.
         /// @param delta         Delta applied between the from and to squares.
         /// @param next_move     Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
-        inline Move* GeneratePawnSideCaptures(Color color, Column ignored_Column, int delta, Move* next_move) const;
+        inline Move* GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const;
 
         /// Generate pawn promotions
         ///
@@ -304,9 +304,9 @@ namespace m8
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GenerateCastlingMoves(Color color,
                                            std::uint8_t castling_side,
-                                           Column king_final_column,
-                                           Column rook_original_column,
-                                           Column rook_final_column,
+                                           Colmn king_final_column,
+                                           Colmn rook_original_column,
+                                           Colmn rook_final_column,
                                            Move* next_move) const;
 
         static const std::array<const Bb, 64> kRookMagics;
@@ -334,12 +334,12 @@ namespace m8
 
         Bb attackers = GenerateRookAttacks(board_.bb_occupied(), sq) & (queens | rooks);
         attackers |= GenerateBishopAttacks(board_.bb_occupied(), sq) & (queens | bishops);
-        attackers |= knight_attack_bb_[sq.value()] & knights;
-        attackers |= king_attack_bb_[sq.value()] & kings;
+        attackers |= knight_attack_bb_[sq] & knights;
+        attackers |= king_attack_bb_[sq] & kings;
 
-        Bb bb_sq = Bb::GetSingleBitBb(sq.value());
-        attackers |= (((bb_sq << 7) & ~kBbColmn[Column::H().value()]) | ((bb_sq << 9) & ~kBbColmn[Column::A().value()])) & board_.bb_piece(kBlackPawn);
-        attackers |= (((bb_sq >> 9) & ~kBbColmn[Column::H().value()]) | ((bb_sq >> 7) & ~kBbColmn[Column::A().value()])) & board_.bb_piece(kWhitePawn);
+        Bb bb_sq = GetSingleBitBb(sq);
+        attackers |= (((bb_sq << 7) & ~GetColmnBb(kColmnH)) | ((bb_sq << 9) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kBlackPawn);
+        attackers |= (((bb_sq >> 9) & ~GetColmnBb(kColmnH)) | ((bb_sq >> 7) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kWhitePawn);
 
         return attackers;
     }
@@ -348,15 +348,15 @@ namespace m8
     {
         Piece king = NewPiece(kKing, color);
         Bb bb_king = board_.bb_piece(king);
-        Sq king_position = bb_king.GetLSB();
+        Sq king_position = GetLsb(bb_king);
         Bb attackers = AttacksTo(king_position);
-        Bb opponent_pieces = board_.UINT64_Color(color.opposite());
-        return (attackers & opponent_pieces) != Bb::Empty();
+        Bb opponent_pieces = board_.bb_color(OpposColor(color));
+        return (attackers & opponent_pieces) != kEmptyBb;
     }
 
     inline Bb MoveGen::GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
     {
-        Magic&  magic = magics[sq.value()];
+        Magic&  magic = magics[sq];
         occ &=  magic.mask;
         occ *=  magic.magic;
         occ >>= magic.shift;
@@ -377,7 +377,7 @@ namespace m8
     {
         Bb targets;
         if (is_captures)
-            targets = board_.UINT64_Color(color.opposite());
+            targets = board_.bb_color(OpposColor(color));
         else
             targets = ~board_.bb_occupied();
 
@@ -395,12 +395,12 @@ namespace m8
 
         while (bb_pieces)
         {
-            Sq from = bb_pieces.RemoveLSB();
-            Bb destinations = attack_array[from.value()] & targets;
+            Sq from = RemoveLsb(bb_pieces);
+            Bb destinations = attack_array[from] & targets;
 
             while (destinations)
             {
-                Sq to = destinations.RemoveLSB();
+                Sq to = RemoveLsb(destinations);
                 *(next_move++) = NewMove(from, to, piece, board_[to]);
             }
         }
@@ -440,13 +440,13 @@ namespace m8
     inline Move* MoveGen::UnpackPawnMoves(Color color, Bb target, int from_delta, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
-        Row eighth_row = Row::_8().color_wise(color);
+        Row eighth_row = 7 - 7 * color;
 
         while (target)
         {
-            Sq to = target.RemoveLSB();
-            Sq from = to.value() + from_delta;
-            if (to.row() != eighth_row)
+            Sq to = RemoveLsb(target);
+            Sq from = to + from_delta;
+            if (GetRow(to) != eighth_row)
             {
                 *(next_move++) = NewMove(from, to, piece, board_[to]);
             }
@@ -462,13 +462,13 @@ namespace m8
         return next_move;
     }
 
-    inline Move* MoveGen::GeneratePawnSideCaptures(Color color, Column ignored_column, int delta, Move* next_move) const
+    inline Move* MoveGen::GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
 
-        Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_column.value()]); // TODO : Make row.Bb()
-        target.Shift(delta);
-        target &= board_.UINT64_Color(color.opposite());
+        Bb target = board_.bb_piece(piece) & ~kBbColmn[ignored_colmn];
+        Shift(target, delta);
+        target &= board_.bb_color(OpposColor(color));
         next_move = UnpackPawnMoves(color, target, -delta, next_move);
 
         return next_move;
@@ -477,11 +477,11 @@ namespace m8
     inline Move* MoveGen::GeneratePawnPromotions(Color color, Move* next_move) const 
     {
         Piece piece = NewPiece(kPawn, color);
-        Row seventh_row = Row::_7().color_wise(color);
-        int forward_move = 8 - 16 * color.value();
+        Row seventh_row = kRow7 - 5 * color;
+        int forward_move = 8 - 16 * color;
 
-        Bb target = board_.bb_piece(piece) & kBbRow[seventh_row.value()];
-        target.Shift(forward_move);
+        Bb target = board_.bb_piece(piece) & kBbRow[seventh_row];
+        Shift(target, forward_move);
         target &= ~board_.bb_occupied();
         next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
 
@@ -490,41 +490,41 @@ namespace m8
 
     inline Move* MoveGen::GenerateCastlingMoves(Color color,
                                                 std::uint8_t castling_side,
-                                                Column king_final_column,
-                                                Column rook_original_column,
-                                                Column rook_final_column,
+                                                Colmn king_final_column,
+                                                Colmn rook_original_column,
+                                                Colmn rook_final_column,
                                                 Move* next_move) const
     {
         if (board_.casle(color, castling_side))
         {
             Piece king = NewPiece(kKing, color);
             Bb bb_king = board_.bb_piece(king);
-            Sq king_position = bb_king.GetLSB();
-            Row row = king_position.row();
-            Sq king_final_position(king_final_column, row);
-            Sq rook_position(rook_original_column, row);
-            Sq rook_final_position(rook_final_column, row);
+            Sq king_position = GetLsb(bb_king);
+            Row row = GetRow(king_position);
+            Sq king_final_position = NewSq(king_final_column, row);
+            Sq rook_position = NewSq(rook_original_column, row);
+            Sq rook_final_position = NewSq(rook_final_column, row);
 
-            Bb bb_travel_king = BbBetween(king_position.value(), king_final_position.value());
-            Bb bb_travel_rook = BbBetween(rook_position.value(), rook_final_position.value());
+            Bb bb_travel_king = BbBetween(king_position, king_final_position);
+            Bb bb_travel_rook = BbBetween(rook_position, rook_final_position);
 
             // Check if any of the travel squared is occupied.
             Bb occ = board_.bb_occupied();
-            occ ^= Bb::GetSingleBitBb(rook_position.value()) | bb_king;
-            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != Bb::Empty();
+            occ ^= GetSingleBitBb(rook_position) | bb_king;
+            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != kEmptyBb;
 
             if (!travel_occupied)
             {
                 // Check if any of the square traveled by the king or the origin or 
                 // destination of the king are under attack.
-                Bb UINT64_Check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position.value());
-                Bb bb_opponents = board_.UINT64_Color(color.opposite());
+                Bb bb_check_attack = bb_travel_king | bb_king | GetSingleBitBb(king_final_position);
+                Bb bb_opponents = board_.bb_color(OpposColor(color));
 
                 bool attacked = false;
-                while (UINT64_Check_attack && !attacked)
+                while (bb_check_attack && !attacked)
                 {
-                    Sq pos = UINT64_Check_attack.RemoveLSB();
-                    attacked = (AttacksTo(pos) & bb_opponents) != Bb::Empty();
+                    Sq pos = RemoveLsb(bb_check_attack);
+                    attacked = (AttacksTo(pos) & bb_opponents) != kEmptyBb;
                 }
 
                 if (!attacked)
@@ -539,8 +539,8 @@ namespace m8
 
     inline Move* MoveGen::GenerateCastlingMoves(Color color, Move* next_move) const
     {
-        next_move = GenerateCastlingMoves(color, kKingSideCastle, Column::G(), board_.casle_colmn(1), Column::F(), next_move);
-        next_move = GenerateCastlingMoves(color, kQueenSideCastle, Column::C(), board_.casle_colmn(0), Column::D(), next_move);
+        next_move = GenerateCastlingMoves(color, kKingSideCastle, kColmnG, board_.casle_colmn(1), kColmnF, next_move);
+        next_move = GenerateCastlingMoves(color, kQueenSideCastle, kColmnC, board_.casle_colmn(0), kColmnD, next_move);
 
         return next_move;
     }
@@ -548,19 +548,19 @@ namespace m8
     inline Move* MoveGen::GeneratePawnMoves(Color color, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
-        Row third_row = Row::_3().color_wise(color);
-        Row seventh_row = Row::_7().color_wise(color);
-        int forward_move = 8 - 16 * color.value();
+        Row third_row = kRow3 + 3 * color;
+        Row seventh_row = kRow7 - 5 * color;
+        int forward_move = 8 - 16 * color;
 
         // Generate the standard one square forward moves. We need to exclude pawns on 
         // the 7th rank that will generate promotions.
-        Bb target = board_.bb_piece(piece) & Bb(~kBbRow[seventh_row.value()]); // TODO : Make row.Bb()
-        target.Shift(forward_move);
+        Bb target = board_.bb_piece(piece) & ~kBbRow[seventh_row];
+        Shift(target, forward_move);
         target &= ~board_.bb_occupied();
 
         // Generate the two squares moves
-        Bb target_dbl = target & kBbRow[third_row.value()];
-        target_dbl.Shift(forward_move);
+        Bb target_dbl = target & kBbRow[third_row];
+        Shift(target_dbl, forward_move);
         target_dbl &= ~board_.bb_occupied();
 
         next_move = UnpackPawnMoves(color, target, -forward_move, next_move);
@@ -571,11 +571,11 @@ namespace m8
 
     inline Move* MoveGen::GeneratePawnCaptures(Color color, Move* next_move) const
     {
-        int forward_left = 7 - 16 * color.value();
-        int forward_right = 9 - 16 * color.value();
+        int forward_left = 7 - 16 * color;
+        int forward_right = 9 - 16 * color;
 
-        next_move = GeneratePawnSideCaptures(color, Column::A(), forward_left, next_move);
-        next_move = GeneratePawnSideCaptures(color, Column::H(), forward_right, next_move);
+        next_move = GeneratePawnSideCaptures(color, kColmnA, forward_left, next_move);
+        next_move = GeneratePawnSideCaptures(color, kColmnH, forward_right, next_move);
         next_move = GeneratePawnPromotions(color, next_move);
 
         return next_move;
@@ -587,9 +587,9 @@ namespace m8
 
         while (bb_from)
         {
-            Sq from = bb_from.RemoveLSB();
+            Sq from = RemoveLsb(bb_from);
             
-            Bb bb_to = Bb::Empty();
+            Bb bb_to = kEmptyBb;
             if (slide_like_rook)
                 bb_to |= GenerateRookAttacks(board_.bb_occupied(), from);
             if (slide_like_bishop)
@@ -598,7 +598,7 @@ namespace m8
 
             while (bb_to)
             {
-                Sq to = bb_to.RemoveLSB();
+                Sq to = RemoveLsb(bb_to);
 
                 *(next_move++) = NewMove(from, to, piece, board_[to]);
             }

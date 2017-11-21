@@ -14,28 +14,26 @@
 namespace m8
 {
     Board::Board()
-        : side_to_move_(0)
     {
         Clear();
     }
 
     Board::Board(const std::string&  fen)
-        : side_to_move_(0)
     {
         Clear();
 
         std::string::const_iterator it = fen.begin();
 
         // First we consume the piece placement section
-        Column column = Column::A();
-        Row row = Row::_8();
+        Colmn colmn = kColmnA;
+        Row row = kRow8;
         while (it < fen.end() && *it != ' ')
         {
             // If the character is a digit we increment the current column by this
             // digit value.
             if (*it >= '0' && *it <= '9')
             {
-                column += *it - '0';
+                colmn += *it - '0';
             }
             else
             {
@@ -45,22 +43,22 @@ namespace m8
                 if (it_piece != char_to_piece_map.end())
                 {
                     // If the current position is invalid we throw an exception
-                    if (!column.IsOnBoard() || !row.IsOnBoard())
+                    if (!IsColmnOnBoard(colmn) || !IsRowOnBoard(row))
                     {
                         throw InvalFenError("Invalid piece placement section in fen string");
                     }
 
-                    Sq sq(column, row);
+                    Sq sq = NewSq(colmn, row);
                     AddPiece(sq, it_piece->second);
-                    column = column.MoveRight();
+                    ++colmn;
                 }
                 else
                 {
                     // If the character is a '/' we move to the next row
                     if (*it == '/')
                     {
-                        column = Column::A();
-                        row = row.MoveDown();
+                        colmn = kColmnA;
+                        --row;
                     }
                     else
                     {
@@ -87,14 +85,14 @@ namespace m8
         {
             if (*it == 'w')
             {
-                set_side_to_move(Color::White());
+                set_side_to_move(kWhite);
                 ++it;
             }
             else
             {
                 if (*it == 'b')
                 {
-                    set_side_to_move(Color::Black());
+                    set_side_to_move(kBlack);
                     ++it;
                 }
                 else
@@ -117,30 +115,31 @@ namespace m8
         {
             if (*it != '-')
             {
-                Column column;
+                Color color;
+                Colmn colmn;
                 uint8_t casle_right;
                 Bb bb_rook;
                 Sq sq_rook;
                 Sq sq_king;
 
-                auto color = isupper(*it) ? Color::White() : Color::Black();
-                bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(Row::_1().color_wise(color).value());
+                color = isupper(*it) ? kWhite : kBlack;
+                bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(color * kRow8);
 
                 if (*it == 'Q' || *it == 'q')
                 {
-                    sq_rook = bb_rook.GetLSB();
+                    sq_rook = GetLsb(bb_rook);
                     casle_right = kQueenSideCastle;
                 }
                 else if (*it == 'K' || *it == 'k')
                 {
-                    sq_rook = bb_rook.GetMSB();
+                    sq_rook = GetMsb(bb_rook);
                     casle_right = kKingSideCastle;
                 }
                 else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
                 {
-                    sq_rook = Sq(tolower(*it) - 'a', Row::_1().color_wise(color));
-                    sq_king = bb_piece(NewPiece(kKing, color)).GetLSB();
-                    casle_right = (sq_rook.column() < sq_king.column() ? kQueenSideCastle : kKingSideCastle);
+                    sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
+                    sq_king = GetLsb(bb_piece(NewPiece(kKing, color)));
+                    casle_right = (sq_rook < sq_king ? kQueenSideCastle : kKingSideCastle);
                 }
                 else
                 {
@@ -148,8 +147,8 @@ namespace m8
                     throw InvalFenError("Unable to read the castinling rights from the fen string.");
                 }
 
-                column = sq_rook.column();
-                casle_colmn_[casle_right == kQueenSideCastle ? 0 : 1] = column;
+                colmn = GetColmn(sq_rook);
+                casle_colmn_[casle_right == kQueenSideCastle ? 0 : 1] = colmn;
                 set_casle(color, casle_right, true);
             }
 
@@ -225,11 +224,11 @@ namespace m8
     {
         uint32_t emptySquares = 0;
 
-        for (Row row = Row::_8(); row.IsOnBoard(); row = row.MoveDown())
+        for (Row row = kRow8; IsRowOnBoard(row); --row)
         {
-            for (Column column = Column::A(); column.IsOnBoard(); column = column.MoveRight())
+            for (Colmn colmn = kColmnA; IsColmnOnBoard(colmn); ++colmn)
             {
-                Sq sq(column, row);
+                Sq sq = NewSq(colmn, row);
                 Piece piece = (*this)[sq];
                 if (IsPiece(piece))
                 {
@@ -253,7 +252,7 @@ namespace m8
                 emptySquares = 0;
             }
 
-            if (row > Row::_1())
+            if (row > kRow1)
             {
                 out << '/';
             }
@@ -262,7 +261,7 @@ namespace m8
 
     void Board::GenerateXFenActiveColour(std::ostream& out) const
     {
-        out << (this->side_to_move() == Color::White() ? 'w' : 'b');
+        out << (this->side_to_move() == kWhite ? 'w' : 'b');
     }
 
     bool Board::GenerateXFenCastling(std::ostream& out, Color color, CastleType castle) const
@@ -273,9 +272,9 @@ namespace m8
         if (result)
         {
             Bb candidate_rooks = this->bb_piece(NewPiece(kRook, color));
-            candidate_rooks &= kBbRow[Row::_1().color_wise(color).value()];
-            Sq sq_outter_most_rook = (castle == kKingSideCastle ? candidate_rooks.GetMSB() : candidate_rooks.GetLSB());
-            Column column_outter_most_rook = sq_outter_most_rook.column();
+            candidate_rooks &= kBbRow[GetColorWiseRow(color, kRow1)];
+            Sq sq_outter_most_rook = (castle == kKingSideCastle ? GetMsb(candidate_rooks) : GetLsb(candidate_rooks));
+            Colmn column_outter_most_rook = GetColmn(sq_outter_most_rook);
 
             char c;
             if (this->casle_colmn(castle_index) == column_outter_most_rook)
@@ -284,10 +283,10 @@ namespace m8
             }
             else
             {
-                c = static_cast<char>('A' + this->casle_colmn(castle_index).value());
+                c = static_cast<char>('A' + this->casle_colmn(castle_index));
             }
 
-            if (color == Color::Black())
+            if (color == kBlack)
             {
                 c = static_cast<char>(tolower(c));
             }
@@ -301,10 +300,10 @@ namespace m8
     {
         bool any_castle;
 
-        any_castle = GenerateXFenCastling(out, Color::White(), kKingSideCastle);
-        any_castle |= GenerateXFenCastling(out, Color::White(), kQueenSideCastle);
-        any_castle |= GenerateXFenCastling(out, Color::Black(), kKingSideCastle);
-        any_castle |= GenerateXFenCastling(out, Color::Black(), kQueenSideCastle);
+        any_castle = GenerateXFenCastling(out, kWhite, kKingSideCastle);
+        any_castle |= GenerateXFenCastling(out, kWhite, kQueenSideCastle);
+        any_castle |= GenerateXFenCastling(out, kBlack, kKingSideCastle);
+        any_castle |= GenerateXFenCastling(out, kBlack, kQueenSideCastle);
 
         if (!any_castle)
         {
@@ -314,10 +313,10 @@ namespace m8
 
     void Board::GenerateXFenEnPassant(std::ostream& out) const
     {
-        if (colmn_enpas_.IsOnBoard())
+        if (IsColmnOnBoard(colmn_enpas_))
         {
-            out << static_cast<char>('a' + colmn_enpas_.value())
-                << static_cast<char>('1' + Row::_5().color_wise(side_to_move_).value());
+            out << static_cast<char>('a' + colmn_enpas_)
+                << static_cast<char>('1' + GetColorWiseRow(side_to_move_, kRow5));
         }
         else
         {
@@ -354,36 +353,36 @@ namespace m8
     void Board::Clear()
     {
         // Initialize the side to move
-        side_to_move_ = Color::White();
+        side_to_move_ = kWhite;
 
         // Initialize the board_
-        for (Sq sq = 0; sq.IsOnBoard(); sq = sq.MoveNext())
+        for (Sq sq = 0; IsSqOnBoard(sq); ++sq)
         {
-            board_[sq.value()] = kNoPiece;
+            board_[sq] = kNoPiece;
         }
 
         // Initialize the pieces bitboards
-        for (Color color = Color::First(); color.IsColor(); color = color.Next())
+        for (Color color = kWhite; IsColor(color); ++color)
         {
             for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
             {
                 Piece piece = NewPiece(piece_type, color);
-                bb_piece_[piece] = Bb::Empty();
+                bb_piece_[piece] = kEmptyBb;
             }
         }
 
         // Initialize the color bitboards
-        bb_color_[Color::White().value()] = Bb::Empty();
-        bb_color_[Color::Black().value()] = Bb::Empty();
+        bb_color_[kWhite] = kEmptyBb;
+        bb_color_[kBlack] = kEmptyBb;
 
         // Initialize the castle columns. By default we use the regular chess columns.
-        casle_colmn_[0] = Column::A();
-        casle_colmn_[1] = Column::H();
+        casle_colmn_[0] = kColmnA;
+        casle_colmn_[1] = kColmnH;
 
         // Initialize the castle flags, the column of the en-passant capture and 
         // the half move clock.
         casle_flag_ = 0;
-        colmn_enpas_ = Column::Invalid();
+        colmn_enpas_ = kInvalColmn;
         half_move_clock_ = 0;
         full_move_clock_ = 0;
     }
@@ -392,17 +391,17 @@ namespace m8
     {
         assert(IsPiece(piece));
 
-        out << (GetColor(piece) == Color::Black() ? '=' : ' ')
+        out << (GetColor(piece) == kBlack ? '=' : ' ')
             << static_cast<char>(toupper(piece_to_char_map.find(piece)->second))
-            << (GetColor(piece) == Color::Black() ? '=' : ' ');
+            << (GetColor(piece) == kBlack ? '=' : ' ');
     }
 
     void DisplayEmptySq(std::ostream& out, Sq sq)
     {
-        auto row = sq.row();
-        auto column = sq.column();
+        auto row = GetRow(sq);
+        auto column = GetColmn(sq);
 
-        if (((row.value() & 1) == 1) == ((column.value() & 1) == 1))
+        if (((row & 1) == 1) == ((column & 1) == 1))
         {
             out << " . ";
         }
@@ -430,7 +429,7 @@ namespace m8
     void DisplayColorRow(std::ostream& out, const Board& board, Color color)
     {
         out << (board.side_to_move() == color ? "=>" : "  ");
-        for (auto column = Column::A(); column.IsOnBoard(); column = column.MoveRight())
+        for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
         {
             out << "+-"
                 << ((board.casle_colmn(0) == column && board.casle(color, kQueenSideCastle))
@@ -442,10 +441,10 @@ namespace m8
 
     void DisplayPriseEnPassantIndicator(std::ostream& out, const Board& board)
     {
-        Column enpas = board.colmn_enpas();
-        if (enpas.IsOnBoard())
+        Colmn enpas = board.colmn_enpas();
+        if (IsColmnOnBoard(enpas))
         {
-            auto spaces = 4 + enpas.value() * 4;
+            auto spaces = 4 + enpas * 4;
             for (int x = 0; x < spaces; ++x)
             {
                 out << ' ';
@@ -462,21 +461,21 @@ namespace m8
 
     void DisplayBoardContent(std::ostream& out, const Board& board)
     {
-        for (auto row = Row::_8(); row.IsOnBoard(); row = row.MoveDown())
+        for (auto row = kRow8; IsRowOnBoard(row); --row)
         {
-            out << row.number() << ' ';
+            out << GetRowNumber(row) << ' ';
 
-            for (auto column = Column::A(); column.IsOnBoard(); column = column.MoveRight())
+            for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
             {
                 out << '|';
 
-                Sq sq(column, row);
+                Sq sq = NewSq(column, row);
                 Piece piece = board[sq];
                 DisplaySq(out, sq, piece);
             }
             out << "|\n";
 
-            if (Row::_1() < row)
+            if (kRow1 < row)
             {
                 out << "  +---+---+---+---+---+---+---+---+\n";
             }
@@ -491,9 +490,9 @@ namespace m8
     std::ostream& operator<<(std::ostream& out, const Board& board)
     {
         DisplayHalfmoveClock(out, board);
-        DisplayColorRow(out, board, Color::Black());
+        DisplayColorRow(out, board, kBlack);
         DisplayBoardContent(out, board);
-        DisplayColorRow(out, board, Color::White());
+        DisplayColorRow(out, board, kWhite);
         DisplayPriseEnPassantIndicator(out, board);
         DisplayColumnsChar(out);
 

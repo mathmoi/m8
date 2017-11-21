@@ -23,21 +23,21 @@ namespace m8
    inline Bb GetRowBb(Row row)
    {
       // A: The row in valid
-      assert(row.IsOnBoard());
+      assert(IsRowOnBoard(row));
 
-      return UINT64_C(0x00000000000000ff) << (row.value() * 8);
+      return UINT64_C(0x00000000000000ff) << (row * 8);
    }
 
    /// Returns a bitboard with all the bits of a specific column set to 1.
    ///
    /// @param colmn The column
    /// @return A bitboard
-   inline Bb GetColmnBb(Column colmn) 
+   inline Bb GetColmnBb(Colmn colmn) 
    {
       // A : The column is valid
-      assert(colmn.IsOnBoard());
+      assert(IsColmnOnBoard(colmn));
 
-      return UINT64_C(0x101010101010101) << colmn.value();
+      return UINT64_C(0x101010101010101) << colmn;
    }
 }
 

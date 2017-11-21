@@ -11,60 +11,29 @@
 
 namespace m8
 {
-    class Color
+    /// Type that represent the color of the pieces
+    typedef std::uint8_t Color;
+
+    const Color kWhite = 0;
+    const Color kBlack = 1;
+
+    /// Indicate if a value is a valid color
+    ///
+    /// @param color The value to evaluate
+    /// @return True if the value is a valid color (0 or 1)
+    inline bool IsColor(Color color) { return color <= kBlack; }
+
+    /// Return the opposite color than the one it is passed in parameter.
+    ///
+    /// @param color Color for wich we want the opposite.
+    /// @return kWhite if kBlack was passed in parameterm otherwise kBlack.
+    inline Color OpposColor(Color color)
     {
-    private:
-        std::uint8_t value_;
+        // A : color is valid
+        assert(IsColor(color));
 
-    public:
-
-        /// <summary>
-        ///  Constructor.
-        /// </summary>
-        inline Color(std::uint8_t value) { value_ = value; };
-
-        /// <summary>
-        ///  White
-        /// </summary>
-        inline static Color White() { return Color(0); };
-
-        /// <summary>
-        ///  Black
-        /// </summary>
-        inline static Color Black() { return Color(1); };
-
-        /// <summary>
-        ///  Return the "first" color. In combination with next, this can be used to
-        ///  iterate over all colors.
-        /// </summary>
-        inline static Color First() { return Color(0); };
-
-        /// <summary>
-        ///  Return the opposite color.
-        /// </summary>
-        inline Color opposite() const { return value_ ^ UINT8_C(1); };
-
-        /// <summary>
-        ///  Return the value of the color.
-        /// </summary>
-        inline std::uint8_t value() const { return value_; };
-
-        /// <summary>
-        ///  Check if this is a valid color.
-        /// </summary>
-        inline bool IsColor() const { return value_ <= 1; };
-
-        /// <summary>
-        ///  Return the "next" color. In combination with First, this can be used to
-        ///  iterate over all colors.
-        /// </summary>
-        inline Color Next() const { return Color(value_ + 1); };
-
-        friend bool operator==(Color, Color);
-    };
-
-    inline bool operator==(Color lhs, Color rhs) { return lhs.value_ == rhs.value_; }
-    inline bool operator!=(Color lhs, Color rhs) { return !(lhs == rhs); }
+        return color ^ UINT8_C(1);
+    }
 }
 
 #endif // M8_COLOR_HPP_

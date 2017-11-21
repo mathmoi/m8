@@ -22,7 +22,7 @@ TEST_CASE("GenerateKnighMoves_NoKnightOfTheColor_ZeroMovesReturned")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::Black(), false, next_move);
+    next_move = move_gen.GenerateKnightMoves(kBlack, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 0);
 }
@@ -35,7 +35,7 @@ TEST_CASE("GenerateKnighMoves_NoPossibleMoves_ZeroMovesReturned")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKnightMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 0);
 }
@@ -46,18 +46,18 @@ TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoard_EightMovesReturned")
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = {NewMove(Sq::E5(), Sq::F7(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::G6(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::G4(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::F3(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::D3(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::C4(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::C6(), kWhiteKnight),
-                                        NewMove(Sq::E5(), Sq::D7(), kWhiteKnight)};
+    std::vector<Move> expected_moves = {NewMove(kE5, kF7, kWhiteKnight),
+                                        NewMove(kE5, kG6, kWhiteKnight),
+                                        NewMove(kE5, kG4, kWhiteKnight),
+                                        NewMove(kE5, kF3, kWhiteKnight),
+                                        NewMove(kE5, kD3, kWhiteKnight),
+                                        NewMove(kE5, kC4, kWhiteKnight),
+                                        NewMove(kE5, kC6, kWhiteKnight),
+                                        NewMove(kE5, kD7, kWhiteKnight)};
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKnightMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 8);
     for (auto expected : expected_moves)
@@ -72,17 +72,17 @@ TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoardOneMoveObstructed_SevenMov
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = { NewMove(Sq::E5(), Sq::F7(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::G6(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::G4(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::D3(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::C4(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::C6(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::D7(), kWhiteKnight) };
+    std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnight),
+                                         NewMove(kE5, kG6, kWhiteKnight),
+                                         NewMove(kE5, kG4, kWhiteKnight),
+                                         NewMove(kE5, kD3, kWhiteKnight),
+                                         NewMove(kE5, kC4, kWhiteKnight),
+                                         NewMove(kE5, kC6, kWhiteKnight),
+                                         NewMove(kE5, kD7, kWhiteKnight) };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKnightMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 7);
     for (auto expected : expected_moves)
@@ -99,10 +99,10 @@ TEST_CASE("GenerateKnighCaptures_SingleKnightMidleOfBoardOnePawnToCapture_OneMov
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::White(), true, next_move);
+    next_move = move_gen.GenerateKnightMoves(kWhite, true, next_move);
 
     REQUIRE((next_move - moves.data()) == 1);
-    REQUIRE(moves[0] == NewMove(Sq::E5(), Sq::F3(), kWhiteKnight, kBlackPawn));
+    REQUIRE(moves[0] == NewMove(kE5, kF3, kWhiteKnight, kBlackPawn));
 }
 
 TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoard_EightMovesReturned")
@@ -111,19 +111,19 @@ TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoard_EightMovesReturned")
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = { NewMove(Sq::E5(), Sq::F7(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::G6(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::G4(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::D3(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::C4(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::C6(), kWhiteKnight),
-                                         NewMove(Sq::E5(), Sq::D7(), kWhiteKnight),
-                                         NewMove(Sq::G1(), Sq::E2(), kWhiteKnight),
-                                         NewMove(Sq::G1(), Sq::H3(), kWhiteKnight)};
+    std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnight),
+                                         NewMove(kE5, kG6, kWhiteKnight),
+                                         NewMove(kE5, kG4, kWhiteKnight),
+                                         NewMove(kE5, kD3, kWhiteKnight),
+                                         NewMove(kE5, kC4, kWhiteKnight),
+                                         NewMove(kE5, kC6, kWhiteKnight),
+                                         NewMove(kE5, kD7, kWhiteKnight),
+                                         NewMove(kG1, kE2, kWhiteKnight),
+                                         NewMove(kG1, kH3, kWhiteKnight)};
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKnightMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 9);
     for (auto expected : expected_moves)
@@ -138,12 +138,12 @@ TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoardAbleToCaptureSinglePawn_TwoCaptur
     MoveList moves;
     Move* next_move = moves.data();
 
-    std::vector<Move> expected_moves = { NewMove(Sq::E5(), Sq::F3(), kWhiteKnight, kBlackPawn),
-                                         NewMove(Sq::G1(), Sq::F3(), kWhiteKnight, kBlackPawn) };
+    std::vector<Move> expected_moves = { NewMove(kE5, kF3, kWhiteKnight, kBlackPawn),
+                                         NewMove(kG1, kF3, kWhiteKnight, kBlackPawn) };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKnightMoves(Color::White(), true, next_move);
+    next_move = move_gen.GenerateKnightMoves(kWhite, true, next_move);
 
     REQUIRE((next_move - moves.data()) == 2);
     for (auto expected : expected_moves)
@@ -160,7 +160,7 @@ TEST_CASE("GenerateKingMoves_NoKing_ZeroMovesReturned")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::Black(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kBlack, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 0);
 }
@@ -173,7 +173,7 @@ TEST_CASE("GenerateKingMoves_AllMovesBlockedByOwnPiece_ZeroMovesReturned")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 0);
 }
@@ -185,17 +185,17 @@ TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SevenMovesReturned
     Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = 
-      { NewMove(Sq::E3(), Sq::E4(), kWhiteKing),
-        NewMove(Sq::E3(), Sq::F4(), kWhiteKing),
-        NewMove(Sq::E3(), Sq::F2(), kWhiteKing),
-        NewMove(Sq::E3(), Sq::E2(), kWhiteKing),
-        NewMove(Sq::E3(), Sq::D2(), kWhiteKing),
-        NewMove(Sq::E3(), Sq::D3(), kWhiteKing),
-        NewMove(Sq::E3(), Sq::D4(), kWhiteKing)};
+      { NewMove(kE3, kE4, kWhiteKing),
+        NewMove(kE3, kF4, kWhiteKing),
+        NewMove(kE3, kF2, kWhiteKing),
+        NewMove(kE3, kE2, kWhiteKing),
+        NewMove(kE3, kD2, kWhiteKing),
+        NewMove(kE3, kD3, kWhiteKing),
+        NewMove(kE3, kD4, kWhiteKing)};
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 7);
     for (auto expected : expected_moves)
@@ -211,11 +211,11 @@ TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SingleCaptureRetur
     Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
-    { NewMove(Sq::E3(), Sq::F3(), kWhiteKing, kBlackPawn)};
+    { NewMove(kE3, kF3, kWhiteKing, kBlackPawn)};
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), true, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, true, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -234,7 +234,7 @@ TEST_CASE("GeneratePawnMoves_NoPawnsOfTheRequestedColor_NoMoves")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnMoves(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnMoves(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -251,13 +251,13 @@ TEST_CASE("GeneratePawnMoves_TwoPawnsThatCanMoveForward_TwoMoves")
 
     std::vector<Move> expected_moves = 
     {
-        NewMove(Sq::D3(), Sq::D4(), kWhitePawn),
-        NewMove(Sq::F4(), Sq::F5(), kWhitePawn)
+        NewMove(kD3, kD4, kWhitePawn),
+        NewMove(kF4, kF5, kWhitePawn)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnMoves(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnMoves(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -276,7 +276,7 @@ TEST_CASE("GeneratePawnMoves_BlockedPawn_NoMoves")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnMoves(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnMoves(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
 }
@@ -289,13 +289,13 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRow_TwoMoves")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::D7(), Sq::D6(), kBlackPawn),
-        NewMove(Sq::D7(), Sq::D5(), kBlackPawn)
+        NewMove(kD7, kD6, kBlackPawn),
+        NewMove(kD7, kD5, kBlackPawn)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnMoves(Color::Black(), next_move);
+    next_move = move_gen.GeneratePawnMoves(kBlack, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -312,12 +312,12 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRowDoubleMoveBlocked_OneMoves")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::D7(), Sq::D6(), kBlackPawn)
+        NewMove(kD7, kD6, kBlackPawn)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnMoves(Color::Black(), next_move);
+    next_move = move_gen.GeneratePawnMoves(kBlack, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -336,7 +336,7 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRowBlocked_NoMoves")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnMoves(Color::Black(), next_move);
+    next_move = move_gen.GeneratePawnMoves(kBlack, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -353,7 +353,7 @@ TEST_CASE("GeneratePawnCaptures_NoPawnOfTheRequestedColor_NoMoves")
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnCaptures(Color::Black(), next_move);
+    next_move = move_gen.GeneratePawnCaptures(kBlack, next_move);
 
     REQUIRE((next_move - moves.data()) == 0);
 }
@@ -366,12 +366,12 @@ TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnLeft_OneMovesReturned")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::E4(), Sq::D5(), kWhitePawn, kBlackKnight)
+        NewMove(kE4, kD5, kWhitePawn, kBlackKnight)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnCaptures(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnCaptures(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -388,12 +388,12 @@ TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnRight_OneMovesReturned")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::E4(), Sq::F5(), kWhitePawn, kBlackKnight)
+        NewMove(kE4, kF5, kWhitePawn, kBlackKnight)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnCaptures(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnCaptures(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -410,15 +410,15 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToPromote_FourMovesReturned")
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::B7(), Sq::B8(), kWhitePawn, kNoPiece, kWhiteQueen),
-        NewMove(Sq::B7(), Sq::B8(), kWhitePawn, kNoPiece, kWhiteRook),
-        NewMove(Sq::B7(), Sq::B8(), kWhitePawn, kNoPiece, kWhiteKnight),
-        NewMove(Sq::B7(), Sq::B8(), kWhitePawn, kNoPiece, kWhiteBishop)
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteQueen),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteRook),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteKnight),
+        NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteBishop)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnCaptures(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnCaptures(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -435,15 +435,15 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::B7(), Sq::C8(), kWhitePawn, kBlackRook, kWhiteQueen),
-        NewMove(Sq::B7(), Sq::C8(), kWhitePawn, kBlackRook, kWhiteRook),
-        NewMove(Sq::B7(), Sq::C8(), kWhitePawn, kBlackRook, kWhiteKnight),
-        NewMove(Sq::B7(), Sq::C8(), kWhitePawn, kBlackRook, kWhiteBishop)
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteQueen),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteRook),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteKnight),
+        NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteBishop)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GeneratePawnCaptures(Color::White(), next_move);
+    next_move = move_gen.GeneratePawnCaptures(kWhite, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -454,32 +454,32 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
 
 TEST_CASE("GenerateRookAttacks_called_ReturnExpectedValue")
 {
-    Bb occ = UINT64_C(0xFFDFEF20EFCFAF7F);
+    Bb occ = BB_C(0xFFDFEF20EFCFAF7F);
     Bb result;
 
-    result = MoveGen::GenerateRookAttacks(occ, Sq::E5());
+    result = MoveGen::GenerateRookAttacks(occ, kE5);
 
-    REQUIRE(UINT64_C(0x0010102F10101010) == result);
+    REQUIRE(BB_C(0x0010102F10101010) == result);
 }
 
 TEST_CASE("m8_rook_attacks__empty_board__return_expected_value")
 {
-    Bb occ = UINT64_C(0x0000000000000080);
+    Bb occ = BB_C(0x0000000000000080);
     Bb result;
 
-    result = MoveGen::GenerateRookAttacks(occ, Sq::H1());
+    result = MoveGen::GenerateRookAttacks(occ, kH1);
 
-    REQUIRE(UINT64_C(0x808080808080807F) == result);
+    REQUIRE(BB_C(0x808080808080807F) == result);
 }
 
 TEST_CASE("m8_bishop_attacks__called__return_expected_value")
 {
-    Bb occ = UINT64_C(0xFFDFEB20EFCFAF7F);
+    Bb occ = BB_C(0xFFDFEB20EFCFAF7F);
     Bb result;
 
-    result = MoveGen::GenerateBishopAttacks(occ, Sq::D5());
+    result = MoveGen::GenerateBishopAttacks(occ, kD5);
 
-    REQUIRE(UINT64_C(0x4022140014204080) == result);
+    REQUIRE(BB_C(0x4022140014204080) == result);
 }
 
 TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_rook_moves")
@@ -490,20 +490,20 @@ TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_r
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::A8(), Sq::B8(), kBlackRook),
-        NewMove(Sq::A8(), Sq::C8(), kBlackRook),
-        NewMove(Sq::A8(), Sq::D8(), kBlackRook),
-        NewMove(Sq::H8(), Sq::F8(), kBlackRook),
-        NewMove(Sq::H8(), Sq::G8(), kBlackRook),
-        NewMove(Sq::H8(), Sq::H7(), kBlackRook),
-        NewMove(Sq::H8(), Sq::H6(), kBlackRook),
-        NewMove(Sq::H8(), Sq::H5(), kBlackRook),
-        NewMove(Sq::H8(), Sq::H4(), kBlackRook),
+        NewMove(kA8, kB8, kBlackRook),
+        NewMove(kA8, kC8, kBlackRook),
+        NewMove(kA8, kD8, kBlackRook),
+        NewMove(kH8, kF8, kBlackRook),
+        NewMove(kH8, kG8, kBlackRook),
+        NewMove(kH8, kH7, kBlackRook),
+        NewMove(kH8, kH6, kBlackRook),
+        NewMove(kH8, kH5, kBlackRook),
+        NewMove(kH8, kH4, kBlackRook),
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateRookMoves(Color::Black(), false, next_move);
+    next_move = move_gen.GenerateRookMoves(kBlack, false, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -520,13 +520,13 @@ TEST_CASE("GenerateRookMoves__called_for_captures__return_all_captures_rook_move
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::A8(), Sq::A7(), kBlackRook, kWhiteQueen),
-        NewMove(Sq::H8(), Sq::H2(), kBlackRook, kWhitePawn),
+        NewMove(kA8, kA7, kBlackRook, kWhiteQueen),
+        NewMove(kH8, kH2, kBlackRook, kWhitePawn),
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateRookMoves(Color::Black(), true, next_move);
+    next_move = move_gen.GenerateRookMoves(kBlack, true, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -543,18 +543,18 @@ TEST_CASE("GenerateBishopMoves__called_for_non_captures__return_all_non_captures
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::A6(), Sq::B7(), kBlackBishop),
-        NewMove(Sq::A6(), Sq::C8(), kBlackBishop),
-        NewMove(Sq::A6(), Sq::B5(), kBlackBishop),
-        NewMove(Sq::A6(), Sq::C4(), kBlackBishop),
-        NewMove(Sq::A6(), Sq::D3(), kBlackBishop),
-        NewMove(Sq::G7(), Sq::F8(), kBlackBishop),
-        NewMove(Sq::G7(), Sq::H6(), kBlackBishop)
+        NewMove(kA6, kB7, kBlackBishop),
+        NewMove(kA6, kC8, kBlackBishop),
+        NewMove(kA6, kB5, kBlackBishop),
+        NewMove(kA6, kC4, kBlackBishop),
+        NewMove(kA6, kD3, kBlackBishop),
+        NewMove(kG7, kF8, kBlackBishop),
+        NewMove(kG7, kH6, kBlackBishop)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateBishopMoves(Color::Black(), false, next_move);
+    next_move = move_gen.GenerateBishopMoves(kBlack, false, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -571,12 +571,12 @@ TEST_CASE("GenerateBishopMoves__called_for_captures__return_all_captures_bishop_
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::A6(), Sq::E2(), kBlackBishop, kWhiteBishop)
+        NewMove(kA6, kE2, kBlackBishop, kWhiteBishop)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateBishopMoves(Color::Black(), true, next_move);
+    next_move = move_gen.GenerateBishopMoves(kBlack, true, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -593,18 +593,18 @@ TEST_CASE("GenerateQueenMoves__called_for_non_captures__return_all_non_captures_
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::F3(), Sq::D3(), kWhiteQueen),
-        NewMove(Sq::F3(), Sq::E3(), kWhiteQueen),
-        NewMove(Sq::F3(), Sq::G3(), kWhiteQueen),
-        NewMove(Sq::F3(), Sq::F4(), kWhiteQueen),
-        NewMove(Sq::F3(), Sq::F5(), kWhiteQueen),
-        NewMove(Sq::F3(), Sq::G4(), kWhiteQueen),
-        NewMove(Sq::F3(), Sq::H5(), kWhiteQueen),
+        NewMove(kF3, kD3, kWhiteQueen),
+        NewMove(kF3, kE3, kWhiteQueen),
+        NewMove(kF3, kG3, kWhiteQueen),
+        NewMove(kF3, kF4, kWhiteQueen),
+        NewMove(kF3, kF5, kWhiteQueen),
+        NewMove(kF3, kG4, kWhiteQueen),
+        NewMove(kF3, kH5, kWhiteQueen),
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateQueenMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateQueenMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -621,13 +621,13 @@ TEST_CASE("GenerateQueenMoves__called_for_captures__return_all_captures_queen_mo
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::F3(), Sq::F6(), kWhiteQueen, kBlackKnight),
-        NewMove(Sq::F3(), Sq::H3(), kWhiteQueen, kBlackPawn)
+        NewMove(kF3, kF6, kWhiteQueen, kBlackKnight),
+        NewMove(kF3, kH3, kWhiteQueen, kBlackPawn)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateQueenMoves(Color::White(), true, next_move);
+    next_move = move_gen.GenerateQueenMoves(kWhite, true, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -642,9 +642,9 @@ TEST_CASE("AttacksTo__lots_of_squares_attack_e5__all_attacks_identified")
 
     MoveGen move_gen(board);
 
-    Bb attacks = move_gen.AttacksTo(Sq::E5());
+    Bb attacks = move_gen.AttacksTo(kE5);
 
-    REQUIRE(attacks == UINT64_C(0x003C64824C289000));
+    REQUIRE(attacks == BB_C(0x003C64824C289000));
 }
 
 TEST_CASE("AttacksTo__lots_of_squares_attack_e5__nothings_attack_a1")
@@ -653,9 +653,9 @@ TEST_CASE("AttacksTo__lots_of_squares_attack_e5__nothings_attack_a1")
 
     MoveGen move_gen(board);
 
-    Bb attacks = move_gen.AttacksTo(Sq::A1());
+    Bb attacks = move_gen.AttacksTo(kA1);
 
-    REQUIRE(attacks == Bb::Empty());
+    REQUIRE(attacks == kEmptyBb);
 }
 
 TEST_CASE("AttacksTo__both_kings_attack_e5__both_attacks_identified")
@@ -664,9 +664,9 @@ TEST_CASE("AttacksTo__both_kings_attack_e5__both_attacks_identified")
 
     MoveGen move_gen(board);
 
-    Bb attacks = move_gen.AttacksTo(Sq::E5());
+    Bb attacks = move_gen.AttacksTo(kE5);
 
-    REQUIRE(attacks == UINT64_C(0x0000100010000000));
+    REQUIRE(attacks == BB_C(0x0000100010000000));
 }
 
 TEST_CASE("IsInCheck__white_king_attack_by_rook__return_true")
@@ -674,7 +674,7 @@ TEST_CASE("IsInCheck__white_king_attack_by_rook__return_true")
     Board board("8/8/4k3/8/r3K2R/8/8/8 w - - 0 1");
     MoveGen move_gen(board);
 
-    bool in_check = move_gen.IsInCheck(Color::White());
+    bool in_check = move_gen.IsInCheck(kWhite);
 
     REQUIRE(in_check == true);
 }
@@ -684,7 +684,7 @@ TEST_CASE("IsInCheck__black_king_is_not_in_check__return_false")
     Board board("8/8/4k3/8/r3K2R/8/8/8 w - - 0 1");
     MoveGen move_gen(board);
 
-    bool in_check = move_gen.IsInCheck(Color::Black());
+    bool in_check = move_gen.IsInCheck(kBlack);
 
     REQUIRE(in_check == false);
 }
@@ -694,7 +694,7 @@ TEST_CASE("IsInCheck__white_king_is_protected_by_own_piece__return_false")
     Board board("8/8/4k3/8/r2QK2R/8/8/8 w - - 0 1");
     MoveGen move_gen(board);
 
-    bool in_check = move_gen.IsInCheck(Color::White());
+    bool in_check = move_gen.IsInCheck(kWhite);
 
     REQUIRE(in_check == false);
 }
@@ -707,17 +707,17 @@ TEST_CASE("GenerateCastlingMoves__chess960_position__correct_moves_including_cas
 
     std::vector<Move> expected_moves =
     {
-        NewMove(Sq::B1(), Sq::A2(), kWhiteKing),
-        NewMove(Sq::B1(), Sq::B2(), kWhiteKing),
-        NewMove(Sq::B1(), Sq::C2(), kWhiteKing),
-        NewMove(Sq::B1(), Sq::C1(), kWhiteKing),
-        NewCastlingMove(Sq::B1(), Sq::G1(), kWhiteKing, kKingSideCastle),
-        NewCastlingMove(Sq::B1(), Sq::C1(), kWhiteKing, kQueenSideCastle)
+        NewMove(kB1, kA2, kWhiteKing),
+        NewMove(kB1, kB2, kWhiteKing),
+        NewMove(kB1, kC2, kWhiteKing),
+        NewMove(kB1, kC1, kWhiteKing),
+        NewCastlingMove(kB1, kG1, kWhiteKing, kKingSideCastle),
+        NewCastlingMove(kB1, kC1, kWhiteKing, kQueenSideCastle)
     };
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == expected_moves.size());
     for (auto expected : expected_moves)
@@ -732,11 +732,11 @@ TEST_CASE("GenerateCastlingMoves__position_traversed_by_rook_attacked__castling_
     MoveList moves;
     Move* next_move = moves.data();
 
-    Move expected_move = NewCastlingMove(Sq::E1(), Sq::C1(), kWhiteKing, kQueenSideCastle);
+    Move expected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
     
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
 
     REQUIRE(Contains(moves.data(), next_move, expected_move));
 }
@@ -747,11 +747,11 @@ TEST_CASE("GenerateCastlingMoves__position_traversed_by_king_attacked__castling_
     MoveList moves;
     Move* next_move = moves.data();
 
-    Move unexpected_move = NewCastlingMove(Sq::E1(), Sq::C1(), kWhiteKing, kQueenSideCastle);
+    Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 5);
     REQUIRE(!Contains(moves.data(), next_move, unexpected_move));
@@ -763,11 +763,11 @@ TEST_CASE("GenerateCastlingMoves__positions_traveled_by_rook_occupied__castling_
     MoveList moves;
     Move* next_move = moves.data();
 
-    Move unexpected_move = NewCastlingMove(Sq::E1(), Sq::C1(), kWhiteKing, kQueenSideCastle);
+    Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
     MoveGen move_gen(board);
 
-    next_move = move_gen.GenerateKingMoves(Color::White(), false, next_move);
+    next_move = move_gen.GenerateKingMoves(kWhite, false, next_move);
 
     REQUIRE((next_move - moves.data()) == 5);
     REQUIRE(!Contains(moves.data(), next_move, unexpected_move));
