@@ -17,14 +17,14 @@ TEST_CASE("Test Board()")
 {
    Board board;
 
-   REQUIRE(board.side_to_move() == kWhite);
+   REQUIRE(board.side_to_move() == Color::White());
 
    for (Sq sq = Sq::A1(); sq.IsOnBoard(); sq = sq.MoveNext())
    {
       REQUIRE(board[sq] == kNoPiece);
    }
 
-   for (Color color = kWhite; IsColor(color); ++color)
+   for (Color color = Color::First(); color.IsColor(); color =  color.Next())
    {
       for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
       {
@@ -32,13 +32,13 @@ TEST_CASE("Test Board()")
       }
    }
 
-   REQUIRE(board.UINT64_Color(kWhite) == Bb::Empty());
-   REQUIRE(board.UINT64_Color(kBlack) == Bb::Empty());
+   REQUIRE(board.UINT64_Color(Color::White()) == Bb::Empty());
+   REQUIRE(board.UINT64_Color(Color::Black()) == Bb::Empty());
 
-   REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-   REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-   REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-   REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+   REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+   REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+   REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+   REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
 
    REQUIRE(board.colmn_enpas().IsOnBoard() == false);
 }
@@ -93,12 +93,12 @@ TEST_CASE("Test Board(fen)")
    REQUIRE(board[Sq::G1()] == kWhiteKnight);
    REQUIRE(board[Sq::H1()] == kWhiteRook);
 
-   REQUIRE(board.side_to_move() == kWhite);
+   REQUIRE(board.side_to_move() == Color::White());
 
-   REQUIRE(board.casle(kWhite, kQueenSideCastle) == true);
-   REQUIRE(board.casle(kWhite, kKingSideCastle) == true);
-   REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
-   REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
+   REQUIRE(board.casle(Color::White(), kQueenSideCastle) == true);
+   REQUIRE(board.casle(Color::White(), kKingSideCastle) == true);
+   REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == true);
+   REQUIRE(board.casle(Color::Black(), kKingSideCastle) == true);
 
    REQUIRE(board.casle_colmn(0) == Column::A());
    REQUIRE(board.casle_colmn(1) == Column::H());
@@ -111,10 +111,10 @@ TEST_CASE("Test Board(fen) 2")
    // Chess360 castling test
    Board board("rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11");
 
-   REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-   REQUIRE(board.casle(kWhite, kKingSideCastle) == true);
-   REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
-   REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
+   REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+   REQUIRE(board.casle(Color::White(), kKingSideCastle) == true);
+   REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == true);
+   REQUIRE(board.casle(Color::Black(), kKingSideCastle) == true);
 
    REQUIRE(board.casle_colmn(0) == Column::A());
    REQUIRE(board.casle_colmn(1) == Column::G());
@@ -135,26 +135,26 @@ TEST_CASE("Test Board(fen) 4")
    // Chess360 castling test
    Board board("rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w");
 
-   REQUIRE(board.side_to_move() == kWhite);
+   REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Test side_to_move()")
 {
    Board board;
 
-   REQUIRE(board.side_to_move() == kWhite);
+   REQUIRE(board.side_to_move() == Color::White());
 
-   board.set_side_to_move(kWhite);
-   REQUIRE(board.side_to_move() == kWhite);
+   board.set_side_to_move(Color::White());
+   REQUIRE(board.side_to_move() == Color::White());
 
-   board.set_side_to_move(kBlack);
-   REQUIRE(board.side_to_move() == kBlack);
+   board.set_side_to_move(Color::Black());
+   REQUIRE(board.side_to_move() == Color::Black());
 
-   board.set_side_to_move(kBlack);
-   REQUIRE(board.side_to_move() == kBlack);
+   board.set_side_to_move(Color::Black());
+   REQUIRE(board.side_to_move() == Color::Black());
 
-   board.set_side_to_move(kWhite);
-   REQUIRE(board.side_to_move() == kWhite);
+   board.set_side_to_move(Color::White());
+   REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Test colmn_enpas()")
@@ -176,83 +176,83 @@ TEST_CASE("Test casle()")
 
    SECTION("white queen side castle")
    {
-      board.set_casle(kWhite, kQueenSideCastle, false);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
+      board.set_casle(Color::White(), kQueenSideCastle, false);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
 
-      board.set_casle(kWhite, kQueenSideCastle, false);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::White(), kQueenSideCastle, false);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
 
-      board.set_casle(kWhite, kQueenSideCastle, true);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == true);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::White(), kQueenSideCastle, true);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == true);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
    }
 
    SECTION("white king side castle")
    {
-      board.set_casle(kWhite, kKingSideCastle, false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
+      board.set_casle(Color::White(), kKingSideCastle, false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
 
-      board.set_casle(kWhite, kKingSideCastle, false);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::White(), kKingSideCastle, false);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
 
-      board.set_casle(kWhite, kKingSideCastle, true);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == true);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::White(), kKingSideCastle, true);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == true);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
    }
 
    SECTION("black queen side castle")
    {
-      board.set_casle(kBlack, kQueenSideCastle, false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
+      board.set_casle(Color::Black(), kQueenSideCastle, false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
 
-      board.set_casle(kBlack, kQueenSideCastle, false);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::Black(), kQueenSideCastle, false);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
 
-      board.set_casle(kBlack, kQueenSideCastle, true);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::Black(), kQueenSideCastle, true);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == true);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
    }
 
    SECTION("black king side castle")
    {
-      board.set_casle(kBlack, kKingSideCastle, false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::Black(), kKingSideCastle, false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
 
-      board.set_casle(kBlack, kKingSideCastle, false);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
+      board.set_casle(Color::Black(), kKingSideCastle, false);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == false);
 
-      board.set_casle(kBlack, kKingSideCastle, true);
-      REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-      REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
+      board.set_casle(Color::Black(), kKingSideCastle, true);
+      REQUIRE(board.casle(Color::White(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::White(), kKingSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kQueenSideCastle) == false);
+      REQUIRE(board.casle(Color::Black(), kKingSideCastle) == true);
    }
 }
 
 TEST_CASE("Test AddPiece()")
 {
    Board board;
-   Piece white_pawn = NewPiece(kPawn, kWhite);
-   Piece black_queen = NewPiece(kQueen, kBlack);
-   Piece white_queen = NewPiece(kQueen, kWhite);
+   Piece white_pawn = NewPiece(kPawn, Color::White());
+   Piece black_queen = NewPiece(kQueen, Color::Black());
+   Piece white_queen = NewPiece(kQueen, Color::White());
    Bb bb;
 
    board.AddPiece(Sq::B2(), white_pawn);
@@ -263,12 +263,12 @@ TEST_CASE("Test AddPiece()")
 
    bb = Bb(0);
    bb.Set(Sq::B2().value());
-   REQUIRE(board.UINT64_Color(kWhite) == bb);
+   REQUIRE(board.UINT64_Color(Color::White()) == bb);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
    bb = Bb(0);
    bb.Set(Sq::D8().value());
-   REQUIRE(board.UINT64_Color(kBlack) == bb);
+   REQUIRE(board.UINT64_Color(Color::Black()) == bb);
    REQUIRE(board.bb_piece(black_queen) == bb);
 
    board.AddPiece(Sq::A2(), white_pawn);
@@ -276,20 +276,20 @@ TEST_CASE("Test AddPiece()")
    bb = Bb(0);
    bb.Set(Sq::B2().value());
    bb.Set(Sq::A2().value());
-   REQUIRE(board.UINT64_Color(kWhite) == bb);
+   REQUIRE(board.UINT64_Color(Color::White()) == bb);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
    board.AddPiece(Sq::C2(), white_queen);
    REQUIRE(board.bb_piece(white_pawn) == bb);
 
    bb.Set(Sq::C2().value());
-   REQUIRE(board.UINT64_Color(kWhite) == bb);
+   REQUIRE(board.UINT64_Color(Color::White()) == bb);
 }
 
 TEST_CASE("Test RemovePiece()")
 {
    Board board;
-   Piece white_pawn = NewPiece(kPawn, kWhite);
+   Piece white_pawn = NewPiece(kPawn, Color::White());
 
    board.AddPiece(Sq::A2(), white_pawn);
    board.AddPiece(Sq::B2(), white_pawn);
@@ -298,24 +298,24 @@ TEST_CASE("Test RemovePiece()")
    board.RemovePiece(Sq::B2());
 
    REQUIRE(board[Sq::B2()] == kNoPiece);
-   REQUIRE(board.UINT64_Color(kWhite)[Sq::B2().value()] == false);
+   REQUIRE(board.UINT64_Color(Color::White())[Sq::B2().value()] == false);
    REQUIRE(board.bb_piece(white_pawn)[Sq::B2().value()] == false);
 }
 
 TEST_CASE("Test MovePiece()")
 {
    Board board;
-   Piece white_pawn = NewPiece(kPawn, kWhite);
+   Piece white_pawn = NewPiece(kPawn, Color::White());
 
    board.AddPiece(Sq::A2(), white_pawn);
    board.MovePiece(Sq::A2(), Sq::A3());
 
    REQUIRE(board[Sq::A2()] == kNoPiece);
-   REQUIRE(board.UINT64_Color(kWhite)[Sq::A2().value()] == false);
+   REQUIRE(board.UINT64_Color(Color::White())[Sq::A2().value()] == false);
    REQUIRE(board.bb_piece(white_pawn)[Sq::A2().value()] == false);
 
    REQUIRE(board[Sq::A3()] == white_pawn);
-   REQUIRE(board.UINT64_Color(kWhite)[Sq::A3().value()] == true);
+   REQUIRE(board.UINT64_Color(Color::White())[Sq::A3().value()] == true);
    REQUIRE(board.bb_piece(white_pawn)[Sq::A3().value()] == true);
 }
 
@@ -330,7 +330,7 @@ TEST_CASE("Make__simple_move__piece_is_moved")
     REQUIRE(board[Sq::G4()] == kWhiteQueen);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__simple_capture__piece_is_moved")
@@ -344,7 +344,7 @@ TEST_CASE("Make__simple_capture__piece_is_moved")
     REQUIRE(board[Sq::F7()] == kWhiteKnight);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__king_side_castling__piece_are_moved")
@@ -360,7 +360,7 @@ TEST_CASE("Make__king_side_castling__piece_are_moved")
     REQUIRE(board[Sq::F1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__queen_side_castling__piece_are_moved")
@@ -376,7 +376,7 @@ TEST_CASE("Make__queen_side_castling__piece_are_moved")
     REQUIRE(board[Sq::D1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__pawn_move__piece_is_moved")
@@ -390,7 +390,7 @@ TEST_CASE("Make__pawn_move__piece_is_moved")
     REQUIRE(board[Sq::D6()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__pawn_moved_two_square__piece_is_moved_and_en_passant_flag_set")
@@ -404,7 +404,7 @@ TEST_CASE("Make__pawn_moved_two_square__piece_is_moved_and_en_passant_flag_set")
     REQUIRE(board[Sq::A4()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::A());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__pawn_capture__piece_are_moved")
@@ -418,7 +418,7 @@ TEST_CASE("Make__pawn_capture__piece_are_moved")
     REQUIRE(board[Sq::E6()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Make__pawn_capture_en_passant__piece_are_moved")
@@ -433,7 +433,7 @@ TEST_CASE("Make__pawn_capture_en_passant__piece_are_moved")
     REQUIRE(board[Sq::A4()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Make__pawn_promotion__piece_is_promoted")
@@ -447,7 +447,7 @@ TEST_CASE("Make__pawn_promotion__piece_is_promoted")
     REQUIRE(board[Sq::H1()] == kBlackKnight);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Make__king_move__castling_flags_are_cleared")
@@ -461,9 +461,9 @@ TEST_CASE("Make__king_move__castling_flags_are_cleared")
     REQUIRE(board[Sq::F1()] == kWhiteKing);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
-    REQUIRE(board.side_to_move() == kBlack);
-    REQUIRE(!board.casle(kWhite, kQueenSideCastle));
-    REQUIRE(!board.casle(kWhite, kKingSideCastle));
+    REQUIRE(board.side_to_move() == Color::Black());
+    REQUIRE(!board.casle(Color::White(), kQueenSideCastle));
+    REQUIRE(!board.casle(Color::White(), kKingSideCastle));
 }
 
 TEST_CASE("Make__king_side_rook_move__king_side_castling_flag_cleared")
@@ -477,9 +477,9 @@ TEST_CASE("Make__king_side_rook_move__king_side_castling_flag_cleared")
     REQUIRE(board[Sq::G1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
-    REQUIRE(board.side_to_move() == kBlack);
-    REQUIRE(board.casle(kWhite, kQueenSideCastle));
-    REQUIRE(!board.casle(kWhite, kKingSideCastle));
+    REQUIRE(board.side_to_move() == Color::Black());
+    REQUIRE(board.casle(Color::White(), kQueenSideCastle));
+    REQUIRE(!board.casle(Color::White(), kKingSideCastle));
 }
 
 TEST_CASE("Make__queen_side_rook_move__queen_side_castling_flag_cleared")
@@ -493,9 +493,9 @@ TEST_CASE("Make__queen_side_rook_move__queen_side_castling_flag_cleared")
     REQUIRE(board[Sq::B1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 1);
-    REQUIRE(board.side_to_move() == kBlack);
-    REQUIRE(!board.casle(kWhite, kQueenSideCastle));
-    REQUIRE(board.casle(kWhite, kKingSideCastle));
+    REQUIRE(board.side_to_move() == Color::Black());
+    REQUIRE(!board.casle(Color::White(), kQueenSideCastle));
+    REQUIRE(board.casle(Color::White(), kKingSideCastle));
 }
 
 TEST_CASE("Unmake__simple_move__piece_is_replaced")
@@ -511,7 +511,7 @@ TEST_CASE("Unmake__simple_move__piece_is_replaced")
     REQUIRE(board[Sq::G4()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__simple_capture__capture_is_unmade")
@@ -527,7 +527,7 @@ TEST_CASE("Unmake__simple_capture__capture_is_unmade")
     REQUIRE(board[Sq::F7()] == kBlackPawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__king_side_castling__castling_is_unmade")
@@ -545,7 +545,7 @@ TEST_CASE("Unmake__king_side_castling__castling_is_unmade")
     REQUIRE(board[Sq::F1()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__queen_side_castling__castling_is_unmade")
@@ -563,7 +563,7 @@ TEST_CASE("Unmake__queen_side_castling__castling_is_unmade")
     REQUIRE(board[Sq::D1()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__pawn_move__moved_is_unmade")
@@ -579,7 +579,7 @@ TEST_CASE("Unmake__pawn_move__moved_is_unmade")
     REQUIRE(board[Sq::D6()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__pawn_moved_two_square__piece_is_moved")
@@ -595,7 +595,7 @@ TEST_CASE("Unmake__pawn_moved_two_square__piece_is_moved")
     REQUIRE(board[Sq::A4()] == kNoPiece);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__pawn_capture__piece_are_moved")
@@ -611,7 +611,7 @@ TEST_CASE("Unmake__pawn_capture__piece_are_moved")
     REQUIRE(board[Sq::E6()] == kBlackPawn);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kWhite);
+    REQUIRE(board.side_to_move() == Color::White());
 }
 
 TEST_CASE("Unmake__pawn_capture_en_passant__piece_are_moved")
@@ -628,7 +628,7 @@ TEST_CASE("Unmake__pawn_capture_en_passant__piece_are_moved")
     REQUIRE(board[Sq::A4()] == kWhitePawn);
     REQUIRE(board.colmn_enpas() == Column::A());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 
 TEST_CASE("Unmake__pawn_promotion__board_is_restored")
@@ -644,6 +644,6 @@ TEST_CASE("Unmake__pawn_promotion__board_is_restored")
     REQUIRE(board[Sq::H1()] == kWhiteRook);
     REQUIRE(board.colmn_enpas() == Column::Invalid());
     REQUIRE(board.half_move_clock() == 0);
-    REQUIRE(board.side_to_move() == kBlack);
+    REQUIRE(board.side_to_move() == Color::Black());
 }
 

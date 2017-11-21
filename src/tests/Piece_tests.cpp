@@ -60,19 +60,19 @@ TEST_CASE("Test CanSlideBishop")
 
 TEST_CASE("Test IsColor")
 {
-   REQUIRE(IsColor(kWhite) == true);
-   REQUIRE(IsColor(kBlack) == true);
+   REQUIRE(Color::White().IsColor() == true);
+   REQUIRE(Color::Black().IsColor() == true);
 
-   for (uint32_t i = kBlack + 1; i <= 255; ++i)
+   for (uint32_t i = Color::Black().value() + 1; i <= 255; ++i)
    {
-      REQUIRE(IsColor(static_cast<Color>(i)) == false);
+      REQUIRE(Color(i).IsColor() == false);
    }
 }
 
 TEST_CASE("Test OpposColor")
 {
-   REQUIRE(OpposColor(kWhite) == kBlack);
-   REQUIRE(OpposColor(kBlack) == kWhite);
+   REQUIRE(Color::White().opposite() == Color::Black());
+   REQUIRE(Color::Black().opposite() == Color::White());
 }
 
 TEST_CASE("Test IsPiece")
@@ -103,51 +103,51 @@ TEST_CASE("Test IsPiece")
 
 TEST_CASE("Test NewPiece")
 {
-   REQUIRE(NewPiece(kPawn, kWhite) == kWhitePawn);
-   REQUIRE(NewPiece(kKnight, kWhite) == kWhiteKnight);
-   REQUIRE(NewPiece(kKing, kWhite) == kWhiteKing);
-   REQUIRE(NewPiece(kQueen, kWhite) == kWhiteQueen);
-   REQUIRE(NewPiece(kBishop, kWhite) == kWhiteBishop);
-   REQUIRE(NewPiece(kRook, kWhite) == kWhiteRook);
+   REQUIRE(NewPiece(kPawn, Color::White()) == kWhitePawn);
+   REQUIRE(NewPiece(kKnight, Color::White()) == kWhiteKnight);
+   REQUIRE(NewPiece(kKing, Color::White()) == kWhiteKing);
+   REQUIRE(NewPiece(kQueen, Color::White()) == kWhiteQueen);
+   REQUIRE(NewPiece(kBishop, Color::White()) == kWhiteBishop);
+   REQUIRE(NewPiece(kRook, Color::White()) == kWhiteRook);
 
-   REQUIRE(NewPiece(kPawn, kBlack) == kBlackPawn);
-   REQUIRE(NewPiece(kKnight, kBlack) == kBlackKnight);
-   REQUIRE(NewPiece(kKing, kBlack) == kBlackKing);
-   REQUIRE(NewPiece(kQueen, kBlack) == kBlackQueen);
-   REQUIRE(NewPiece(kBishop, kBlack) == kBlackBishop);
-   REQUIRE(NewPiece(kRook, kBlack) == kBlackRook);
+   REQUIRE(NewPiece(kPawn, Color::Black()) == kBlackPawn);
+   REQUIRE(NewPiece(kKnight, Color::Black()) == kBlackKnight);
+   REQUIRE(NewPiece(kKing, Color::Black()) == kBlackKing);
+   REQUIRE(NewPiece(kQueen, Color::Black()) == kBlackQueen);
+   REQUIRE(NewPiece(kBishop, Color::Black()) == kBlackBishop);
+   REQUIRE(NewPiece(kRook, Color::Black()) == kBlackRook);
 }
 
 TEST_CASE("Test GetPieceType")
 {
-   REQUIRE(GetPieceType(NewPiece(kPawn, kWhite)) == kPawn);
-   REQUIRE(GetPieceType(NewPiece(kKnight, kWhite)) == kKnight);
-   REQUIRE(GetPieceType(NewPiece(kKing, kWhite)) == kKing);
-   REQUIRE(GetPieceType(NewPiece(kQueen, kWhite)) == kQueen);
-   REQUIRE(GetPieceType(NewPiece(kBishop, kWhite)) == kBishop);
-   REQUIRE(GetPieceType(NewPiece(kRook, kWhite)) == kRook);
+   REQUIRE(GetPieceType(NewPiece(kPawn, Color::White())) == kPawn);
+   REQUIRE(GetPieceType(NewPiece(kKnight, Color::White())) == kKnight);
+   REQUIRE(GetPieceType(NewPiece(kKing, Color::White())) == kKing);
+   REQUIRE(GetPieceType(NewPiece(kQueen, Color::White())) == kQueen);
+   REQUIRE(GetPieceType(NewPiece(kBishop, Color::White())) == kBishop);
+   REQUIRE(GetPieceType(NewPiece(kRook, Color::White())) == kRook);
 
-   REQUIRE(GetPieceType(NewPiece(kPawn, kBlack)) == kPawn);
-   REQUIRE(GetPieceType(NewPiece(kKnight, kBlack)) == kKnight);
-   REQUIRE(GetPieceType(NewPiece(kKing, kBlack)) == kKing);
-   REQUIRE(GetPieceType(NewPiece(kQueen, kBlack)) == kQueen);
-   REQUIRE(GetPieceType(NewPiece(kBishop, kBlack)) == kBishop);
-   REQUIRE(GetPieceType(NewPiece(kRook, kBlack)) == kRook);
+   REQUIRE(GetPieceType(NewPiece(kPawn, Color::Black())) == kPawn);
+   REQUIRE(GetPieceType(NewPiece(kKnight, Color::Black())) == kKnight);
+   REQUIRE(GetPieceType(NewPiece(kKing, Color::Black())) == kKing);
+   REQUIRE(GetPieceType(NewPiece(kQueen, Color::Black())) == kQueen);
+   REQUIRE(GetPieceType(NewPiece(kBishop, Color::Black())) == kBishop);
+   REQUIRE(GetPieceType(NewPiece(kRook, Color::Black())) == kRook);
 }
 
 TEST_CASE("Test GetColor")
 {
-   REQUIRE(GetColor(NewPiece(kPawn, kWhite)) == kWhite);
-   REQUIRE(GetColor(NewPiece(kKnight, kWhite)) == kWhite);
-   REQUIRE(GetColor(NewPiece(kKing, kWhite)) == kWhite);
-   REQUIRE(GetColor(NewPiece(kQueen, kWhite)) == kWhite);
-   REQUIRE(GetColor(NewPiece(kBishop, kWhite)) == kWhite);
-   REQUIRE(GetColor(NewPiece(kRook, kWhite)) == kWhite);
+   REQUIRE(GetColor(NewPiece(kPawn, Color::White())) == Color::White());
+   REQUIRE(GetColor(NewPiece(kKnight, Color::White())) == Color::White());
+   REQUIRE(GetColor(NewPiece(kKing, Color::White())) == Color::White());
+   REQUIRE(GetColor(NewPiece(kQueen, Color::White())) == Color::White());
+   REQUIRE(GetColor(NewPiece(kBishop, Color::White())) == Color::White());
+   REQUIRE(GetColor(NewPiece(kRook, Color::White())) == Color::White());
 
-   REQUIRE(GetColor(NewPiece(kPawn, kBlack)) == kBlack);
-   REQUIRE(GetColor(NewPiece(kKnight, kBlack)) == kBlack);
-   REQUIRE(GetColor(NewPiece(kKing, kBlack)) == kBlack);
-   REQUIRE(GetColor(NewPiece(kQueen, kBlack)) == kBlack);
-   REQUIRE(GetColor(NewPiece(kBishop, kBlack)) == kBlack);
-   REQUIRE(GetColor(NewPiece(kRook, kBlack)) == kBlack);
+   REQUIRE(GetColor(NewPiece(kPawn, Color::Black())) == Color::Black());
+   REQUIRE(GetColor(NewPiece(kKnight, Color::Black())) == Color::Black());
+   REQUIRE(GetColor(NewPiece(kKing, Color::Black())) == Color::Black());
+   REQUIRE(GetColor(NewPiece(kQueen, Color::Black())) == Color::Black());
+   REQUIRE(GetColor(NewPiece(kBishop, Color::Black())) == Color::Black());
+   REQUIRE(GetColor(NewPiece(kRook, Color::Black())) == Color::Black());
 }

@@ -14,11 +14,13 @@
 namespace m8
 {
     Board::Board()
+        : side_to_move_(0)
     {
         Clear();
     }
 
     Board::Board(const std::string&  fen)
+        : side_to_move_(0)
     {
         Clear();
 
@@ -85,14 +87,14 @@ namespace m8
         {
             if (*it == 'w')
             {
-                set_side_to_move(kWhite);
+                set_side_to_move(Color::White());
                 ++it;
             }
             else
             {
                 if (*it == 'b')
                 {
-                    set_side_to_move(kBlack);
+                    set_side_to_move(Color::Black());
                     ++it;
                 }
                 else
@@ -115,15 +117,14 @@ namespace m8
         {
             if (*it != '-')
             {
-                Color color;
                 Column column;
                 uint8_t casle_right;
                 Bb bb_rook;
                 Sq sq_rook;
                 Sq sq_king;
 
-                color = isupper(*it) ? kWhite : kBlack;
-                bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(color * Row::_8().value());
+                auto color = isupper(*it) ? Color::White() : Color::Black();
+                bb_rook = bb_piece(NewPiece(kRook, color)) & GetRowBb(Row::_1().color_wise(color).value());
 
                 if (*it == 'Q' || *it == 'q')
                 {
@@ -137,7 +138,7 @@ namespace m8
                 }
                 else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
                 {
-                    sq_rook = Sq(tolower(*it) - 'a', Row::_8().color_wise(color));
+                    sq_rook = Sq(tolower(*it) - 'a', Row::_1().color_wise(color));
                     sq_king = bb_piece(NewPiece(kKing, color)).GetLSB();
                     casle_right = (sq_rook.column() < sq_king.column() ? kQueenSideCastle : kKingSideCastle);
                 }
@@ -261,7 +262,7 @@ namespace m8
 
     void Board::GenerateXFenActiveColour(std::ostream& out) const
     {
-        out << (this->side_to_move() == kWhite ? 'w' : 'b');
+        out << (this->side_to_move() == Color::White() ? 'w' : 'b');
     }
 
     bool Board::GenerateXFenCastling(std::ostream& out, Color color, CastleType castle) const
@@ -286,7 +287,7 @@ namespace m8
                 c = static_cast<char>('A' + this->casle_colmn(castle_index).value());
             }
 
-            if (color == kBlack)
+            if (color == Color::Black())
             {
                 c = static_cast<char>(tolower(c));
             }
@@ -300,10 +301,10 @@ namespace m8
     {
         bool any_castle;
 
-        any_castle = GenerateXFenCastling(out, kWhite, kKingSideCastle);
-        any_castle |= GenerateXFenCastling(out, kWhite, kQueenSideCastle);
-        any_castle |= GenerateXFenCastling(out, kBlack, kKingSideCastle);
-        any_castle |= GenerateXFenCastling(out, kBlack, kQueenSideCastle);
+        any_castle = GenerateXFenCastling(out, Color::White(), kKingSideCastle);
+        any_castle |= GenerateXFenCastling(out, Color::White(), kQueenSideCastle);
+        any_castle |= GenerateXFenCastling(out, Color::Black(), kKingSideCastle);
+        any_castle |= GenerateXFenCastling(out, Color::Black(), kQueenSideCastle);
 
         if (!any_castle)
         {
@@ -353,7 +354,7 @@ namespace m8
     void Board::Clear()
     {
         // Initialize the side to move
-        side_to_move_ = kWhite;
+        side_to_move_ = Color::White();
 
         // Initialize the board_
         for (Sq sq = 0; sq.IsOnBoard(); sq = sq.MoveNext())
@@ -362,7 +363,7 @@ namespace m8
         }
 
         // Initialize the pieces bitboards
-        for (Color color = kWhite; IsColor(color); ++color)
+        for (Color color = Color::First(); color.IsColor(); color = color.Next())
         {
             for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
             {
@@ -372,8 +373,8 @@ namespace m8
         }
 
         // Initialize the color bitboards
-        UINT64_Color_[kWhite] = Bb::Empty();
-        UINT64_Color_[kBlack] = Bb::Empty();
+        bb_color_[Color::White().value()] = Bb::Empty();
+        bb_color_[Color::Black().value()] = Bb::Empty();
 
         // Initialize the castle columns. By default we use the regular chess columns.
         casle_colmn_[0] = Column::A();
@@ -391,9 +392,9 @@ namespace m8
     {
         assert(IsPiece(piece));
 
-        out << (GetColor(piece) == kBlack ? '=' : ' ')
+        out << (GetColor(piece) == Color::Black() ? '=' : ' ')
             << static_cast<char>(toupper(piece_to_char_map.find(piece)->second))
-            << (GetColor(piece) == kBlack ? '=' : ' ');
+            << (GetColor(piece) == Color::Black() ? '=' : ' ');
     }
 
     void DisplayEmptySq(std::ostream& out, Sq sq)
@@ -490,9 +491,9 @@ namespace m8
     std::ostream& operator<<(std::ostream& out, const Board& board)
     {
         DisplayHalfmoveClock(out, board);
-        DisplayColorRow(out, board, kBlack);
+        DisplayColorRow(out, board, Color::Black());
         DisplayBoardContent(out, board);
-        DisplayColorRow(out, board, kWhite);
+        DisplayColorRow(out, board, Color::White());
         DisplayPriseEnPassantIndicator(out, board);
         DisplayColumnsChar(out);
 

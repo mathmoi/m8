@@ -210,7 +210,7 @@ namespace m8
         std::array<Bb, kMaxPiece + 1> bb_piece_;
 
         /// Bitboard for each color
-        std::array<Bb, 2> UINT64_Color_;
+        std::array<Bb, 2> bb_color_;
 
         /// Original column of the two rooks. This is used to determine which 
         /// rook can castle because in Chess960 the rook may not start on 
@@ -399,7 +399,7 @@ namespace m8
     inline void Board::set_side_to_move(Color side_to_move)
     {
         // A : The side to move is a valid color
-        assert(IsColor(side_to_move));
+        assert(side_to_move.IsColor());
 
         side_to_move_ = side_to_move;
     }
@@ -415,32 +415,32 @@ namespace m8
     inline Bb Board::UINT64_Color(Color color) const
     {
         // A : The color is valid
-        assert(IsColor(color));
+        assert(color.IsColor());
 
-        return UINT64_Color_[color];
+        return bb_color_[color.value()];
     }
 
     inline Bb Board::bb_occupied() const
     {
-        return UINT64_Color_[kWhite] | UINT64_Color_[kBlack];
+        return bb_color_[Color::White().value()] | bb_color_[Color::Black().value()];
     }
 
     inline bool Board::casle(Color color, std::uint8_t casle_right) const
     {
         // A : The color and castling rights are valids
-        assert(IsColor(color));
+        assert(color.IsColor());
         assert(casle_right == kQueenSideCastle || casle_right == kKingSideCastle);
 
-        return (casle_flag_ & (casle_right << color << color)) != 0;
+        return (casle_flag_ & (casle_right << color.value() << color.value())) != 0;
     }
 
     inline void Board::set_casle(Color color, std::uint8_t casle_right, bool value)
     {
         // A : The inputs are valids
-        assert(IsColor(color));
+        assert(color.IsColor());
         assert(casle_right == kQueenSideCastle || casle_right == kKingSideCastle);
 
-        std::uint8_t mask = casle_right << color << color;
+        std::uint8_t mask = casle_right << color.value() << color.value();
         casle_flag_ ^= (-static_cast<std::uint8_t>(value) ^ casle_flag_) & mask;
     }
 
@@ -465,7 +465,7 @@ namespace m8
         bb_piece_[piece].Set(sq.value());
 
         Color color = GetColor(piece);
-        UINT64_Color_[color].Set(sq.value());
+        bb_color_[color.value()].Set(sq.value());
     }
 
     inline void Board::RemovePiece(Sq sq)
@@ -475,7 +475,7 @@ namespace m8
         assert(IsPiece((*this)[sq]));
 
         Color color = GetColor((*this)[sq]);
-        UINT64_Color_[color].Unset(sq.value());
+        bb_color_[color.value()].Unset(sq.value());
 
         bb_piece_[(*this)[sq]].Unset(sq.value());
 
@@ -497,7 +497,7 @@ namespace m8
         Bb diff = Bb::GetSingleBitBb(from.value());
         diff.Set(to.value());
 
-        UINT64_Color_[GetColor(piece)] = UINT64_Color_[GetColor(piece)] ^ diff;
+        bb_color_[GetColor(piece).value()] = bb_color_[GetColor(piece).value()] ^ diff;
         bb_piece_[piece] = bb_piece_[piece] ^ diff;
     }
 
@@ -535,7 +535,7 @@ namespace m8
 
             Sq pos_taken(to.column(), from.row());
 
-            assert(board_[pos_taken.value()] == NewPiece(kPawn, OpposColor(GetColor(piece))));
+            assert(board_[pos_taken.value()] == NewPiece(kPawn, GetColor(piece).opposite()));
 
             RemovePiece(pos_taken);
             MakeSimpleMove(from, to, piece, kNoPiece);
@@ -623,7 +623,7 @@ namespace m8
         UnmakeInfo unmake_info = colmn_enpas_.value() << 24 | half_move_clock_;
 
         // If the side to move is black increment the move number
-        full_move_clock_ += side_to_move_;
+        full_move_clock_ += side_to_move_.value();
 
         ++half_move_clock_;
         colmn_enpas_ = Column::Invalid();
@@ -653,7 +653,7 @@ namespace m8
             break;
         }
 
-        side_to_move_ = OpposColor(side_to_move_);
+        side_to_move_ = side_to_move_.opposite();
 
         return unmake_info;
     }
@@ -676,7 +676,7 @@ namespace m8
 
     inline void Board::UnmakeCastlingMove(Sq from, Sq to, Piece piece, CastleType castle)
     {
-        Piece rook = NewPiece(kRook, OpposColor(side_to_move_));
+        Piece rook = NewPiece(kRook, side_to_move_.opposite());
         Column rook_colmn = casle_colmn_[castle - 1];
         Row row = from.row();
         Sq rook_from(rook_colmn, row);
@@ -700,14 +700,14 @@ namespace m8
 
     inline void Board::UnmakePawnMove(Sq from, Sq to, Piece piece, Piece taken, Piece promote_to)
     {
-        Row row_enpas = Row::_6().color_wise(OpposColor(side_to_move_));
+        Row row_enpas = Row::_6().color_wise(side_to_move_.opposite());
 
         if (colmn_enpas_.IsOnBoard() &&
             taken == NewPiece(kPawn, side_to_move_) &&
             to == Sq(colmn_enpas_, row_enpas))
         {
             UnmakeSimpleMove(from, to, piece, kNoPiece);
-            AddPiece(Sq(colmn_enpas_, Row::_5().color_wise(OpposColor(side_to_move_))), taken);
+            AddPiece(Sq(colmn_enpas_, Row::_5().color_wise(side_to_move_.opposite())), taken);
         }
         else if (IsPiece(promote_to))
         {
@@ -727,7 +727,7 @@ namespace m8
 
     inline void Board::Unmake(Move move, UnmakeInfo unmake_info)
     {
-        assert(GetColor(GetPiece(move)) == OpposColor(side_to_move_));
+        assert(GetColor(GetPiece(move)) == side_to_move_.opposite());
 
         Sq from = GetFrom(move);
         Sq to = GetTo(move);
@@ -759,10 +759,10 @@ namespace m8
             break;
         }
 
-        side_to_move_ = OpposColor(side_to_move_);
+        side_to_move_ = side_to_move_.opposite();
 
         // If the side to move is black decrement the move number.
-        full_move_clock_ -= side_to_move_;
+        full_move_clock_ -= side_to_move_.value();
     }
 }
 

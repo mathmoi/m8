@@ -71,7 +71,7 @@ namespace m8
         /// <param name="row">Row</param>
         /// <returns></returns>
         inline Row color_wise(Color color) const {
-            return Row((value_ * OpposColor(color)) + ((7 - value_) * color));
+            return Row((value_ * color.opposite().value()) + ((7 - value_) * color.value()));
         }
 
         /// <summary>

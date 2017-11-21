@@ -156,7 +156,7 @@ namespace m8
    /// @returns True if the value is a valid piece
    inline bool IsPiece(Piece piece)
    {
-      return IsPieceType(piece & 7) && IsColor(piece >> 3);
+      return IsPieceType(piece & 7) && Color(piece >> 3).IsColor();
    }
 
    /// Generate a new piece value.
@@ -168,9 +168,9 @@ namespace m8
    {
       // A : The piece_type and color are valid.
       assert(IsPieceType(piece_type));
-      assert(IsColor(color));
+      assert(color.IsColor());
 
-      return (color << 3) | piece_type;
+      return (color.value() << 3) | piece_type;
    }
 
    /// Extract the piece type from a piece

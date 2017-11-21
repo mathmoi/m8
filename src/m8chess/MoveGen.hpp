@@ -350,7 +350,7 @@ namespace m8
         Bb bb_king = board_.bb_piece(king);
         Sq king_position = bb_king.GetLSB();
         Bb attackers = AttacksTo(king_position);
-        Bb opponent_pieces = board_.UINT64_Color(OpposColor(color));
+        Bb opponent_pieces = board_.UINT64_Color(color.opposite());
         return (attackers & opponent_pieces) != Bb::Empty();
     }
 
@@ -377,7 +377,7 @@ namespace m8
     {
         Bb targets;
         if (is_captures)
-            targets = board_.UINT64_Color(OpposColor(color));
+            targets = board_.UINT64_Color(color.opposite());
         else
             targets = ~board_.bb_occupied();
 
@@ -440,7 +440,7 @@ namespace m8
     inline Move* MoveGen::UnpackPawnMoves(Color color, Bb target, int from_delta, Move* next_move) const
     {
         Piece piece = NewPiece(kPawn, color);
-        Row eighth_row = 7 - 7 * color;
+        Row eighth_row = Row::_8().color_wise(color);
 
         while (target)
         {
@@ -468,7 +468,7 @@ namespace m8
 
         Bb target = board_.bb_piece(piece) & Bb(~kBbColmn[ignored_column.value()]); // TODO : Make row.Bb()
         target.Shift(delta);
-        target &= board_.UINT64_Color(OpposColor(color));
+        target &= board_.UINT64_Color(color.opposite());
         next_move = UnpackPawnMoves(color, target, -delta, next_move);
 
         return next_move;
@@ -478,7 +478,7 @@ namespace m8
     {
         Piece piece = NewPiece(kPawn, color);
         Row seventh_row = Row::_7().color_wise(color);
-        int forward_move = 8 - 16 * color;
+        int forward_move = 8 - 16 * color.value();
 
         Bb target = board_.bb_piece(piece) & kBbRow[seventh_row.value()];
         target.Shift(forward_move);
@@ -518,7 +518,7 @@ namespace m8
                 // Check if any of the square traveled by the king or the origin or 
                 // destination of the king are under attack.
                 Bb UINT64_Check_attack = bb_travel_king | bb_king | Bb::GetSingleBitBb(king_final_position.value());
-                Bb bb_opponents = board_.UINT64_Color(OpposColor(color));
+                Bb bb_opponents = board_.UINT64_Color(color.opposite());
 
                 bool attacked = false;
                 while (UINT64_Check_attack && !attacked)
@@ -550,7 +550,7 @@ namespace m8
         Piece piece = NewPiece(kPawn, color);
         Row third_row = Row::_3().color_wise(color);
         Row seventh_row = Row::_7().color_wise(color);
-        int forward_move = 8 - 16 * color;
+        int forward_move = 8 - 16 * color.value();
 
         // Generate the standard one square forward moves. We need to exclude pawns on 
         // the 7th rank that will generate promotions.
@@ -571,8 +571,8 @@ namespace m8
 
     inline Move* MoveGen::GeneratePawnCaptures(Color color, Move* next_move) const
     {
-        int forward_left = 7 - 16 * color;
-        int forward_right = 9 - 16 * color;
+        int forward_left = 7 - 16 * color.value();
+        int forward_right = 9 - 16 * color.value();
 
         next_move = GeneratePawnSideCaptures(color, Column::A(), forward_left, next_move);
         next_move = GeneratePawnSideCaptures(color, Column::H(), forward_right, next_move);
