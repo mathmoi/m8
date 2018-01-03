@@ -15,6 +15,9 @@
 #ifndef M8_MOVE_GEN_HPP_
 #define M8_MOVE_GEN_HPP_
 
+// TODO : Attacks should be in a separate file than MoveGen #refactoring
+// TODO : XRay attacks should be in a separate file #refactoring
+
 namespace m8
 {
     /// Class containing all the functionalitues necessary to generate moves.
@@ -48,6 +51,30 @@ namespace m8
         /// @param sq  Postion of the bishop.
         /// @return    A bitboard representing all squares attacked by the bishop.
         inline static Bb GenerateBishopAttacks(Bb occ, Sq sq);
+
+        /// Given a board occupancy, returns the x-ray attacks of a rook on a given 
+        /// squares. X-ray attacks are squares "attacked" by a piece through another
+        /// piece. Theses are not real attacks because the blocking piece protext the 
+        /// so-called attacked square.
+        ///
+        /// @param occ       Bitboard representing the occupancy of the board.
+        /// @param blockers  Positions of the piece to considered blockers.
+        /// @param sq        Postion of the bishop.
+        inline static Bb GenerateRookXRay(Bb occ, Bb blockers, Sq sq);
+
+        /// Given a board occupancy, returns the x-ray attacks of a bishop on a given 
+        /// squares. X-ray attacks are squares "attacked" by a piece through another
+        /// piece. Theses are not real attacks because the blocking piece protext the 
+        /// so-called attacked square.
+        ///
+        /// @param occ       Bitboard representing the occupancy of the board.
+        /// @param blockers  Positions of the piece to considered blockers.
+        /// @param sq        Postion of the bishop.
+        inline static Bb GenerateBishopXRay(Bb occ, Bb blockers, Sq sq);
+
+        /// Generate a bitboard of all the squares containing a given piece type that 
+        /// attacks a given square.
+        inline Bb GenerateAttacksTo(Piece piece, Sq sq);
 
         /// Generate the moves of the knight. The moves are added to an array specified by
         /// the parameter next_move the end of the sequence of moves is indicated by a 
@@ -148,6 +175,9 @@ namespace m8
         /// @param color Color of the side to for which to verify if the king is in check.
         inline bool IsInCheck(Color color) const;
 
+        /// Returns a bitboard of the pinned pieces of a give color.
+        inline Bb GetPinnedPieces(Color color) const;
+
     private:
         /// Structure that hold all the parameters required to do the move generation of a 
         /// rook or bishop on a given square.
@@ -173,6 +203,17 @@ namespace m8
 
         /// Initialise the rook magic array
         static void InitializeRookMagics();
+
+        /// Given a board occupancy, returns the x-ray attacks of a piece on a given 
+        /// squares. X-ray attacks are squares "attacked" by a piece through another
+        /// piece. Theses are not real attacks because the blocking piece protext the 
+        /// so-called attacked square.
+        ///
+        /// @param occ       Bitboard representing the occupancy of the board.
+        /// @param blockers  Positions of the piece to considered blockers.
+        /// @param sq        Postion of the bishop.
+        template<Bb (*GenerateAttacks)(Bb, Sq)>
+        inline static Bb GeneratePieceXRay(Bb occ, Bb blockers, Sq sq);
 
         /// Generate a bitboard of the square attacked by a rook on a given square given a
         /// specific occupation of the board.
@@ -217,6 +258,9 @@ namespace m8
         /// @param sq     Postion of the slider.
         /// @return       A bitboard representing all squares attacked by the slider.
         inline static Bb GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq);
+
+        /// Generate a bitboard of the pawns attacking a given square.
+        inline static Bb GeneratePawnAttacksTo(Color color, Sq sq);
 
         /// Returns the target squares give the color of a moving piece and wheter we are
         /// generating captures or not.
@@ -371,6 +415,56 @@ namespace m8
     inline Bb MoveGen::GenerateBishopAttacks(Bb occ, Sq sq)
     {
         return GenerateSliderAttacks(bishop_magic_, occ, sq);
+    }
+
+    inline Bb MoveGen::GeneratePawnAttacksTo(Color color, Sq sq)
+    {
+        Bb bb = GetSingleBitBb(sq) & ~kBbColmn[kColmnA];
+        Bb result = (color == kWhite ? bb >> 9 : bb << 7);
+
+        bb = GetSingleBitBb(sq) & ~kBbColmn[kColmnH];
+        result |= (color == kWhite ? bb >> 7 : bb << 9);
+
+        return result;
+    }
+
+    inline Bb MoveGen::GenerateAttacksTo(Piece piece, Sq sq)
+    {
+        assert(IsPiece(piece));
+        assert(IsSqOnBoard(sq));
+
+        Bb result;
+
+        switch (GetPieceType(piece))
+        {
+        case kRook:
+            result = GenerateRookAttacks(board_.bb_occupied(), sq);
+            break;
+
+        case kBishop:
+            result = GenerateBishopAttacks(board_.bb_occupied(), sq);
+            break;
+
+        case kQueen:
+            result = GenerateRookAttacks(board_.bb_occupied(), sq) |
+                     GenerateBishopAttacks(board_.bb_occupied(), sq);
+            break;
+
+        case kKnight:
+            result = knight_attack_bb_[sq];
+            break;
+
+        case kKing:
+            result = king_attack_bb_[sq];
+            break;
+
+        case kPawn:
+            result = GeneratePawnAttacksTo(GetColor(piece), sq);
+            break;
+        }
+
+        result &= board_.bb_piece(piece);
+        return result;
     }
 
     inline Bb MoveGen::GetTargets(Color color, bool is_captures) const
@@ -661,6 +755,52 @@ namespace m8
         next_move = GenerateQuietMoves(color, next_move);
         
         return next_move;
+    }
+
+    template<Bb(*GenerateAttacks)(Bb, Sq)>
+    inline Bb MoveGen::GeneratePieceXRay(Bb occ, Bb blockers, Sq sq)
+    {
+        Bb attacks = GenerateAttacks(occ, sq);
+        blockers &= attacks;
+        occ ^= blockers;
+        Bb attaksWhithoutBlockers = GenerateAttacks(occ, sq);
+
+        return attacks ^ attaksWhithoutBlockers;
+    }
+
+    inline Bb MoveGen::GenerateRookXRay(Bb occ, Bb blockers, Sq sq)
+    {
+        return GeneratePieceXRay<GenerateRookAttacks>(occ, blockers, sq);
+    }
+
+    inline Bb MoveGen::GenerateBishopXRay(Bb occ, Bb blockers, Sq sq)
+    {
+        return GeneratePieceXRay<GenerateBishopAttacks>(occ, blockers, sq);
+    }
+
+    inline Bb MoveGen::GetPinnedPieces(Color color) const
+    {
+        Sq king_sq = GetLsb(board_.bb_piece(NewPiece(kKing, color)));
+        Color attacker_color = OpposColor(color);
+        Bb attacker_like_rook = board_.bb_piece(NewPiece(kRook, attacker_color))
+                              | board_.bb_piece(NewPiece(kQueen, attacker_color));
+        Bb attacker_like_bishop = board_.bb_piece(NewPiece(kBishop, attacker_color))
+                                | board_.bb_piece(NewPiece(kQueen, attacker_color));
+        Bb occ = board_.bb_occupied();
+        Bb blockers = board_.bb_color(color);
+
+        Bb pinners = (GenerateRookXRay(occ, blockers, king_sq) & attacker_like_rook)
+                   | (GenerateBishopXRay(occ, blockers, king_sq) & attacker_like_bishop);
+
+        Bb pinned = kEmptyBb;
+        while (pinners)
+        {
+            Sq pinner_sq = RemoveLsb(pinners);
+
+            pinned |= BbBetween(king_sq, pinner_sq) & blockers;
+        }
+
+        return pinned;
     }
 }
 

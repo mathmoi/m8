@@ -36,6 +36,7 @@ namespace m8
     /// @name Castle flags constant
     /// Constant used as flags for the castling rights
     /// @{
+    const CastleType kNoCastling = 0;
     const CastleType kQueenSideCastle = 1;
     const CastleType kKingSideCastle = 2;
     /// @}
@@ -157,6 +158,9 @@ namespace m8
         ///
         /// @param value New value for the full move clock.
         inline void set_full_move_clock(std::uint32_t value) { full_move_clock_ = value; };
+
+        /// Returns the position of the king of the given color.
+        inline Sq king_sq(Color color) const { return GetLsb(bb_piece(NewPiece(kKing, color))); };
 
         /// Returns a fen string representing the current position on the board.
         std::string fen() const;

@@ -13,11 +13,19 @@ file(GLOB_RECURSE common_header_files
      RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
      ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8common/*.hpp)
 
+file(GLOB_RECURSE m8chess_header_files
+     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8chess/*.hpp)
+
+file(GLOB_RECURSE m8_header_files
+     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8/*.hpp)
+
 add_executable(m8_tests
-	            ../../src/tests/tests_main.cpp
+               ../../src/tests/tests_main.cpp
                ../../src/tests/Sq_tests.cpp
                ../../src/tests/Bb_tests.cpp
-	            ../../src/tests/Piece_tests.cpp
+               ../../src/tests/Piece_tests.cpp
                ../../src/tests/Board_tests.cpp
                ../../src/tests/Move_tests.cpp
                ../../src/tests/MoveGen_tests.cpp
@@ -25,4 +33,9 @@ add_executable(m8_tests
                ../../src/m8chess/Board.cpp
                ../../src/m8common/Bb.cpp
                ../../src/m8chess/MoveGen.cpp
+               ../../src/m8chess/SAN.cpp
+               ../../src/m8chess/Direction.cpp
+               ../../src/tests/SAN_tests.cpp
+               ${m8_header_files}
+               ${m8chess_header_files}
                ${common_header_files})

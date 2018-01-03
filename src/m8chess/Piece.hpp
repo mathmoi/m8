@@ -40,6 +40,17 @@ namespace m8
    const PieceType kMaxPieceType = 6;
    /// @}
 
+   /// Map that can be used to translate from character to piece type.
+   const std::unordered_map<char, PieceType> char_to_piece_type_map =
+   {
+       { 'P', kPawn },
+       { 'N', kKnight },
+       { 'K', kKing },
+       { 'Q', kQueen },
+       { 'B', kBishop },
+       { 'R', kRook },
+   };
+
    /// Indicate if a value is a valid PieceType.
    ///
    /// @param piece_type The PieceType to evaluate.

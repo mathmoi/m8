@@ -38,6 +38,11 @@ namespace m8
    const Colmn kInvalColmn = 255;
    /// @}
 
+   /// Create a new column from the character representing the column.
+   ///
+   /// @param c  Character representing the column. Must be between 'a' and 'h'.
+   inline Colmn NewColmn(char c) { assert('a' <= c && c <= 'h'); return c - 'a'; }
+
    /// Indicate if a given column is on the board.
    ///
    /// @param colmn The column to test.
@@ -70,6 +75,11 @@ namespace m8
    const Row kRow8 = 7;
    const Row kInvalRow = 255;
    /// @}
+
+   /// Create a new row from the character representing the row number.
+   ///
+   /// @param c  Character representing the row. Must be between '1' and '8'.
+   inline Row NewRow(char c) { assert('1' <= c && c <= '8'); return c - '1'; }
 
    /// Indicate if a given row is on the board.
    ///
@@ -228,6 +238,82 @@ namespace m8
       assert(IsSqOnBoard(sq));
 
       return sq >> 3;
+   }
+
+   /// Get the square above of the give square. The result may be an invalid square.
+   inline Sq MoveSqUp(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq + 8;
+   }
+
+   /// Get the square bellow of the give square. The result may be an invalid square.
+   inline Sq MoveSqDown(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq - 8;
+   }
+
+   /// Get the square just left of the give square. The result may be an invalid square.
+   inline Sq MoveSqLeft(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq - 1;
+   }
+
+   /// Get the square just right of the give square. The result may be an invalid square.
+   inline Sq MoveSqRight(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq + 1;
+   }
+
+   /// Get the square just up left from the give square. The result may be an invalid 
+   /// square.
+   inline Sq MoveSqUpLeft(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq + 7;
+   }
+
+   /// Get the square just up right from the give square. The result may be an invalid 
+   /// square.
+   inline Sq MoveSqUpRight(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq + 9;
+   }
+
+   /// Get the square just down left from the give square. The result may be an invalid 
+   /// square.
+   inline Sq MoveSqDownLeft(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq - 9;
+   }
+
+   /// Get the square just down right from the give square. The result may be an invalid 
+   /// square.
+   inline Sq MoveSqDownRight(Sq sq)
+   {
+       // A : The square is valid
+       assert(IsSqOnBoard(sq));
+
+       return sq - 7;
    }
 
    /// Get the index of the diagonals the square is on.

@@ -58,6 +58,42 @@ namespace m8
     /// @param piece_taken Piece taken if any.
     /// @param promote_to  Piece promoted to if any.
     /// @return A move.
+    inline Move NewMove(Sq from, Sq to, Piece piece, Piece piece_taken, Piece promote_to, std::uint8_t castling)
+    {
+        // A : All the parameters are valids
+        assert(IsSqOnBoard(from));
+        assert(IsSqOnBoard(to));
+        assert(IsPiece(piece));
+        assert(!piece_taken || IsPiece(piece_taken));
+        assert(!promote_to || IsPiece(promote_to));
+        assert(0 <= castling && castling <= 2);
+
+        return from << kFromPos |
+               to << kToPos |
+               piece << kPiecePos |
+               piece_taken << kPieceTakenPos |
+               promote_to << kPromoteToPos |
+               castling << kCastlingPos;
+    }
+
+    /// Create a new move. This method pack all the informations of a move into a single
+    /// uint32_t. The informations are mapped this way :
+    ///  
+    ///  bits     content
+    ///  -------  -----------------------------------------
+    ///   0 -  5  From square
+    ///   8 - 13  To square
+    ///  14 - 15  Castling type (1: queenside, 2: kingside)
+    ///  16 - 19  Piece moved
+    ///  20 - 23  Pieced promoted to if any
+    ///  25 - 28  Piece taken if any
+    ///
+    /// @param from        From square.
+    /// @param to          To square.
+    /// @param piece       Moved piece.
+    /// @param piece_taken Piece taken if any.
+    /// @param promote_to  Piece promoted to if any.
+    /// @return A move.
     inline Move NewMove(Sq from, Sq to, Piece piece, Piece piece_taken, Piece promote_to)
     {
         // A : All the parameters are valids

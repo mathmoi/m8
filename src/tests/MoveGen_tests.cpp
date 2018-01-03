@@ -772,3 +772,27 @@ TEST_CASE("GenerateCastlingMoves__positions_traveled_by_rook_occupied__castling_
     REQUIRE((next_move - moves.data()) == 5);
     REQUIRE(!Contains(moves.data(), next_move, unexpected_move));
 }
+
+TEST_CASE("GenerateRookXRay_ComplexePositions_XRayAttackesReturned")
+{
+    Bb occ = BB_C(0x0000006500080008);
+    Bb blockers = BB_C(0x0000002400080000);
+
+    Bb expected = BB_C(0x0000004300000808);
+
+    Bb xray = MoveGen::GenerateRookXRay(occ, blockers, kD5);
+
+    REQUIRE(expected == xray);
+}
+
+TEST_CASE("GenerateBishopXRay_ComplexePositions_XRayAttackesReturned")
+{
+    Bb occ = BB_C(0x4000100004204100);
+    Bb blockers = BB_C(0x4000100000204100);
+
+    Bb expected = BB_C(0x4020000000004000);
+
+    Bb xray = MoveGen::GenerateBishopXRay(occ, blockers, kD5);
+
+    REQUIRE(expected == xray);
+}

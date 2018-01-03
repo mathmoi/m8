@@ -14,6 +14,8 @@
 #include <iostream>
 #include <array>
 
+#include "0x88.hpp"
+
 // Determine if we can use the MSVC++ Intrinsics.
 #ifdef _MSC_VER
 #  ifdef _WIN64
@@ -44,6 +46,9 @@ namespace m8
 
    /// Empty bitboard constant
    const Bb kEmptyBb = BB_C(0);
+
+   /// Filled bitboard constant
+   const Bb kFilledBb = UINT64_MAX;
 
    /// Bitboards with bits sets for each column
    const std::array<const Bb, 8> kBbColmn = { BB_C(0x0101010101010101),
@@ -353,46 +358,18 @@ namespace m8
    /// Visually display the binary representation of a Bitboard on a std::ostream.
    ///
    /// example output:
-   /// --X - ----
+   /// - - X - - - - -
    /// X X - X - X - X
-   /// -X X X - X X X
+   /// - X X X - X X X
    /// X X X - X - X X
-   /// X X - -X - -X
-   /// -X - X X - -X
-   /// -X - X - -X -
-   /// X - --X - -X
+   /// X X - - X - - X
+   /// - X - X X - - X
+   /// - X - X - - X -
+   /// X - - - X - - X
    ///
    /// @param out Output stream on wich to display the bitboard
    /// @param bb  Bitboard to display
    void DisplayBb(std::ostream& out, Bb bb);
-
-
-
-
-
-
-
-
-
-   /// Return the 0x88 index of a Mailbox square.
-   ///
-   /// @param sq Index of the square in a mailbox board representation.
-   /// @return Index of the square in a 0x88 board representation.
-   inline std::uint8_t Get0x88Index(std::uint8_t index)
-   {
-       return index + (index & ~7);
-   }
-
-   /// Return the 0x88 difference between two square. This diffrence has the property of
-   /// being unique for each combination of squares in regards to direction and distance.
-   ///
-   /// @param from First square.
-   /// @param to Second square.
-   /// @param The difference between the squares. Should be in the range [-119, 119];
-   inline std::int8_t CalculateOx88diff(std::uint8_t from, std::uint8_t to)
-   {
-       return Get0x88Index(to) - Get0x88Index(from);
-   }
 
    /// Return a bitboard with the bits between two squares set to one.
    ///

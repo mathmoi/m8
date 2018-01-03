@@ -138,7 +138,7 @@ namespace m8
                 else if ((tolower(*it) >= 'a' && tolower(*it) <= 'h'))
                 {
                     sq_rook = NewSq(tolower(*it) - 'a', color * kRow8);
-                    sq_king = GetLsb(bb_piece(NewPiece(kKing, color)));
+                    sq_king = king_sq(color);
                     casle_right = (sq_rook < sq_king ? kQueenSideCastle : kKingSideCastle);
                 }
                 else

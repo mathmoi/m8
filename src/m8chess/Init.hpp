@@ -6,6 +6,9 @@
 #include "../m8common/m8common.hpp"
 
 #include "MoveGen.hpp"
+#include "Direction.hpp"
+
+#include <iostream>
 
 namespace m8
 {
@@ -14,5 +17,6 @@ namespace m8
     {
         MoveGen::InitializePreCalc();
         BbInitializePreCalc();
+        InitializeDirection();
     }
 }

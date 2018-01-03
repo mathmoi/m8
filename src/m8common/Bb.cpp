@@ -84,25 +84,25 @@ namespace m8
         InitializeBbBetween();
     }
 
-	void DisplayBb(std::ostream& out, Bb bb)
-	{
+    void DisplayBb(std::ostream& out, Bb bb)
+    {
         const std::uint8_t kRow8 = 7;
         const std::uint8_t kColmnA = 0;
         const std::uint8_t kColmnH = 8;
 
-		for (std::uint8_t row = kRow8; row < 8; --row)
-		{
-			out << '\t';
-			for (std::uint8_t colmn = kColmnA; colmn < 8; ++colmn)
-			{
-				std::uint8_t sq = (row << 3) + colmn;
-				out << (GetBit(bb, sq) ? 'X' : '-');
+        for (std::uint8_t row = kRow8; row < 8; --row)
+        {
+            out << '\t';
+            for (std::uint8_t colmn = kColmnA; colmn < 8; ++colmn)
+            {
+                std::uint8_t sq = (row << 3) + colmn;
+                out << (GetBit(bb, sq) ? 'X' : '-');
 
-				if (colmn < kColmnH)
-					out << ' ';
-			}
+                if (colmn < kColmnH)
+                    out << ' ';
+            }
 
-			out << std::endl;
-		}
-	}
+            out << std::endl;
+        }
+    }
 }
