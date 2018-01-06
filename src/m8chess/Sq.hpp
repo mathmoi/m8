@@ -339,6 +339,15 @@ namespace m8
 
        return GetColmn(sq) + GetRow(sq);
    }
+
+   /// Return a square as a string.
+   inline std::string SqToString(Sq sq)
+   {
+       assert(IsSqOnBoard(sq));
+
+       return std::string({ GetColumnChar(GetColmn(sq)),
+                            GetRowNumber(GetRow(sq)) });
+   }
 }
 
 #endif // M8_SQ_HPP_

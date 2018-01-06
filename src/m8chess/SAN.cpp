@@ -5,10 +5,12 @@
 ///         SAN notation.
 
 #include <exception>
+#include <sstream>
 
 #include "SAN.hpp"
 #include "Board.hpp"
 #include "Direction.hpp"
+#include "Mat.hpp"
 #include "MoveGen.hpp"
 
 namespace m8
@@ -134,11 +136,14 @@ namespace m8
 
         if (!info.IsConsumed())
         {
-            auto it = char_to_piece_type_map.find(info.first());
-            if (it != char_to_piece_type_map.end())
+            piece_type = GetPieceTypeFromChar(info.first());
+            if (IsPieceType(piece_type))
             {
-                piece_type = it->second;
                 ++info.begin;
+            }
+            else
+            {
+                piece_type = kPawn;
             }
         }
 
@@ -241,10 +246,10 @@ namespace m8
     void ReadPromotion(ParseInfo& info)
     {
         // If the last character is a piece it's the promotion piece.
-        auto it = char_to_piece_type_map.find(info.last());
-        if (it != char_to_piece_type_map.end())
+        PieceType promotion = GetPieceTypeFromChar(info.last());
+        if (IsPieceType(promotion))
         {
-            info.promote_to = NewPiece(it->second, info.side_to_move);
+            info.promote_to = NewPiece(promotion, info.side_to_move);
             --info.end;
 
             if (info.last() == '=')
@@ -304,9 +309,110 @@ namespace m8
         return NewMove(info.from, info.to, info.piece, info.piece_taken, info.promote_to, info.castling);
     }
 
-    std::string RenderSAN(Move move, Board board)
+    void OutputCharPieceForSan(std::ostream& out, Move move)
     {
-        // TODO : Implement this.
-        throw std::exception("Not implemented");
+        PieceType piece_type = GetPieceType(GetPiece(move));
+        if (piece_type != kPawn)
+        {
+            out << GetCharFromPieceType(piece_type);
+        }
+    }
+
+    void OutputDestination(std::ostream& out, Move move)
+    {
+        out << SqToString(GetTo(move));
+    }
+
+    void OutputCastling(std::ostream& out, CastleType type)
+    {
+        out << (type == kKingSideCastle ? "O-O" : "O-O-O");
+    }
+
+    void OutputCaptureCharacter(std::ostream& out, Move move)
+    {
+        Piece taken = GetPieceTaken(move);
+        if (IsPiece(taken))
+        {
+            out << 'x';
+        }
+    }
+
+    void OutputPawnCaptureOriginColumn(std::ostream& out, Move move)
+    {
+        if (GetPieceType(GetPiece(move)) == kPawn &&
+            IsPiece(GetPieceTaken(move)))
+        {
+            out << GetColumnChar(GetColmn(GetFrom(move)));
+        }
+    }
+
+    void OutputPromotion(std::ostream& out, Move move)
+    {
+        Piece promote_to = GetPromoteTo(move);
+        if (IsPiece(GetPromoteTo(move)))
+        {
+            PieceType piece_type = GetPieceType(promote_to);
+            out << '=' << GetCharFromPieceType(piece_type);
+        }
+    }
+
+    void OutputCheckAndMateCharacter(std::ostream& out, Move move, Board& board, const MoveGen& generator)
+    {
+        Color color_after_move = OpposColor(GetColor(GetPiece(move)));
+
+        UnmakeInfo unmake_info = board.Make(move);
+        if (generator.IsInCheck(color_after_move))
+        {
+            out << (IsMat(board) ? '#' : '+');
+        };
+        board.Unmake(move, unmake_info);
+    }
+
+    void OutputDisambiguationCharacters(std::ostream& out, Move move, Board& board, const MoveGen& generator)
+    {
+        Piece piece = GetPiece(move);
+        Color color = GetColor(piece);
+        Sq to = GetTo(move);
+        Sq from = GetFrom(move);
+        Colmn colmn = GetColmn(from);
+        Row row = GetRow(from);
+
+        Bb candidates = generator.GenerateAttacksTo(piece, to);
+        candidates = RemovePinnedCandidates(candidates, color, to, board, generator);
+
+        if (GetPopct(candidates & GetRowBb(row)) > 1)
+        {
+            out << GetColumnChar(colmn);
+        }
+
+        if (GetPopct(candidates & GetColmnBb(colmn)) > 1)
+        {
+            out << GetRowNumber(row);
+        }
+    }
+
+    std::string RenderSAN(Move move, Board& board)
+    {
+        std::ostringstream out;
+
+        CastleType castle_type = GetCastling(move);
+        if (castle_type == kNoCastling)
+        {
+            MoveGen generator(board);
+
+            OutputCharPieceForSan(out, move);
+            OutputPawnCaptureOriginColumn(out, move);
+            OutputDisambiguationCharacters(out, move, board, generator);
+            OutputCaptureCharacter(out, move);
+            OutputDestination(out, move);
+            OutputPromotion(out, move);
+            OutputCheckAndMateCharacter(out, move, board, generator);
+        }
+        else
+        {
+            OutputCastling(out, castle_type);
+        }
+
+        return out.str();
     }
 }

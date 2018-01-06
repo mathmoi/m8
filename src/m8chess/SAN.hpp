@@ -36,7 +36,7 @@ namespace m8
     /// @param move   Move to render. 
     /// @param board  Board object that provide the current position needed to render the
     ///               move in SAN notation.
-    std::string RenderSAN(Move move, Board board);
+    std::string RenderSAN(Move move, Board& board);
 }
 
 #endif // M8_SAN_HPP_

@@ -18,6 +18,17 @@ void ParserTest(std::string fen, std::string san, Move expected)
     REQUIRE(expected == actual);
 }
 
+void RenderTest(std::string fen, Move move, std::string expected)
+{
+    Board board(fen);
+    std::string actual = RenderSAN(move, board);
+    REQUIRE(expected == actual);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//                                 ParseSAN tests                                      //
+/////////////////////////////////////////////////////////////////////////////////////////
+
 TEST_CASE("ParseSAN_OO_CorrectMovedReturned")
 {   
     ParserTest("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R w Kq g6 0 1",
@@ -128,4 +139,114 @@ TEST_CASE("ParseSAN_NonAmbiguousMoveBecauseOfPinnedPiece_CorrectMoveReturned")
     ParserTest("4k3/4r3/8/8/8/2N1N3/8/4K3 w - - 0 1",
                "Nd5",
                NewMove(kC3, kD5, kWhiteKnight));
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//                                 RenderSAN tests                                     //
+/////////////////////////////////////////////////////////////////////////////////////////
+
+TEST_CASE("RenderSAN_KingSideMove_CorrectStringReturned")
+{
+    RenderTest("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R w Kq g6 0 1",
+               NewCastlingMove(kE1, kG1, kWhiteKing, kKingSideCastle),
+               "O-O");
+}
+
+TEST_CASE("RenderSAN_QueenSideMove_CorrectStringReturned")
+{
+    RenderTest("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R b Kq g6 0 1",
+               NewCastlingMove(kE8, kC8, kBlackKing, kQueenSideCastle),
+               "O-O-O");
+}
+
+TEST_CASE("RenderSAN_SimpleKnightMove_CorrectStringReturned")
+{
+    RenderTest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+               NewMove(kB1, kC3, kWhiteKnight),
+               "Nc3");
+}
+
+TEST_CASE("RenderSAN_PawnTwoSquarePush_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 b kq - 0 1",
+               NewMove(kC7, kC5, kBlackPawn),
+               "c5");
+}
+
+TEST_CASE("RenderSAN_KnightCapture_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Pppp1ppp/5nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 b kq - 0 1",
+               NewMove(kA5, kC4, kBlackKnight, kWhitePawn),
+               "Nxc4");
+}
+
+TEST_CASE("RenderSAN_PawnCapture_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Pppp1ppp/5nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 b kq - 0 1",
+               NewMove(kG7, kH6, kBlackPawn, kWhiteKnight),
+               "gxh6");
+}
+
+TEST_CASE("RenderSAN_PawnPromotion_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Pppp1ppp/5nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 b kq - 0 1",
+               NewMove(kB2, kB1, kBlackPawn, kNoPiece, kBlackQueen),
+               "b1=Q");
+}
+
+TEST_CASE("RenderSAN_PawnUnderPromotionAndCapture_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Pppp1ppp/5nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 b kq - 0 1",
+               NewMove(kB2, kA1, kBlackPawn, kWhiteRook, kBlackKnight),
+               "bxa1=N");
+}
+
+TEST_CASE("RenderSAN_PriseEnPassant_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Ppp2ppp/1b3nbN/nP1pP3/BBP5/q4N2/Pp1P2PP/R2Q1RK1 w kq d5 0 1",
+               NewMove(kE5, kD6, kWhitePawn, kBlackPawn),
+               "exd6");
+}
+
+TEST_CASE("RenderSAN_CheckingMove_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Ppp2ppp/1b2pnbN/nP2P3/BBP5/q4N2/Pp2P1PP/R2Q1RK1 w kq - 0 1",
+               NewMove(kD1, kD7, kWhiteQueen),
+               "Qd7+");
+}
+
+TEST_CASE("RenderSAN_MatingMove_CorrectStringReturned")
+{
+    RenderTest("r3k2r/Ppp2ppp/1b2pNN1/nP2P1n1/BBP5/q7/Pp2P1PP/R2Q1RK1 w kq - 0 1",
+               NewMove(kD1, kD7, kWhiteQueen),
+               "Qd7#");
+}
+
+
+TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByColumn_CorrectStringReturned")
+{
+    RenderTest("4k3/8/2r3r1/8/8/8/8/4K3 b - - 0 1",
+               NewMove(kC6, kE6, kBlackRook),
+               "Rce6+");
+}
+
+TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByRow_CorrectStringReturned")
+{
+    RenderTest("2r1k3/8/8/8/8/2r5/8/4K3 b - - 0 1",
+               NewMove(kC8, kC6, kBlackRook),
+               "R8c6");
+}
+
+TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByRowAndColumn_CorrectStringReturned")
+{
+    RenderTest("2N1k3/8/8/8/2N1N3/8/8/4K3 w - - 0 1",
+               NewMove(kC4, kD6, kWhiteKnight),
+               "Nc4d6+");
+}
+
+TEST_CASE("RenderSAN_NonAmbiguousMoveBecauseOfPinnedPiece_CorrectStringReturned")
+{
+    RenderTest("4k3/4r3/8/8/8/2N1N3/8/4K3 w - - 0 1",
+               NewMove(kC3, kD5, kWhiteKnight),
+               "Nd5");
 }

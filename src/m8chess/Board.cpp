@@ -39,8 +39,8 @@ namespace m8
             {
                 // If the character is a piece we add it to the board at the 
                 // current position.
-                auto it_piece = char_to_piece_map.find(*it);
-                if (it_piece != char_to_piece_map.end())
+                Piece piece = GetPieceFromChar(*it);
+                if (IsPiece(piece))
                 {
                     // If the current position is invalid we throw an exception
                     if (!IsColmnOnBoard(colmn) || !IsRowOnBoard(row))
@@ -49,7 +49,7 @@ namespace m8
                     }
 
                     Sq sq = NewSq(colmn, row);
-                    AddPiece(sq, it_piece->second);
+                    AddPiece(sq, piece);
                     ++colmn;
                 }
                 else
@@ -238,7 +238,7 @@ namespace m8
                         emptySquares = 0;
                     }
 
-                    out << piece_to_char_map.find(piece)->second;
+                    out << GetCharFromPiece(piece);
                 }
                 else
                 {
@@ -392,7 +392,7 @@ namespace m8
         assert(IsPiece(piece));
 
         out << (GetColor(piece) == kBlack ? '=' : ' ')
-            << static_cast<char>(toupper(piece_to_char_map.find(piece)->second))
+            << GetCharFromPieceType(GetPieceType(piece))
             << (GetColor(piece) == kBlack ? '=' : ' ');
     }
 

@@ -74,7 +74,7 @@ namespace m8
 
         /// Generate a bitboard of all the squares containing a given piece type that 
         /// attacks a given square.
-        inline Bb GenerateAttacksTo(Piece piece, Sq sq);
+        inline Bb GenerateAttacksTo(Piece piece, Sq sq) const;
 
         /// Generate the moves of the knight. The moves are added to an array specified by
         /// the parameter next_move the end of the sequence of moves is indicated by a 
@@ -388,6 +388,7 @@ namespace m8
         return attackers;
     }
 
+    // TODO : Should this method be extracted from MoveGen and use a MoveGen as input?
     inline bool MoveGen::IsInCheck(Color color) const
     {
         Piece king = NewPiece(kKing, color);
@@ -428,7 +429,7 @@ namespace m8
         return result;
     }
 
-    inline Bb MoveGen::GenerateAttacksTo(Piece piece, Sq sq)
+    inline Bb MoveGen::GenerateAttacksTo(Piece piece, Sq sq) const
     {
         assert(IsPiece(piece));
         assert(IsSqOnBoard(sq));

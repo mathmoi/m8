@@ -51,6 +51,16 @@ namespace m8
        { 'R', kRook },
    };
 
+   const std::unordered_map<PieceType, char> piece_type_to_char_map = 
+   {
+       { kPawn, 'P'},
+       { kKnight, 'N'},
+       { kKing, 'K' },
+       { kQueen, 'Q' },
+       { kBishop, 'B' },
+       { kRook, 'R' }
+   };
+
    /// Indicate if a value is a valid PieceType.
    ///
    /// @param piece_type The PieceType to evaluate.
@@ -96,6 +106,31 @@ namespace m8
       assert(IsPieceType(piece_type));
 
       return (piece_type & UINT8_C(6)) == UINT8_C(4);
+   }
+
+   /// Get the PieceType from a character.
+   ///
+   /// @returns The piece type or kNoPieceType if the character does 
+   ///          not represents a known piece type.
+   inline PieceType GetPieceTypeFromChar(char c)
+   {
+       PieceType piece_type = kNoPieceType;
+
+       auto it = char_to_piece_type_map.find(c);
+       if (it != char_to_piece_type_map.end())
+       {
+           piece_type = it->second;
+       }
+
+       return piece_type;
+   }
+
+   /// Get a char representing a piece type.
+   inline char GetCharFromPieceType(PieceType piece_type)
+   {
+       assert(IsPieceType(piece_type));
+
+       return piece_type_to_char_map.at(piece_type);
    }
 
    ////////////////////////////////////////////////////////////////////////////
@@ -206,6 +241,31 @@ namespace m8
       assert(IsPiece(piece));
 
       return piece >> 3;
+   }
+
+   /// Get the Piece from a character.
+   ///
+   /// @returns The piece or kNoPiece if the character does not represents a known piece 
+   ///          type.
+   inline PieceType GetPieceFromChar(char c)
+   {
+       Piece piece = kNoPiece;
+
+       auto it = char_to_piece_map.find(c);
+       if (it != char_to_piece_map.end())
+       {
+           piece = it->second;
+       }
+
+       return piece;
+   }
+
+   /// Get a char representing a piece.
+   inline char GetCharFromPiece(Piece piece)
+   {
+       assert(IsPiece(piece));
+
+       return piece_to_char_map.at(piece);
    }
 }
 
