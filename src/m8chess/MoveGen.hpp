@@ -1,9 +1,10 @@
 /// @file   MoveGen.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities to generate moves
 
 #include <cstdint>
+#include <stdexcept>
 
 #include "../m8common/m8common.hpp"
 #include "Const.hpp"
@@ -311,6 +312,9 @@ namespace m8
         case kPawn:
             result = GeneratePawnAttacksTo(GetColor(piece), sq);
             break;
+
+        default:
+            throw std::out_of_range("Invalid PieceType");
         }
 
         result &= board_.bb_piece(piece);
