@@ -11,12 +11,11 @@
 #include "Piece.hpp"
 #include "Move.hpp"
 #include "Board.hpp"
+#include "Attacks.hpp"
+#include "XRay.hpp"
 
 #ifndef M8_MOVE_GEN_HPP_
 #define M8_MOVE_GEN_HPP_
-
-// TODO : Attacks should be in a separate file than MoveGen #refactoring
-// TODO : XRay attacks should be in a separate file #refactoring
 
 namespace m8
 {
@@ -31,46 +30,6 @@ namespace m8
         inline MoveGen(const Board& board)
             : board_(board)
         {};
-
-        /// Initialize the precalculated data associated with the MoveGen class. This 
-        /// method should be called once before the class can be used.
-        static void InitializePreCalc();
-
-        /// Given a board occupancy, returns the squares attacked by a rook on a given 
-        /// square.
-        ///
-        /// @param occ Bitboard representing the occupancy of the board.
-        /// @param sq  Postion of the rook.
-        /// @return    A bitboard representing all squares attacked by the rook.
-        inline static Bb GenerateRookAttacks(Bb occ, Sq sq);
-
-        /// Given a board occupancy, returns the squares attacked by a bishop on a given 
-        /// square.
-        ///
-        /// @param occ Bitboard representing the occupancy of the board.
-        /// @param sq  Postion of the bishop.
-        /// @return    A bitboard representing all squares attacked by the bishop.
-        inline static Bb GenerateBishopAttacks(Bb occ, Sq sq);
-
-        /// Given a board occupancy, returns the x-ray attacks of a rook on a given 
-        /// squares. X-ray attacks are squares "attacked" by a piece through another
-        /// piece. Theses are not real attacks because the blocking piece protext the 
-        /// so-called attacked square.
-        ///
-        /// @param occ       Bitboard representing the occupancy of the board.
-        /// @param blockers  Positions of the piece to considered blockers.
-        /// @param sq        Postion of the bishop.
-        inline static Bb GenerateRookXRay(Bb occ, Bb blockers, Sq sq);
-
-        /// Given a board occupancy, returns the x-ray attacks of a bishop on a given 
-        /// squares. X-ray attacks are squares "attacked" by a piece through another
-        /// piece. Theses are not real attacks because the blocking piece protext the 
-        /// so-called attacked square.
-        ///
-        /// @param occ       Bitboard representing the occupancy of the board.
-        /// @param blockers  Positions of the piece to considered blockers.
-        /// @param sq        Postion of the bishop.
-        inline static Bb GenerateBishopXRay(Bb occ, Bb blockers, Sq sq);
 
         /// Generate a bitboard of all the squares containing a given piece type that 
         /// attacks a given square.
@@ -169,51 +128,11 @@ namespace m8
         ///
         /// @param sq Square for which we want to get the attackers.
         inline Bb AttacksTo(Sq sq) const;
-
-        /// Verify if a given color is in check.
-        ///
-        /// @param color Color of the side to for which to verify if the king is in check.
-        inline bool IsInCheck(Color color) const;
-
+        
         /// Returns a bitboard of the pinned pieces of a give color.
         inline Bb GetPinnedPieces(Color color) const;
 
     private:
-        /// Structure that hold all the parameters required to do the move generation of a 
-        /// rook or bishop on a given square.
-        struct Magic
-        {
-            Bb* attack;
-            Bb mask;
-            Bb magic;
-            std::uint32_t shift;
-        };
-
-        /// Type for an attack array for simples moves (knight and kings).
-        typedef std::array<Bb, 64> AttackArray;
-
-        /// Type for an array of Magic structures.
-        typedef std::array<Magic, 64> MagicArray;
-
-        /// Initialize the precalculation of knight_attack_bb_.
-        static void InitializeKnightAttackBb();
-
-        /// Initialize the precalculation of king_attack_bb_.
-        static void InitializeKingAttackBb();
-
-        /// Initialise the rook magic array
-        static void InitializeRookMagics();
-
-        /// Given a board occupancy, returns the x-ray attacks of a piece on a given 
-        /// squares. X-ray attacks are squares "attacked" by a piece through another
-        /// piece. Theses are not real attacks because the blocking piece protext the 
-        /// so-called attacked square.
-        ///
-        /// @param occ       Bitboard representing the occupancy of the board.
-        /// @param blockers  Positions of the piece to considered blockers.
-        /// @param sq        Postion of the bishop.
-        template<Bb (*GenerateAttacks)(Bb, Sq)>
-        inline static Bb GeneratePieceXRay(Bb occ, Bb blockers, Sq sq);
 
         /// Generate a bitboard of the square attacked by a rook on a given square given a
         /// specific occupation of the board.
@@ -222,17 +141,7 @@ namespace m8
         /// @param occupation Occupation of the board.
         /// @return A bitboard indicating the squares attacked by the rook.
         static Bb GenerateRookAttackForOccupancy(Sq from, Bb occupation);
-
-        /// Generate the rook attacks precalculation for a given square.
-        ///
-        /// @param sq Position of the rook.
-        /// @param magic Magic structure for which the methods generate the attack tables.
-        ///              This parameter is a reference and will be modified by the method.
-        static void InitializeRookAttack(Sq sq, MoveGen::Magic& magic);
-
-        /// Initialise the bishop magic array
-        static void InitializeBishopMagics();
-
+        
         /// Generate a bitboard of the square attacked by a bishop on a given square given
         /// a specific occupation of the board.
         ///
@@ -240,24 +149,6 @@ namespace m8
         /// @param occupation Occupation of the board.
         /// @return A bitboard indicating the squares attacked by the bishop.
         static Bb GenerateBishopAttackForOccupancy(Sq from, Bb occupation);
-
-        /// Generate the bishop attacks precalculation for a given square.
-        ///
-        /// @param sq Position of the rook.
-        /// @param magic Magic structure for which the methods generate the attack tables.
-        ///              This parameter is a reference and will be modified by the method.
-        static void InitializeBishopAttack(Sq sq, MoveGen::Magic& magic);
-
-        /// Given a board occupancy and the magic precalculation array, returns the 
-        /// squares attacked by a slider (rook or bishop) on a given square.
-        ///
-        /// @param magics Precalculation for the magic bitboard move generation for the 
-        ///               slider type. If the magics precalculation for a rook are passed
-        ///               this method will generate attacks for a rook.
-        /// @param occ    Bitboard representing the occupancy of the board.
-        /// @param sq     Postion of the slider.
-        /// @return       A bitboard representing all squares attacked by the slider.
-        inline static Bb GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq);
 
         /// Generate a bitboard of the pawns attacking a given square.
         inline static Bb GeneratePawnAttacksTo(Color color, Sq sq);
@@ -352,18 +243,6 @@ namespace m8
                                            Colmn rook_original_column,
                                            Colmn rook_final_column,
                                            Move* next_move) const;
-
-        static const std::array<const Bb, 64> kRookMagics;
-        static const std::array<const std::uint32_t, 64> kRookMagicShifts;
-        static const std::array<const Bb, 64> kBishopMagics;
-        static const std::array<const std::uint32_t, 64> kBishopMagicShifts;
-
-        static AttackArray knight_attack_bb_;
-        static AttackArray king_attack_bb_;
-        static std::array<Bb, 102400> rook_attack_bb_;
-        static std::array<Bb, 5248> bishop_attack_bb_;
-        static MagicArray rook_magic_;
-        static MagicArray bishop_magic_;
         
         const Board& board_;
     };
@@ -378,44 +257,14 @@ namespace m8
 
         Bb attackers = GenerateRookAttacks(board_.bb_occupied(), sq) & (queens | rooks);
         attackers |= GenerateBishopAttacks(board_.bb_occupied(), sq) & (queens | bishops);
-        attackers |= knight_attack_bb_[sq] & knights;
-        attackers |= king_attack_bb_[sq] & kings;
+        attackers |= knight_attack_bb[sq] & knights;
+        attackers |= king_attack_bb[sq] & kings;
 
         Bb bb_sq = GetSingleBitBb(sq);
         attackers |= (((bb_sq << 7) & ~GetColmnBb(kColmnH)) | ((bb_sq << 9) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kBlackPawn);
         attackers |= (((bb_sq >> 9) & ~GetColmnBb(kColmnH)) | ((bb_sq >> 7) & ~GetColmnBb(kColmnA))) & board_.bb_piece(kWhitePawn);
 
         return attackers;
-    }
-
-    // TODO : Should this method be extracted from MoveGen and use a MoveGen as input?
-    inline bool MoveGen::IsInCheck(Color color) const
-    {
-        Piece king = NewPiece(kKing, color);
-        Bb bb_king = board_.bb_piece(king);
-        Sq king_position = GetLsb(bb_king);
-        Bb attackers = AttacksTo(king_position);
-        Bb opponent_pieces = board_.bb_color(OpposColor(color));
-        return (attackers & opponent_pieces) != kEmptyBb;
-    }
-
-    inline Bb MoveGen::GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
-    {
-        Magic&  magic = magics[sq];
-        occ &=  magic.mask;
-        occ *=  magic.magic;
-        occ >>= magic.shift;
-        return  magic.attack[occ];
-    }
-
-    inline Bb MoveGen::GenerateRookAttacks(Bb occ, Sq sq)
-    {
-        return GenerateSliderAttacks(rook_magic_, occ, sq);
-    }
-
-    inline Bb MoveGen::GenerateBishopAttacks(Bb occ, Sq sq)
-    {
-        return GenerateSliderAttacks(bishop_magic_, occ, sq);
     }
 
     inline Bb MoveGen::GeneratePawnAttacksTo(Color color, Sq sq)
@@ -452,11 +301,11 @@ namespace m8
             break;
 
         case kKnight:
-            result = knight_attack_bb_[sq];
+            result = knight_attack_bb[sq];
             break;
 
         case kKing:
-            result = king_attack_bb_[sq];
+            result = king_attack_bb[sq];
             break;
 
         case kPawn:
@@ -510,7 +359,7 @@ namespace m8
                                    is_captures,
                                    piece,
                                    board_.bb_piece(piece),
-                                   knight_attack_bb_,
+                                   knight_attack_bb,
                                    next_move);
     }
 
@@ -521,7 +370,7 @@ namespace m8
                                         is_captures,
                                         piece,
                                         board_.bb_piece(piece),
-                                        king_attack_bb_,
+                                        king_attack_bb,
                                         next_move);
 
         if (!is_captures)
@@ -756,27 +605,6 @@ namespace m8
         next_move = GenerateQuietMoves(color, next_move);
         
         return next_move;
-    }
-
-    template<Bb(*GenerateAttacks)(Bb, Sq)>
-    inline Bb MoveGen::GeneratePieceXRay(Bb occ, Bb blockers, Sq sq)
-    {
-        Bb attacks = GenerateAttacks(occ, sq);
-        blockers &= attacks;
-        occ ^= blockers;
-        Bb attaksWhithoutBlockers = GenerateAttacks(occ, sq);
-
-        return attacks ^ attaksWhithoutBlockers;
-    }
-
-    inline Bb MoveGen::GenerateRookXRay(Bb occ, Bb blockers, Sq sq)
-    {
-        return GeneratePieceXRay<GenerateRookAttacks>(occ, blockers, sq);
-    }
-
-    inline Bb MoveGen::GenerateBishopXRay(Bb occ, Bb blockers, Sq sq)
-    {
-        return GeneratePieceXRay<GenerateBishopAttacks>(occ, blockers, sq);
     }
 
     inline Bb MoveGen::GetPinnedPieces(Color color) const

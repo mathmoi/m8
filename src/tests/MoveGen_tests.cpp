@@ -452,36 +452,6 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
     }
 }
 
-TEST_CASE("GenerateRookAttacks_called_ReturnExpectedValue")
-{
-    Bb occ = BB_C(0xFFDFEF20EFCFAF7F);
-    Bb result;
-
-    result = MoveGen::GenerateRookAttacks(occ, kE5);
-
-    REQUIRE(BB_C(0x0010102F10101010) == result);
-}
-
-TEST_CASE("m8_rook_attacks__empty_board__return_expected_value")
-{
-    Bb occ = BB_C(0x0000000000000080);
-    Bb result;
-
-    result = MoveGen::GenerateRookAttacks(occ, kH1);
-
-    REQUIRE(BB_C(0x808080808080807F) == result);
-}
-
-TEST_CASE("m8_bishop_attacks__called__return_expected_value")
-{
-    Bb occ = BB_C(0xFFDFEB20EFCFAF7F);
-    Bb result;
-
-    result = MoveGen::GenerateBishopAttacks(occ, kD5);
-
-    REQUIRE(BB_C(0x4022140014204080) == result);
-}
-
 TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_rook_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
@@ -669,36 +639,6 @@ TEST_CASE("AttacksTo__both_kings_attack_e5__both_attacks_identified")
     REQUIRE(attacks == BB_C(0x0000100010000000));
 }
 
-TEST_CASE("IsInCheck__white_king_attack_by_rook__return_true")
-{
-    Board board("8/8/4k3/8/r3K2R/8/8/8 w - - 0 1");
-    MoveGen move_gen(board);
-
-    bool in_check = move_gen.IsInCheck(kWhite);
-
-    REQUIRE(in_check == true);
-}
-
-TEST_CASE("IsInCheck__black_king_is_not_in_check__return_false")
-{
-    Board board("8/8/4k3/8/r3K2R/8/8/8 w - - 0 1");
-    MoveGen move_gen(board);
-
-    bool in_check = move_gen.IsInCheck(kBlack);
-
-    REQUIRE(in_check == false);
-}
-
-TEST_CASE("IsInCheck__white_king_is_protected_by_own_piece__return_false")
-{
-    Board board("8/8/4k3/8/r2QK2R/8/8/8 w - - 0 1");
-    MoveGen move_gen(board);
-
-    bool in_check = move_gen.IsInCheck(kWhite);
-
-    REQUIRE(in_check == false);
-}
-
 TEST_CASE("GenerateCastlingMoves__chess960_position__correct_moves_including_castling returned")
 {
     Board board("rk2r3/8/8/8/8/8/4P3/RK2R3 w KQkq - 0 1");
@@ -771,28 +711,4 @@ TEST_CASE("GenerateCastlingMoves__positions_traveled_by_rook_occupied__castling_
 
     REQUIRE((next_move - moves.data()) == 5);
     REQUIRE(!Contains(moves.data(), next_move, unexpected_move));
-}
-
-TEST_CASE("GenerateRookXRay_ComplexePositions_XRayAttackesReturned")
-{
-    Bb occ = BB_C(0x0000006500080008);
-    Bb blockers = BB_C(0x0000002400080000);
-
-    Bb expected = BB_C(0x0000004300000808);
-
-    Bb xray = MoveGen::GenerateRookXRay(occ, blockers, kD5);
-
-    REQUIRE(expected == xray);
-}
-
-TEST_CASE("GenerateBishopXRay_ComplexePositions_XRayAttackesReturned")
-{
-    Bb occ = BB_C(0x4000100004204100);
-    Bb blockers = BB_C(0x4000100000204100);
-
-    Bb expected = BB_C(0x4020000000004000);
-
-    Bb xray = MoveGen::GenerateBishopXRay(occ, blockers, kD5);
-
-    REQUIRE(expected == xray);
 }

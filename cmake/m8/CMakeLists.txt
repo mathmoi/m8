@@ -33,8 +33,8 @@ add_executable(m8
                ../../src/m8chess/Board.cpp
                ../../src/m8common/Bb.cpp
                ../../src/m8chess/SAN.cpp
-               ../../src/m8chess/MoveGen.cpp
                ../../src/m8chess/Direction.cpp
+               ../../src/m8chess/Attacks.cpp
                ${m8_header_files}
                ${m8chess_header_files}
                ${common_header_files})

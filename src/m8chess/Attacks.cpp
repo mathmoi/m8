@@ -1,20 +1,20 @@
-/// @file   MoveGen.cpp
-/// @author Mathieu Pagï¿½
-/// @date   December 2015
-/// @brief  Contains the definition of types and utilities to generate moves
+/// @file   Attacks.cpp
+/// @author Mathieu Pagé
+/// @date   Janurary 2018
+/// @brief  Contains methods and array used to generate attacks bitboards.
 
-#include "MoveGen.hpp"
+#include "Attacks.hpp"
 
 namespace m8
 {
-    MoveGen::AttackArray MoveGen::knight_attack_bb_;
-    MoveGen::AttackArray MoveGen::king_attack_bb_;
-    std::array<Bb, 102400> MoveGen::rook_attack_bb_;
-    std::array<Bb, 5248> MoveGen::bishop_attack_bb_;
-    MoveGen::MagicArray MoveGen::rook_magic_;
-    MoveGen::MagicArray MoveGen::bishop_magic_;
+    AttackArray knight_attack_bb;
+    AttackArray king_attack_bb;
+    std::array<Bb, 102400> rook_attack_bb;
+    std::array<Bb, 5248> bishop_attack_bb;
+    MagicArray rook_magic;
+    MagicArray bishop_magic;
 
-    const std::array<const Bb, 64> MoveGen::kRookMagics =
+    const std::array<const Bb, 64> kRookMagics =
     {
         BB_C(0x0080004000802410),
         BB_C(0x004000a000401001),
@@ -82,7 +82,7 @@ namespace m8
         BB_C(0x0000040040210082)
     };
 
-    const std::array<const std::uint32_t, 64> MoveGen::kRookMagicShifts =
+    const std::array<const std::uint32_t, 64> kRookMagicShifts =
     {
         52, 53, 53, 53, 53, 53, 53, 52,
         53, 54, 54, 54, 54, 54, 54, 53,
@@ -94,7 +94,7 @@ namespace m8
         52, 53, 53, 53, 53, 53, 53, 52
     };
 
-    const std::array<const Bb, 64> MoveGen::kBishopMagics =
+    const std::array<const Bb, 64> kBishopMagics =
     {
         BB_C(0x0004100200410000),
         BB_C(0x0020010101000000),
@@ -162,7 +162,7 @@ namespace m8
         BB_C(0x0100100101010200)
     };
 
-    const std::array<const std::uint32_t, 64> MoveGen::kBishopMagicShifts =
+    const std::array<const std::uint32_t, 64> kBishopMagicShifts =
     {
         58, 59, 59, 59, 59, 59, 59, 58,
         59, 59, 59, 59, 59, 59, 59, 59,
@@ -174,7 +174,7 @@ namespace m8
         58, 59, 59, 59, 59, 59, 59, 58
     };
 
-    void MoveGen::InitializeKnightAttackBb()
+    void InitializeKnightAttackBb()
     {
         for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
         {
@@ -206,11 +206,11 @@ namespace m8
             if (col >= kColmnB && row <= kRow6)
                 SetBit(mask, sq + 15);
 
-            knight_attack_bb_[sq] = mask;
+            knight_attack_bb[sq] = mask;
         }
     }
 
-    void MoveGen::InitializeKingAttackBb()
+    void InitializeKingAttackBb()
     {
         for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
         {
@@ -228,7 +228,7 @@ namespace m8
                 SetBit(mask, sq + 1);
 
             if (col < kColmnH && row > kRow1)
-                SetBit(mask, sq -7);
+                SetBit(mask, sq - 7);
 
             if (row > kRow1)
                 SetBit(mask, sq - 8);
@@ -242,11 +242,11 @@ namespace m8
             if (col > kColmnA && row < kRow8)
                 SetBit(mask, sq + 7);
 
-            king_attack_bb_[sq] = mask;
+            king_attack_bb[sq] = mask;
         }
     }
 
-    Bb MoveGen::GenerateRookAttackForOccupancy(Sq from, Bb occupation)
+    Bb GenerateRookAttackForOccupancy(Sq from, Bb occupation)
     {
         Bb bb_attack = kEmptyBb;
         Sq sq;
@@ -286,7 +286,12 @@ namespace m8
         return bb_attack;
     }
 
-    void MoveGen::InitializeRookAttack(Sq sq, MoveGen::Magic& magic)
+    /// Generate the rook attacks precalculation for a given square.
+    ///
+    /// @param sq Position of the rook.
+    /// @param magic Magic structure for which the methods generate the attack tables.
+    ///              This parameter is a reference and will be modified by the method.
+    void InitializeRookAttack(Sq sq, Magic& magic)
     {
         /* For each variation of occupation of the mask */
         std::uint64_t nbr_bits = GetPopct(magic.mask);
@@ -298,20 +303,20 @@ namespace m8
         }
     }
 
-    void MoveGen::InitializeRookMagics()
+    void InitializeRookMagics()
     {
-        Bb* ptr_attack = rook_attack_bb_.data();
+        Bb* ptr_attack = rook_attack_bb.data();
 
         for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
         {
             Row row = GetRow(sq);
             Colmn col = GetColmn(sq);
-            Magic& magic = rook_magic_[sq];
+            Magic& magic = rook_magic[sq];
 
             magic.attack = ptr_attack;
             magic.mask = ((kBbRow[row] & ~(kBbColmn[kColmnA] | kBbColmn[kColmnH])) |
-                          (kBbColmn[col] & ~(kBbRow[kRow1] | kBbRow[kRow8]))) &
-                          ~ GetSingleBitBb(sq);
+                (kBbColmn[col] & ~(kBbRow[kRow1] | kBbRow[kRow8]))) &
+                ~GetSingleBitBb(sq);
             magic.magic = kRookMagics[sq];
             magic.shift = kRookMagicShifts[sq];
 
@@ -321,7 +326,7 @@ namespace m8
         }
     }
 
-    Bb MoveGen::GenerateBishopAttackForOccupancy(Sq from, Bb occupation)
+    Bb GenerateBishopAttackForOccupancy(Sq from, Bb occupation)
     {
         Bb bb_attack = kEmptyBb;
         Sq sq;
@@ -329,8 +334,8 @@ namespace m8
         /* go northest */
         sq = from;
         while (GetRow(sq) < kRow8 &&
-               GetColmn(sq) < kColmnH &&
-               !GetBit(occupation, sq))
+            GetColmn(sq) < kColmnH &&
+            !GetBit(occupation, sq))
         {
             SetBit(bb_attack, sq + 9);
             sq += 9;
@@ -339,8 +344,8 @@ namespace m8
         /* go southest */
         sq = from;
         while (GetRow(sq) > kRow1 &&
-               GetColmn(sq) < kColmnH &&
-               !GetBit(occupation, sq))
+            GetColmn(sq) < kColmnH &&
+            !GetBit(occupation, sq))
         {
             SetBit(bb_attack, sq - 7);
             sq -= 7;
@@ -349,8 +354,8 @@ namespace m8
         /* go southwest */
         sq = from;
         while (GetRow(sq) > kRow1 &&
-               GetColmn(sq) > kColmnA &&
-               !GetBit(occupation, sq))
+            GetColmn(sq) > kColmnA &&
+            !GetBit(occupation, sq))
         {
             SetBit(bb_attack, sq - 9);
             sq -= 9;
@@ -359,8 +364,8 @@ namespace m8
         /* go northwest */
         sq = from;
         while (GetRow(sq) < kRow8 &&
-               GetColmn(sq) > kColmnA &&
-               !GetBit(occupation, sq))
+            GetColmn(sq) > kColmnA &&
+            !GetBit(occupation, sq))
         {
             SetBit(bb_attack, sq + 7);
             sq += 7;
@@ -369,7 +374,12 @@ namespace m8
         return bb_attack;
     }
 
-    void MoveGen::InitializeBishopAttack(Sq sq, MoveGen::Magic& magic)
+    /// Generate the bishop attacks precalculation for a given square.
+    ///
+    /// @param sq Position of the rook.
+    /// @param magic Magic structure for which the methods generate the attack tables.
+    ///              This parameter is a reference and will be modified by the method.
+    void InitializeBishopAttack(Sq sq, Magic& magic)
     {
         /* For each variation of occupation of the mask */
         uint64_t nbr_bits = GetPopct(magic.mask);
@@ -381,23 +391,23 @@ namespace m8
         }
     }
 
-    void MoveGen::InitializeBishopMagics()
+    void InitializeBishopMagics()
     {
-        Bb border =              kBbRow[kRow8] |
-                    kBbColmn[kColmnA] | kBbColmn[kColmnH] |
-                                 kBbRow[kRow1];
+        Bb border = kBbRow[kRow8] |
+            kBbColmn[kColmnA] | kBbColmn[kColmnH] |
+            kBbRow[kRow1];
 
-        Bb* ptr_attack = bishop_attack_bb_.data();
+        Bb* ptr_attack = bishop_attack_bb.data();
 
         for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
         {
             Diagonal diag = GetDiag(sq);
             Diagonal anti_diag = GetAntiDiag(sq);
-            Magic& magic = bishop_magic_[sq];
+            Magic& magic = bishop_magic[sq];
 
             magic.attack = ptr_attack;
             magic.mask = (kBbDiag[diag] ^ kBbAntiDiag[anti_diag]) & ~border;
-            magic.magic =  kBishopMagics[sq];
+            magic.magic = kBishopMagics[sq];
             magic.shift = kBishopMagicShifts[sq];
 
             InitializeBishopAttack(sq, magic);
@@ -406,7 +416,7 @@ namespace m8
         }
     }
 
-    void MoveGen::InitializePreCalc()
+    void InitializeAttacks()
     {
         InitializeKnightAttackBb();
         InitializeKingAttackBb();

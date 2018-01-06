@@ -10,7 +10,7 @@
 #include "SAN.hpp"
 #include "Board.hpp"
 #include "Direction.hpp"
-#include "Mat.hpp"
+#include "Checkmate.hpp"
 #include "MoveGen.hpp"
 
 namespace m8
@@ -361,7 +361,7 @@ namespace m8
         Color color_after_move = OpposColor(GetColor(GetPiece(move)));
 
         UnmakeInfo unmake_info = board.Make(move);
-        if (generator.IsInCheck(color_after_move))
+        if (IsInCheck(color_after_move, board, generator))
         {
             out << (IsMat(board) ? '#' : '+');
         };

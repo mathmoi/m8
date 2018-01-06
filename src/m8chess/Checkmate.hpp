@@ -1,19 +1,32 @@
-/// @file   Mat.hpp
+/// @file   Checkmate.hpp
 /// @author Mathieu Pagé
 /// @date   Janurary 2018
-/// @brief  Contains a method used to check if a postion is a mat.
+/// @brief  Contains a method used to verify that a player is in check or mate.
 
-#ifndef M8_MAT_HPP_
-#define M8_MAT_HPP_
+#ifndef M8_CHECKMATE_HPP_
+#define M8_CHECKMATE_HPP_
 
 #include "MoveGen.hpp"
 
 namespace m8
 {
+    /// Verify if a given color is in check.
+    ///
+    /// @param color Color of the side to for which to verify if the king is in check.
+    inline bool IsInCheck(Color color, const Board& board, const MoveGen& generator)
+    {
+        Piece king = NewPiece(kKing, color);
+        Bb bb_king = board.bb_piece(king);
+        Sq king_position = GetLsb(bb_king);
+        Bb attackers = generator.AttacksTo(king_position);
+        Bb opponent_pieces = board.bb_color(OpposColor(color));
+        return (attackers & opponent_pieces) != kEmptyBb;
+    }
+
     /// This method check if the side to move is mat. For performance reasons no 
     /// verification is made to make sure that the king is currently attacked (in check)
     /// this must be done separately.
-    bool IsMat(Board& board)
+    inline bool IsMat(Board& board)
     {
         Color side_to_move = board.side_to_move();
 
@@ -28,7 +41,7 @@ namespace m8
         while (!found && next < end)
         {
             UnmakeInfo unmake_info = board.Make(*next);
-            found = !generator.IsInCheck(side_to_move);
+            found = !IsInCheck(side_to_move, board, generator);
             board.Unmake(*next, unmake_info);
 
             ++next;
@@ -38,4 +51,4 @@ namespace m8
     }
 }
 
-#endif // M8_MAT_HPP_
+#endif // M8_CHECKMATE_HPP_

@@ -29,12 +29,15 @@ add_executable(m8_tests
                ../../src/tests/Board_tests.cpp
                ../../src/tests/Move_tests.cpp
                ../../src/tests/MoveGen_tests.cpp
+               ../../src/tests/Attacks_tests.cpp
+               ../../src/tests/Checkmate_tests.cpp
+               ../../src/tests/XRay_tests.cpp
                ../../src/tests/catch.hpp
                ../../src/m8chess/Board.cpp
                ../../src/m8common/Bb.cpp
-               ../../src/m8chess/MoveGen.cpp
                ../../src/m8chess/SAN.cpp
                ../../src/m8chess/Direction.cpp
+               ../../src/m8chess/Attacks.cpp
                ../../src/tests/SAN_tests.cpp
                ${m8_header_files}
                ${m8chess_header_files}
