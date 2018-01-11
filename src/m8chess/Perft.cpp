@@ -1,5 +1,5 @@
 /// @file   Perft.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains functionalities of the perft command.
 
@@ -57,7 +57,8 @@ namespace m8
         PerftResult result;
 
         auto start = high_resolution_clock::now();
-        result.nodes = Perft<true>(depth, board, MoveGen(board), callback);
+        MoveGen generator(board);
+        result.nodes = Perft<true>(depth, board, generator, callback);
         auto end = high_resolution_clock::now();
 
         duration<double> time_span = duration_cast<duration<double>>(end - start);
