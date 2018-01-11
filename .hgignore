@@ -1,6 +1,5 @@
 regexp syntax
 
-^\.vscode/
 ^Doxygen/html
 ^VS/Debug/
 ^VS/.*/Debug/

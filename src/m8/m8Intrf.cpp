@@ -1,5 +1,5 @@
 /// @file   m8Intrf.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   May 2015
 /// @brief  Contains the class m8Intrf that implements m8's shell like interface.
 
@@ -16,8 +16,9 @@
 namespace m8
 {
     m8Intrf::m8Intrf()
-        : shell_intrf_(),
-        engine_()
+        : engine_(),
+          shell_intrf_()
+        
     {
         SetupShellInterf();
     }
