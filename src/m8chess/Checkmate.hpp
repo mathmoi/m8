@@ -33,7 +33,7 @@ namespace m8
         MoveGen generator(board);
         MoveList moves;
         Move* end = moves.data();
-        end = generator.GenerateAllMoves(side_to_move, end);
+        end = generator.GenerateAllMoves(end);
 
         // We look for a move that doesn't leave the side to move in check.
         bool found = false;

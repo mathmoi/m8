@@ -48,6 +48,9 @@ namespace m8
 
       /// Handled the fen command.
       void HandleFen(std::vector<std::string> args_list);
+
+      /// Handle the perft command.
+      void HandlePerft(std::vector<std::string> args_list);
    };
 
 }

@@ -249,13 +249,13 @@ namespace m8 {
         {
             magic = GenerateRndFewBits(rng);
             fail = false;
-            used->fill(BB_C(0));
+            used->fill(kFilledBb);
 
             std::uint32_t index_occup = 0;
             while (!fail && index_occup < occupancies.size())
             {
                 Bb magic_index = CalculateMagicIndex(occupancies[index_occup], magic, shift);
-                if (!(*used)[magic_index])
+                if ((*used)[magic_index] == kFilledBb)
                 {
                     (*used)[magic_index] = attack_sets[index_occup];
                 }

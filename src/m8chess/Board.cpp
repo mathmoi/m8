@@ -266,7 +266,6 @@ namespace m8
 
     bool Board::GenerateXFenCastling(std::ostream& out, Color color, CastleType castle) const
     {
-        size_t castle_index = castle - 1;
         bool result = this->casle(color, castle);
 
         if (result)
@@ -277,13 +276,13 @@ namespace m8
             Colmn column_outter_most_rook = GetColmn(sq_outter_most_rook);
 
             char c;
-            if (this->casle_colmn(castle_index) == column_outter_most_rook)
+            if (this->casle_colmn(castle) == column_outter_most_rook)
             {
                 c = (castle == kKingSideCastle ? 'K' : 'Q');
             }
             else
             {
-                c = static_cast<char>('A' + this->casle_colmn(castle_index));
+                c = static_cast<char>('A' + this->casle_colmn(castle));
             }
 
             if (color == kBlack)
@@ -432,8 +431,8 @@ namespace m8
         for (auto column = kColmnA; IsColmnOnBoard(column); ++column)
         {
             out << "+-"
-                << ((board.casle_colmn(0) == column && board.casle(color, kQueenSideCastle))
-                    || (board.casle_colmn(1) == column && board.casle(color, kKingSideCastle)) ? 'X' : '-')
+                << ((board.casle_colmn(kQueenSideCastle) == column && board.casle(color, kQueenSideCastle))
+                    || (board.casle_colmn(kKingSideCastle) == column && board.casle(color, kKingSideCastle)) ? 'X' : '-')
                 << '-';
         }
         out << "+\n";

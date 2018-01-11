@@ -452,6 +452,21 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
     }
 }
 
+TEST_CASE("GeneratePawnCaptures_PriseEnPassantPossible_PriseEnPassantReturned")
+{
+    Board board("rnbqkbnr/p2ppppp/8/1Pp5/8/8/1PPPPPPP/RNBQKBNR w KQkq c6 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    Move expected = NewMove(kB5, kC6, kWhitePawn, kBlackPawn);
+
+    MoveGen move_gen(board);
+    next_move = move_gen.GeneratePawnCaptures(kWhite, next_move);
+
+    REQUIRE((next_move - moves.data()) == 1);
+    REQUIRE(Contains(moves.data(), next_move, expected));
+}
+
 TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_rook_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
@@ -531,6 +546,21 @@ TEST_CASE("GenerateBishopMoves__called_for_non_captures__return_all_non_captures
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
     }
+}
+
+TEST_CASE("GenerateBishopMoves__CaptureOnTheCornerOfBoard__CaptureInCornerReturned")
+{
+    Board board("rnbqkbnr/1ppppp1p/p5p1/8/8/1P6/PBPPPPPP/RN1QKBNR w KQkq - 0 1");
+    MoveList moves;
+    Move* next_move = moves.data();
+
+    Move expected_move = NewMove(kB2, kH8, kWhiteBishop, kBlackRook);
+
+    MoveGen move_gen(board);
+
+    next_move = move_gen.GenerateBishopMoves(kWhite, true, next_move);
+
+    REQUIRE(Contains(moves.data(), next_move, expected_move));
 }
 
 TEST_CASE("GenerateBishopMoves__called_for_captures__return_all_captures_bishop_moves")

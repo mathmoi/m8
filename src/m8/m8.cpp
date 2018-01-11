@@ -4,6 +4,7 @@
 /// @brief  Contains the entry point (main) of m8.
 
 #include "m8Intrf.hpp"
+#include "../m8chess/Init.hpp"
 
 /// Main function. The entry point of the application.
 ///
@@ -14,6 +15,8 @@
 ///          terminated correctly and another value otherwise.
 int main(int argc, char* argv[])
 {
+    m8::InitializePreCalc();
+
    m8::m8Intrf intrf;
    intrf.Execute();
 

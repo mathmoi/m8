@@ -35,6 +35,7 @@ add_executable(m8
                ../../src/m8chess/SAN.cpp
                ../../src/m8chess/Direction.cpp
                ../../src/m8chess/Attacks.cpp
+               ../../src/m8chess/Perft.cpp
                ${m8_header_files}
                ${m8chess_header_files}
                ${common_header_files})

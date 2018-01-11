@@ -357,6 +357,11 @@ namespace m8
         /// @oaram out      Stream on which to generate the field.
         void GenerateXFenClocks(std::ostream& out) const;
 
+        /// Remove the appropriate castling right if a rook is captured.
+        ///
+        /// @param taken Piece taken.
+        /// @param to    Target square of the move.
+        inline void RemoveCastlingRookCaptured(Piece taken, Sq to);
     };
 
     /// Overloading the << operator for an output stream and a Board. This 
@@ -426,9 +431,9 @@ namespace m8
     inline Colmn Board::casle_colmn(std::size_t indx) const
     {
         // A : The index is 0 or 1.
-        assert(indx == 0 || indx == 1);
+        assert(indx == 1 || indx == 2);
 
-        return casle_colmn_[indx];
+        return casle_colmn_[indx - 1];
     }
 
     inline void Board::AddPiece(Sq sq, Piece piece)
@@ -548,7 +553,7 @@ namespace m8
 
         Piece rook = NewPiece(kRook, side_to_move_);
         Colmn rook_colmn = casle_colmn_[castle - 1];
-        Row row = GetRow(piece);
+        Row row = GetRow(from);
         Sq rook_from = NewSq(rook_colmn, row);
         Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
 
@@ -589,6 +594,28 @@ namespace m8
         this->set_casle(side_to_move_, kKingSideCastle, false);
     }
 
+    inline void Board::RemoveCastlingRookCaptured(Piece taken, Sq to)
+    {
+        if (IsPiece(taken) && GetPieceType(taken) == kRook)
+        {
+            Color color = GetColor(taken);
+            Row origin_row = GetColorWiseRow(color, kRow1);
+
+            if (GetRow(to) == origin_row)
+            {
+                Colmn colmn = GetColmn(to);
+                if (colmn == casle_colmn(kQueenSideCastle))
+                {
+                    set_casle(color, kQueenSideCastle, false);
+                }
+                if (colmn == casle_colmn(kKingSideCastle))
+                {
+                    set_casle(color, kKingSideCastle, false);
+                }
+            }
+        }
+    }
+
     inline UnmakeInfo Board::Make(Move move)
     {
         assert(GetColor(GetPiece(move)) == side_to_move_);
@@ -599,7 +626,7 @@ namespace m8
         Piece taken = GetPieceTaken(move);
         PieceType piece_type = GetPieceType(piece);
 
-        UnmakeInfo unmake_info = colmn_enpas_ << 24 | half_move_clock_;
+        UnmakeInfo unmake_info = colmn_enpas_ << 24 | casle_flag_ << 20 | half_move_clock_;
 
         // If the side to move is black increment the move number
         full_move_clock_ += side_to_move_;
@@ -632,6 +659,8 @@ namespace m8
             break;
         }
 
+        RemoveCastlingRookCaptured(taken, to);
+
         side_to_move_ = OpposColor(side_to_move_);
 
         return unmake_info;
@@ -657,7 +686,7 @@ namespace m8
     {
         Piece rook = NewPiece(kRook, OpposColor(side_to_move_));
         Colmn rook_colmn = casle_colmn_[castle - 1];
-        Row row = GetRow(piece);
+        Row row = GetRow(from);
         Sq rook_from = NewSq(rook_colmn, row);
         Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
 
@@ -714,7 +743,7 @@ namespace m8
         Piece taken = GetPieceTaken(move);
         PieceType piece_type = GetPieceType(piece);
 
-        half_move_clock_ = unmake_info & 0xFFFFFF;
+        half_move_clock_ = unmake_info & 0xFFFFF;
         colmn_enpas_ = unmake_info >> 24;
 
         switch (piece_type)
@@ -739,6 +768,8 @@ namespace m8
         }
 
         side_to_move_ = OpposColor(side_to_move_);
+
+        casle_flag_ = (unmake_info >> 20) & 0xF;
 
         // If the side to move is black decrement the move number.
         full_move_clock_ -= side_to_move_;

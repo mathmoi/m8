@@ -117,12 +117,11 @@ namespace m8
         /// @return A pointer to the position afther the last move inserted into the array.
         inline Move* GenerateQuietMoves(Color color, Move* next_move) const;
 
-        /// Generate all moves.
+        /// Generate all moves for the current side on move.
         ///
-        /// @param color     Color of the pieces to generate the moves for.
         /// @param next_move Pointer into an array where we can add moves.
         /// @return A pointer to the position afther the last move inserted into the array.
-        inline Move* GenerateAllMoves(Color color, Move* next_move) const;
+        inline Move* GenerateAllMoves(Move* next_move) const;
 
         /// Generate a bitboard of all the squares that attacks a given square.
         ///
@@ -211,6 +210,13 @@ namespace m8
         /// @param next_move     Pointer into an array where we can add moves.
         /// @return A pointer to the position after the last move inserted into the array.
         inline Move* GeneratePawnSideCaptures(Color color, Colmn ignored_colmn, int delta, Move* next_move) const;
+
+        /// Generate the en-passant capture
+        ///
+        /// @param color         Color of the pawn to generate the moves for.
+        /// @param next_move     Pointer into an array where we can add moves.
+        /// @return A pointer to the position after the last move inserted into the array.
+        inline Move* GeneratePriseEnPassant(Color color, Move* next_move) const;
 
         /// Generate pawn promotions
         ///
@@ -418,6 +424,40 @@ namespace m8
         return next_move;
     }
 
+    inline Move* MoveGen::GeneratePriseEnPassant(Color color, Move* next_move) const
+    {
+        Colmn enpas = board_.colmn_enpas();
+        if (IsColmnOnBoard(enpas))
+        {
+            Piece pawn = NewPiece(kPawn, color);
+            Row row = GetColorWiseRow(color, kRow5);
+
+            if (enpas > kColmnA)
+            {
+                Sq from = NewSq(enpas - 1, row);
+                if (board_[from] == pawn)
+                {
+                    Sq to = NewSq(enpas, GetColorWiseRow(color, kRow6));
+                    Piece captured = NewPiece(kPawn, OpposColor(color));
+                    *(next_move++) = NewMove(from, to, pawn, captured);
+                }
+            }
+
+            if (enpas < kColmnH)
+            {
+                Sq from = NewSq(enpas + 1, row);
+                if (board_[from] == pawn)
+                {
+                    Sq to = NewSq(enpas, GetColorWiseRow(color, kRow6));
+                    Piece captured = NewPiece(kPawn, OpposColor(color));
+                    *(next_move++) = NewMove(from, to, pawn, captured);
+                }
+            }
+        }
+
+        return next_move;
+    }
+
     inline Move* MoveGen::GeneratePawnPromotions(Color color, Move* next_move) const 
     {
         Piece piece = NewPiece(kPawn, color);
@@ -483,8 +523,8 @@ namespace m8
 
     inline Move* MoveGen::GenerateCastlingMoves(Color color, Move* next_move) const
     {
-        next_move = GenerateCastlingMoves(color, kKingSideCastle, kColmnG, board_.casle_colmn(1), kColmnF, next_move);
-        next_move = GenerateCastlingMoves(color, kQueenSideCastle, kColmnC, board_.casle_colmn(0), kColmnD, next_move);
+        next_move = GenerateCastlingMoves(color, kKingSideCastle, kColmnG, board_.casle_colmn(kKingSideCastle), kColmnF, next_move);
+        next_move = GenerateCastlingMoves(color, kQueenSideCastle, kColmnC, board_.casle_colmn(kQueenSideCastle), kColmnD, next_move);
 
         return next_move;
     }
@@ -520,6 +560,7 @@ namespace m8
 
         next_move = GeneratePawnSideCaptures(color, kColmnA, forward_left, next_move);
         next_move = GeneratePawnSideCaptures(color, kColmnH, forward_right, next_move);
+        next_move = GeneratePriseEnPassant(color, next_move);
         next_move = GeneratePawnPromotions(color, next_move);
 
         return next_move;
@@ -599,8 +640,10 @@ namespace m8
         return next_move;
     }
 
-    inline Move* MoveGen::GenerateAllMoves(Color color, Move* next_move) const
+    inline Move* MoveGen::GenerateAllMoves(Move* next_move) const
     {
+        Color color = board_.side_to_move();
+
         next_move = GenerateCaptures(color, next_move);
         next_move = GenerateQuietMoves(color, next_move);
         

@@ -100,8 +100,8 @@ TEST_CASE("Test Board(fen)")
    REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
    REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
 
-   REQUIRE(board.casle_colmn(0) == kColmnA);
-   REQUIRE(board.casle_colmn(1) == kColmnH);
+   REQUIRE(board.casle_colmn(kQueenSideCastle) == kColmnA);
+   REQUIRE(board.casle_colmn(kKingSideCastle) == kColmnH);
 
    REQUIRE(board.colmn_enpas() == kInvalColmn);
 }
@@ -116,8 +116,8 @@ TEST_CASE("Test Board(fen) 2")
    REQUIRE(board.casle(kBlack, kQueenSideCastle) == true);
    REQUIRE(board.casle(kBlack, kKingSideCastle) == true);
 
-   REQUIRE(board.casle_colmn(0) == kColmnA);
-   REQUIRE(board.casle_colmn(1) == kColmnG);
+   REQUIRE(board.casle_colmn(kQueenSideCastle) == kColmnA);
+   REQUIRE(board.casle_colmn(kKingSideCastle) == kColmnG);
 
    REQUIRE(board.half_move_clock() == 4);
 }

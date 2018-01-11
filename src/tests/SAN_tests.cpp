@@ -250,3 +250,10 @@ TEST_CASE("RenderSAN_NonAmbiguousMoveBecauseOfPinnedPiece_CorrectStringReturned"
                NewMove(kC3, kD5, kWhiteKnight),
                "Nd5");
 }
+
+TEST_CASE("RenderSAN_SimplePawnMove_CorrectStringReturned")
+{
+    RenderTest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+               NewMove(kB2, kB3, kWhitePawn),
+               "b3");
+}

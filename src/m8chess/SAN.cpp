@@ -371,23 +371,26 @@ namespace m8
     void OutputDisambiguationCharacters(std::ostream& out, Move move, Board& board, const MoveGen& generator)
     {
         Piece piece = GetPiece(move);
-        Color color = GetColor(piece);
-        Sq to = GetTo(move);
-        Sq from = GetFrom(move);
-        Colmn colmn = GetColmn(from);
-        Row row = GetRow(from);
-
-        Bb candidates = generator.GenerateAttacksTo(piece, to);
-        candidates = RemovePinnedCandidates(candidates, color, to, board, generator);
-
-        if (GetPopct(candidates & GetRowBb(row)) > 1)
+        if (GetPieceType(piece) != kPawn)
         {
-            out << GetColumnChar(colmn);
-        }
+            Color color = GetColor(piece);
+            Sq to = GetTo(move);
+            Sq from = GetFrom(move);
+            Colmn colmn = GetColmn(from);
+            Row row = GetRow(from);
 
-        if (GetPopct(candidates & GetColmnBb(colmn)) > 1)
-        {
-            out << GetRowNumber(row);
+            Bb candidates = generator.GenerateAttacksTo(piece, to);
+            candidates = RemovePinnedCandidates(candidates, color, to, board, generator);
+
+            if (GetPopct(candidates & GetRowBb(row)) > 1)
+            {
+                out << GetColumnChar(colmn);
+            }
+
+            if (GetPopct(candidates & GetColmnBb(colmn)) > 1)
+            {
+                out << GetRowNumber(row);
+            }
         }
     }
 
