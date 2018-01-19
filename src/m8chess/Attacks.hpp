@@ -55,9 +55,9 @@ namespace m8
     /// @param occ    Bitboard representing the occupancy of the board.
     /// @param sq     Postion of the slider.
     /// @return       A bitboard representing all squares attacked by the slider.
-    inline Bb GenerateSliderAttacks(MagicArray magics, Bb occ, Sq sq)
+    inline Bb GenerateSliderAttacks(const MagicArray& magics, Bb occ, Sq sq)
     {
-        Magic&  magic = magics[sq];
+        const Magic&  magic = magics[sq];
         occ &= magic.mask;
         occ *= magic.magic;
         occ >>= magic.shift;

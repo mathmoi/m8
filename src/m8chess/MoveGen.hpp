@@ -645,7 +645,7 @@ namespace m8
     }
 
     inline Move* MoveGen::GenerateAllMoves(Move* next_move) const
-    {
+    {        
         Color color = board_.side_to_move();
 
         next_move = GenerateCaptures(color, next_move);

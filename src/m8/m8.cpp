@@ -15,7 +15,7 @@
 ///          terminated correctly and another value otherwise.
 int main(int argc, char* argv[])
 {
-    m8::InitializePreCalc();
+   m8::InitializePreCalc();
 
    m8::m8Intrf intrf;
    intrf.Execute();
