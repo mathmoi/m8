@@ -10,6 +10,8 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <cmath>
+#include <iomanip>
 
 namespace m8
 {
@@ -40,6 +42,20 @@ namespace m8
         if (!(stream >> retour) || (failIfLeftoverChars && stream.get(c)))
             throw BadConvr("ConvertTo(\"" + str + "\")");
         return retour;
+    }
+
+    /// Convert a number to string using the bigest metric suffixe possible.
+    ///
+    /// @param number    Number to convert to a string.
+    /// @param precision Number of decimal digit to use in output.
+    inline std::string AddMetricSuffix(std::uint64_t number, int precision)
+    {
+        static const std::array<std::string, 7> suffixes = { {"", "k", "M", "G", "T", "P", "E"} };
+        auto index = static_cast<std::size_t>(std::log10(number) / 3);
+
+        std::ostringstream out;
+        out << std::setiosflags(std::ios::fixed) << std::setprecision(precision) << (number / std::pow(1000, index)) << suffixes[index];
+        return out.str();
     }
 
     /// Verify if an elements is in a container.

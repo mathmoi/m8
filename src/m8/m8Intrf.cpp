@@ -129,7 +129,7 @@ namespace m8
         std::cout << '\n'
                   << " Nodes: " << result.nodes <<'\n'
                   << " Time : " << result.seconds <<'\n'
-                  << " Nodes per second: " <<(result.nodes / result.seconds) << '\n'
+                  << " Nodes per second: " << AddMetricSuffix(result.nodes / result.seconds, 3) << '\n'
                   <<std::endl;
     }
 }
