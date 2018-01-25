@@ -51,7 +51,7 @@ namespace m8
     inline std::string AddMetricSuffix(std::uint64_t number, int precision)
     {
         static const std::array<std::string, 7> suffixes = { {"", "k", "M", "G", "T", "P", "E"} };
-        auto index = static_cast<std::size_t>(std::log10(number) / 3);
+        auto index = static_cast<std::size_t>((number > 0 ? std::log10(number) / 3 : 0));
 
         std::ostringstream out;
         out << std::setiosflags(std::ios::fixed) << std::setprecision(precision) << (number / std::pow(1000, index)) << suffixes[index];

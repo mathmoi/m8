@@ -15,6 +15,7 @@ namespace m8
 
     PerftResult Engine::Perft(int depth, std::function<void(std::string, std::uint64_t)> callback)
     {
-        return m8::Perft(depth, board_, [callback, this](Move move, std::uint64_t count) { callback(RenderSAN(move, board_), count); });
+        m8::Perft perft(depth, board_, [callback, this](Move move, std::uint64_t count) { callback(RenderSAN(move, board_), count); });
+        return perft.RunParallel();
     }
 }
