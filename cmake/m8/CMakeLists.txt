@@ -3,10 +3,12 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHE
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
 endif()
 
-# We set maximum warnings on GCC
+
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+  FIND_PACKAGE ( Threads REQUIRED )
+
+  # We set maximum warnings on GCC
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic")
 endif()
 
 # We add boost
@@ -39,3 +41,7 @@ add_executable(m8
                ${m8_header_files}
                ${m8chess_header_files}
                ${common_header_files})
+
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    target_link_libraries(m8 ${CMAKE_THREAD_LIBS_INIT})
+endif()

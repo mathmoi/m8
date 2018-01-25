@@ -39,12 +39,11 @@ namespace m8
     {
         int count = 0;
 
-        UnmakeInfo unmake_info;
+        UnmakeInfo unmake_info = 0;
         if (node->move() != kNullMove)
         {
             unmake_info = board.Make(node->move());
         }
-
 
         if (node->children().size() > 0)
         {

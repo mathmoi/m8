@@ -1,5 +1,5 @@
 /// @file   Perft.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains functionalities of the perft command.
 
@@ -11,6 +11,7 @@
 #include <memory>
 #include <mutex>
 #include <future>
+#include <vector>
 
 #include <boost/optional.hpp>
 
@@ -63,7 +64,7 @@ namespace m8
         inline void AddChild(PerftNode::Ptr child) { children_.push_back(child); }
         inline boost::optional<std::uint64_t> count() const { return count_; }
         inline void set_count(std::uint64_t count) { count_ = count; }
-        inline int children_done() const { return children_done_; }
+        inline unsigned int children_done() const { return children_done_; }
         inline void AddChildDone() { ++children_done_; }
         inline PerftNode::Ptr parent() const { return parent_; }
 
@@ -74,7 +75,7 @@ namespace m8
         boost::optional<std::uint64_t> count_;
         int depth_;
         Nodes children_;
-        int children_done_;
+        unsigned int children_done_;
 
         std::mutex mutex_;
     };
