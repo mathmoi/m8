@@ -1,47 +1,28 @@
-# enable c++11 for gcc
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
-endif()
+ucm_set_runtime(STATIC)
 
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   FIND_PACKAGE ( Threads REQUIRED )
-
-  # We set maximum warnings on GCC
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
 endif()
 
 # We add boost
-find_package(Boost REQUIRED)
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)    
+set(Boost_USE_STATIC_RUNTIME     ON)
+find_package(Boost REQUIRED COMPONENTS program_options
+                                       filesystem)
 include_directories(${Boost_INCLUDE_DIRS})  
+     
+ucm_add_dirs(../../src/m8common
+             ../../src/m8chess
+             ../../src/m8
+             TO sources_files
+             RECURSIVE
+             FILTER_POP 3)
 
-file(GLOB_RECURSE common_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8common/*.hpp)
+ucm_add_target(NAME m8 
+               TYPE EXECUTABLE
+               SOURCES ${sources_files})
 
-file(GLOB_RECURSE m8chess_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8chess/*.hpp)
-
-file(GLOB_RECURSE m8_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8/*.hpp)
-
-add_executable(m8
-               ../../src/m8/m8.cpp
-               ../../src/m8/Engine.cpp
-               ../../src/m8/ShellIntrf.cpp
-               ../../src/m8/m8Intrf.cpp
-               ../../src/m8chess/Board.cpp
-               ../../src/m8common/Bb.cpp
-               ../../src/m8chess/SAN.cpp
-               ../../src/m8chess/Direction.cpp
-               ../../src/m8chess/Attacks.cpp
-               ../../src/m8chess/Perft.cpp
-               ${m8_header_files}
-               ${m8chess_header_files}
-               ${common_header_files})
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(m8 ${CMAKE_THREAD_LIBS_INIT})
-endif()
+target_link_libraries(m8 ${Boost_LIBRARIES}
+                         ${CMAKE_THREAD_LIBS_INIT})

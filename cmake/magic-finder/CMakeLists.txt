@@ -1,23 +1,23 @@
-# set flags for g++
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
-endif()
+ucm_set_runtime(STATIC)
 
-# We set maximum warnings on GCC
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  FIND_PACKAGE ( Threads REQUIRED )
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
 endif()
 
 # We add boost
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})  
+     
+ucm_add_dirs(../../src/magic-finder
+             TO sources_files
+             RECURSIVE
+             FILTER_POP 3)
+ucm_add_files(../../src/m8common/Bb.cpp
+              ../../src/m8common/Bb.hpp
+              TO sources_files
+              FILTER_POP 3)
 
-file(GLOB_RECURSE common_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/common/*.hpp)
-
-add_executable(magic-finder
-	              ../../src/magic-finder/magic-finder.cpp
-                 ../../src/m8common/Bb.cpp
-                 ${common_header_files})
+ucm_add_target(NAME m8-magic-finder
+               TYPE EXECUTABLE
+               SOURCES ${sources_files})

@@ -8,6 +8,7 @@
 
 #include "ShellIntrf.hpp"
 #include "Engine.hpp"
+#include "options/Options.hpp"
 
 namespace m8
 {
@@ -38,19 +39,29 @@ namespace m8
       /// Handles a user move.
       ///
       /// @params args_list Arguments of the command inputed by the user.
-      void HandleUserMove(std::vector<std::string> args_list);
+      void HandleUserMove(std::vector<std::string> args_list) const;
 
       /// Handles the help command.
-      void HandleHelp();
+      void HandleHelp() const;
 
       /// Handles the display command.
-      void HandleDisplay();
+      void HandleDisplay() const;
 
       /// Handled the fen command.
       void HandleFen(std::vector<std::string> args_list);
 
       /// Handle the perft command.
       void HandlePerft(std::vector<std::string> args_list);
+
+      /// Handle the options command.
+      void HandleOptions() const;
+
+      /// Handle the option command.
+      void HandleOption(std::vector<std::string> args_list) const;
+
+      void DisplayOption(const Option& option) const;
+      void DisplayOption(const std::string& option_name) const;
+      void EditOption(const std::string& option_name, const std::string& value) const;
    };
 
 }

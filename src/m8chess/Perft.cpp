@@ -5,8 +5,8 @@
 
 #include <chrono>
 #include <future>
-#include <iostream> // TODO : Remove this include
 
+#include "../m8/options/Options.hpp"
 #include "Perft.hpp"
 #include "MoveGen.hpp"
 #include "Checkmate.hpp"
@@ -81,6 +81,7 @@ namespace m8
 
     void Perft::CreateRootNodes()
     {
+        int parallel_perft_min_work_items = Options::instance().parallel_perft_min_work_items().value();
 
         MoveGen move_gen(board_);
 
@@ -91,7 +92,7 @@ namespace m8
         {
             count = AddLayer(root_, board_, move_gen);
             ++layers;
-        } while (layers < depth_ && count < 100); // TODO : Constant should be a parameter
+        } while (layers < depth_ && count < parallel_perft_min_work_items);
     }
 
     bool Perft::ReserveNode(PerftNode::Ptr node)
@@ -222,8 +223,10 @@ namespace m8
 
     std::vector<std::future<void>> Perft::StartThreads()
     {
+        int threads = Options::instance().parallel_perft_threads().value();
+
         std::vector<std::future<void>> futures;
-        for (int i = 0; i < 4; ++i) // TODO: Number of threads should be an option.
+        for (int i = 0; i < threads; ++i)
         {
             futures.push_back(std::async(std::launch::async, &Perft::RunWorkerThread, this));
         }

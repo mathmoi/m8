@@ -11,7 +11,7 @@
 #include "m8Intrf.hpp"
 #include "../m8common/stringHelpers.hpp"
 #include "../m8common/Utils.hpp"
-
+#include "options/Options.hpp"
 
 namespace m8
 {
@@ -58,6 +58,14 @@ namespace m8
             "Execute a perft test",
             "perft {Depth}",
             std::bind(&m8Intrf::HandlePerft, this, _1)));
+        shell_intrf_.AddCmd(ShellCmd("options",
+            "Display all the options and their values",
+            "options",
+            std::bind(&m8Intrf::HandleOptions, this)));
+        shell_intrf_.AddCmd(ShellCmd("option",
+            "Get or set the value of an option",
+            "option {name} [value]",
+            std::bind(&m8Intrf::HandleOption, this, _1)));
     }
 
     void m8Intrf::HandleExit()
@@ -65,12 +73,12 @@ namespace m8
         shell_intrf_.set_abort(true);
     }
 
-    void m8Intrf::HandleHelp()
+    void m8Intrf::HandleHelp() const
     {
         shell_intrf_.DisplayHelp();
     }
 
-    void m8Intrf::HandleDisplay()
+    void m8Intrf::HandleDisplay() const
     {
         std::cout << '\n' << engine_.board() << '\n' << std::endl;
     }
@@ -131,5 +139,70 @@ namespace m8
                   << " Time : " << result.seconds <<'\n'
                   << " Nodes per second: " << AddMetricSuffix(result.nodes / result.seconds, 3) << '\n'
                   <<std::endl;
+    }
+
+    void m8Intrf::HandleOptions() const
+    {
+        std::cout << '\n';
+
+        for (auto& pair : Options::instance().map())
+        {
+            std::cout << pair.second.name() <<'=' <<pair.second.ToString() <<'\n';
+        }
+
+        std::cout << std::endl;
+    }
+
+    void m8Intrf::DisplayOption(const Option& option) const
+    {
+        std::cout << '\n'
+                  << "Option name: " << option.name() << '\n'
+                  << "Description: " << option.description() << '\n'
+                  << "Value: " << option.ToString() << '\n'
+                  << std::endl;
+    }
+
+    void m8Intrf::DisplayOption(const std::string& option_name) const
+    {
+        auto& options = Options::instance();
+        auto it = options.map().find(option_name);
+        if (it != options.map().cend())
+        {
+            DisplayOption(it->second);
+        }
+        else
+        {
+            std::cout << "Option \"" << option_name << "\" does not exist." << std::endl;
+        }
+    }
+
+    void m8Intrf::EditOption(const std::string& option_name, const std::string& value) const
+    {
+        auto& options = Options::instance();
+        auto it = options.map().find(option_name);
+        if (it != options.map().end())
+        {
+            it->second.set_value(value);
+        }
+        else
+        {
+            std::cout << "Option \"" << option_name << "\" does not exist." << std::endl;
+        }
+    }
+
+    void m8Intrf::HandleOption(std::vector<std::string> args_list) const
+    {
+        if (args_list.size() == 2)
+        {
+            DisplayOption(args_list[1]);
+        }
+        else if (args_list.size() == 3)
+        {
+            EditOption(args_list[1], args_list[2]);
+        }
+        else
+        {
+            std::cout << "Usage : option {name} [value]" << std::endl;
+        }
     }
 }

@@ -1,44 +1,32 @@
-# enable c++11 for gcc
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ucm_set_runtime(STATIC)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  FIND_PACKAGE ( Threads REQUIRED )
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
 endif()
 
-# We set maximum warnings on GCC
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  # Update if necessary
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
-endif()
+# We add boost
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)    
+set(Boost_USE_STATIC_RUNTIME     ON)
+find_package(Boost REQUIRED COMPONENTS program_options
+                                       filesystem)
+include_directories(${Boost_INCLUDE_DIRS})  
+find_package(Boost REQUIRED COMPONENTS program_options
+                                       filesystem)
+include_directories(${Boost_INCLUDE_DIRS})  
+     
+ucm_add_dirs(../../src/m8common
+             ../../src/m8chess
+             ../../src/tests
+             ../../src/m8/options
+             TO sources_files
+             RECURSIVE
+             FILTER_POP 3)
 
-file(GLOB_RECURSE common_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8common/*.hpp)
+ucm_add_target(NAME m8_tests 
+               TYPE EXECUTABLE
+               SOURCES ${sources_files})
 
-file(GLOB_RECURSE m8chess_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8chess/*.hpp)
-
-file(GLOB_RECURSE m8_header_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/m8/*.hpp)
-
-add_executable(m8_tests
-               ../../src/tests/tests_main.cpp
-               ../../src/tests/Sq_tests.cpp
-               ../../src/tests/Bb_tests.cpp
-               ../../src/tests/Piece_tests.cpp
-               ../../src/tests/Board_tests.cpp
-               ../../src/tests/Move_tests.cpp
-               ../../src/tests/MoveGen_tests.cpp
-               ../../src/tests/Attacks_tests.cpp
-               ../../src/tests/Checkmate_tests.cpp
-               ../../src/tests/XRay_tests.cpp
-               ../../src/tests/catch.hpp
-               ../../src/m8chess/Board.cpp
-               ../../src/m8common/Bb.cpp
-               ../../src/m8chess/SAN.cpp
-               ../../src/m8chess/Direction.cpp
-               ../../src/m8chess/Attacks.cpp
-               ../../src/tests/SAN_tests.cpp
-               ${m8_header_files}
-               ${m8chess_header_files}
-               ${common_header_files})
+target_link_libraries(m8_tests ${Boost_LIBRARIES}
+                               ${CMAKE_THREAD_LIBS_INIT})
