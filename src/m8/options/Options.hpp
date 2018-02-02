@@ -31,24 +31,34 @@ namespace m8
         /// Get the only instance of the class (Singleton pattern)
         inline static Options& instance();
 
+        /// Delete the copy constructor
+        Options(Options const&) = delete;
+
+        /// Delete the copy operator
+        void operator=(Options const&) = delete;
+
         // Create the get functions for all the options
         OPTIONS_DEFINITIONS(OPTIONS_ACCESSORS)
 
         /// Give read only access to the options map.
         inline const Storage& map() const { return options_; }
 
-        /// Read the options from the command line and a file
+        /// Read the options from the command line
         ///
         /// @param argc  Number of arguments on the command line. This information is 
         ///              passed to the main function.
         /// @param argv  Values of the arguments.
-        /// @param file  Stream opened on a file containings options.
         /// @param out   Output stream the function can use to display informations to 
         ///              the user.
         /// @returns     A boolean value indicating if we must stop the execution. This 
         ///              will be set to true if the users asked to display to availables
         ///              options.
-        bool ReadOptions(int argc, char** argv, std::istream& file, std::ostream& out);
+        bool ReadOptions(int argc, char** argv, std::ostream& out);
+
+        /// Read the options from a file
+        ///
+        /// @param file  Stream opened on a file containings options.
+        void ReadOptions(std::istream& file);
 
         /// Create a new options file on the provided stream.
         void CreateOptionsFile(std::ostream& out);

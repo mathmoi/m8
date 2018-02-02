@@ -14,18 +14,24 @@
 
 bool ReadOptions(int argc, char* argv[])
 {
-    auto options = m8::Options::instance();
+    auto& options = m8::Options::instance();
 
-    if (!boost::filesystem::exists("m8.ini"))
+    bool ini_file_exists = boost::filesystem::exists("m8.ini");
+    if (ini_file_exists)
+    {
+        std::ifstream m8_ini("m8.ini");
+        options.ReadOptions(m8_ini);
+        m8_ini.close();
+    }
+    
+    bool stop_execution = options.ReadOptions(argc, argv, std::cout);
+
+    if (!ini_file_exists && options.ini().value())
     {
         std::ofstream ofile("m8.ini");
         options.CreateOptionsFile(ofile);
         ofile.close();
     }
-
-    std::ifstream m8_ini("m8.ini");
-    bool stop_execution = options.ReadOptions(argc, argv, m8_ini, std::cout);
-    m8_ini.close();
 
     return stop_execution;
 }

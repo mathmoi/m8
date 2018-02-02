@@ -15,6 +15,10 @@
           "Minimum number of work item the perft load is separated in.", \
           int,                                                           \
           100)                                                           \
+    macro(ini,                                                           \
+          "Generate a m8.ini file if one can not be found.",             \
+          bool,                                                          \
+          false)                                                         \
                                    
 #endif // M8_OPTIONS_DEFINITIONS_HPP_
 

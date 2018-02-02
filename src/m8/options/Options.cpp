@@ -28,14 +28,13 @@ namespace m8
         return desc;
     }
 
-    bool Options::ReadOptions(int argc, char** argv, std::istream& file, std::ostream& out)
+    bool Options::ReadOptions(int argc, char** argv, std::ostream& out)
     {
         bool stop_execution = false;
 
         auto desc = GenerateOptionsDescriptions();
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::store(po::parse_config_file(file, desc), vm);
         po::notify(vm);
 
         if (vm.count("help")) {
@@ -49,6 +48,16 @@ namespace m8
 
 
         return stop_execution;
+    }
+
+    void Options::ReadOptions(std::istream& file)
+    {
+        auto desc = GenerateOptionsDescriptions();
+        po::variables_map vm;
+        po::store(po::parse_config_file(file, desc), vm);
+        po::notify(vm);
+        
+        OPTIONS_DEFINITIONS(OPTIONS_READ_VALUES_PO)
     }
 
     void Options::CreateOptionsFile(std::ostream& out)
