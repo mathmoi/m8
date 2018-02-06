@@ -12,6 +12,11 @@
 #include "../m8common/stringHelpers.hpp"
 #include "../m8common/Utils.hpp"
 #include "options/Options.hpp"
+#include "../m8common/logging.hpp"
+
+// This macro can be used in the m8Intrf class to output both to std::cout and to the log system.
+#define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
+#define M8_EMPTY_LINE()  std::cout <<std::endl;
 
 namespace m8
 {
@@ -53,11 +58,11 @@ namespace m8
         shell_intrf_.AddCmd(ShellCmd("fen",
             "Get or set the position of the board as a XFen string",
             "fen [XFenString]",
-            std::bind(&m8Intrf::HandleFen, this, _1)));
+            std::bind(&m8Intrf::HandleFen, this, std::placeholders::_1)));
         shell_intrf_.AddCmd(ShellCmd("perft",
             "Execute a perft test",
             "perft {Depth}",
-            std::bind(&m8Intrf::HandlePerft, this, _1)));
+            std::bind(&m8Intrf::HandlePerft, this, std::placeholders::_1)));
         shell_intrf_.AddCmd(ShellCmd("options",
             "Display all the options and their values",
             "options",
@@ -65,7 +70,7 @@ namespace m8
         shell_intrf_.AddCmd(ShellCmd("option",
             "Get or set the value of an option",
             "option {name} [value]",
-            std::bind(&m8Intrf::HandleOption, this, _1)));
+            std::bind(&m8Intrf::HandleOption, this, std::placeholders::_1)));
     }
 
     void m8Intrf::HandleExit()
@@ -80,14 +85,16 @@ namespace m8
 
     void m8Intrf::HandleDisplay() const
     {
-        std::cout << '\n' << engine_.board() << '\n' << std::endl;
+        M8_EMPTY_LINE();
+        M8_OUT_LINE(<< engine_.board());
+        M8_EMPTY_LINE();
     }
 
     void m8Intrf::HandleFen(std::vector<std::string> args_list)
     {
         if (args_list.size() == 1)
         {
-            std::cout <<' ' << engine_.board().fen() << std::endl;
+            M8_OUT_LINE(<<' ' << engine_.board().fen());
         }
         else
         {
@@ -99,7 +106,7 @@ namespace m8
             }
             catch (InvalFenError)
             {
-                std::cout << "Invalid fen string." << std::endl;
+                M8_OUT_LINE(<< "Invalid fen string.");
             }
         }
     }
@@ -109,7 +116,7 @@ namespace m8
         // Check number of arguments
         if (args_list.size() != 2)
         {
-            std::cout << "Usage : perft {Depth}" << std::endl;
+            M8_OUT_LINE(<< "Usage : perft {Depth}");
             return;
         }
 
@@ -121,50 +128,50 @@ namespace m8
         }
         catch (BadConvr exc)
         {
-            std::cout << "Usage : perft {Depth}" << std::endl;
+            M8_OUT_LINE(<< "Usage : perft {Depth}");
             return;
         }
 
         if (depth < 1 || 255 < depth)
         {
-            std::cout << "The depth must be between 1 and 255" << std::endl;
+            M8_OUT_LINE(<<"The depth must be between 1 and 255");
         }
 
-        std::cout << '\n';
+        M8_EMPTY_LINE();
 
-        auto result = engine_.Perft(depth, [](std::string move, std::uint64_t count) { std::cout << ' ' << move << '\t' << count << std::endl; });
+        auto result = engine_.Perft(depth, [](std::string move, std::uint64_t count) { M8_OUT_LINE(<< ' ' << move << '\t' << count); });
 
-        std::cout << '\n'
-                  << " Nodes: " << result.nodes <<'\n'
-                  << " Time : " << result.seconds <<'\n'
-                  << " Nodes per second: " << AddMetricSuffix(result.nodes / result.seconds, 3) << '\n'
-                  <<std::endl;
+        M8_EMPTY_LINE();
+        M8_OUT_LINE(<< " Nodes: " << result.nodes);
+        M8_OUT_LINE(<< " Time : " << result.seconds);
+        M8_OUT_LINE(<< " Nodes per second: " << AddMetricSuffix(result.nodes / static_cast<std::uint64_t>(result.seconds), 3));
+        M8_EMPTY_LINE();
     }
 
     void m8Intrf::HandleOptions() const
     {
-        std::cout << '\n';
+        M8_EMPTY_LINE();
 
-        for (auto& pair : Options::instance().map())
+        for (auto& pair : Options::get().map())
         {
-            std::cout << pair.second.name() <<'=' <<pair.second.ToString() <<'\n';
+            M8_OUT_LINE(<<pair.second.name() <<'=' <<pair.second.ToString());
         }
 
-        std::cout << std::endl;
+        M8_EMPTY_LINE();
     }
 
     void m8Intrf::DisplayOption(const Option& option) const
     {
-        std::cout << '\n'
-                  << "Option name: " << option.name() << '\n'
-                  << "Description: " << option.description() << '\n'
-                  << "Value: " << option.ToString() << '\n'
-                  << std::endl;
+        M8_EMPTY_LINE();
+        M8_OUT_LINE(<<"Option name: " << option.name());
+        M8_OUT_LINE(<<"Description: " << option.description());
+        M8_OUT_LINE(<<"Value: " << option.ToString());
+        M8_EMPTY_LINE();
     }
 
     void m8Intrf::DisplayOption(const std::string& option_name) const
     {
-        auto& options = Options::instance();
+        auto& options = Options::get();
         auto it = options.map().find(option_name);
         if (it != options.map().cend())
         {
@@ -172,13 +179,13 @@ namespace m8
         }
         else
         {
-            std::cout << "Option \"" << option_name << "\" does not exist." << std::endl;
+            M8_OUT_LINE(<< "Option \"" << option_name << "\" does not exist.");
         }
     }
 
     void m8Intrf::EditOption(const std::string& option_name, const std::string& value) const
     {
-        auto& options = Options::instance();
+        auto& options = Options::get();
         auto it = options.map().find(option_name);
         if (it != options.map().end())
         {
@@ -186,7 +193,7 @@ namespace m8
         }
         else
         {
-            std::cout << "Option \"" << option_name << "\" does not exist." << std::endl;
+            M8_OUT_LINE(<< "Option \"" << option_name << "\" does not exist.");
         }
     }
 
@@ -202,7 +209,7 @@ namespace m8
         }
         else
         {
-            std::cout << "Usage : option {name} [value]" << std::endl;
+            M8_OUT_LINE(<< "Usage : option {name} [value]");
         }
     }
 }

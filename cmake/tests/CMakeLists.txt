@@ -1,6 +1,6 @@
 ucm_set_runtime(STATIC)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   FIND_PACKAGE ( Threads REQUIRED )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
 endif()
@@ -10,11 +10,9 @@ set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)    
 set(Boost_USE_STATIC_RUNTIME     ON)
 find_package(Boost REQUIRED COMPONENTS program_options
-                                       filesystem)
-include_directories(${Boost_INCLUDE_DIRS})  
-find_package(Boost REQUIRED COMPONENTS program_options
-                                       filesystem)
-include_directories(${Boost_INCLUDE_DIRS})  
+                                       filesystem
+                                       log)
+include_directories(${Boost_INCLUDE_DIRS})
      
 ucm_add_dirs(../../src/m8common
              ../../src/m8chess

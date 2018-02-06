@@ -10,6 +10,7 @@
 #include "Perft.hpp"
 #include "MoveGen.hpp"
 #include "Checkmate.hpp"
+#include "../m8common/logging.hpp"
 
 namespace m8
 {
@@ -81,7 +82,7 @@ namespace m8
 
     void Perft::CreateRootNodes()
     {
-        int parallel_perft_min_work_items = Options::instance().parallel_perft_min_work_items().value();
+        int parallel_perft_min_work_items = Options::get().parallel_perft_min_work_items().value();
 
         MoveGen move_gen(board_);
 
@@ -149,7 +150,7 @@ namespace m8
         }
     }
 
-    void Perft::PropagateResult(PerftNode::Ptr node)
+    void Perft::PropagateResultParent(PerftNode::Ptr node)
     {
         std::lock_guard<std::mutex> lock(node->mutex());
 
@@ -170,7 +171,7 @@ namespace m8
 
         if (node->parent())
         {
-            PropagateResult(node->parent());
+            PropagateResultParent(node->parent());
         }
 
         if (node->parent() == root_)
@@ -202,12 +203,15 @@ namespace m8
 
         if (node->parent())
         {
-            PropagateResult(node->parent());
+            PropagateResultParent(node->parent());
         }
     }
 
     void Perft::RunWorkerThread()
     {
+        M8_LOG_SCOPE_THREAD();
+        M8_DEBUG << "Thread started";
+
         PerftNode::Ptr node = PickNode(root_);
         while (node)
         {
@@ -219,11 +223,13 @@ namespace m8
             
             node = PickNode(root_);
         }
+
+        M8_DEBUG << "Thread finished";
     }
 
     std::vector<std::future<void>> Perft::StartThreads()
     {
-        int threads = Options::instance().parallel_perft_threads().value();
+        int threads = Options::get().parallel_perft_threads().value();
 
         std::vector<std::future<void>> futures;
         for (int i = 0; i < threads; ++i)

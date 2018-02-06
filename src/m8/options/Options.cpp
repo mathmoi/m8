@@ -9,9 +9,9 @@
 
 #include "Options.hpp"
 
-#define OPTIONS_ADD_OPTIONS_PO(name, desc, type, default_value)     (boost::replace_all_copy(std::string(#name), "_", "-").c_str(), po::value<type>(), desc)
-#define OPTIONS_READ_VALUES_PO(name, desc, type, default_value)     if (vm.count(boost::replace_all_copy(std::string(#name), "_", "-"))) {name##_.set_value(vm.at(boost::replace_all_copy(std::string(#name), "_", "-")).as<type>());}
-#define OPTIONS_OUTPUT_FILE(name, desc, type, default_value)        <<"# " <<desc <<"\n#" <<boost::replace_all_copy(std::string(#name), "_", "-") <<'=' <<default_value <<"\n\n"
+#define M8_OPTIONS_ADD_OPTIONS_PO(name, desc, type, default_value)     (boost::replace_all_copy(std::string(#name), "_", "-").c_str(), po::value<type>(), desc)
+#define M8_OPTIONS_READ_VALUES_PO(name, desc, type, default_value)     if (vm.count(boost::replace_all_copy(std::string(#name), "_", "-"))) {name##_.set_value(vm.at(boost::replace_all_copy(std::string(#name), "_", "-")).as<type>());}
+#define M8_OPTIONS_OUTPUT_FILE(name, desc, type, default_value)        <<"# " <<desc <<"\n#" <<boost::replace_all_copy(std::string(#name), "_", "-") <<'=' <<default_value <<"\n\n"
 
 namespace po = boost::program_options;
 
@@ -22,8 +22,7 @@ namespace m8
         po::options_description desc("Allowed options");
         desc.add_options()
             ("help", "produce help message")
-            OPTIONS_DEFINITIONS(OPTIONS_ADD_OPTIONS_PO)
-            ;
+            M8_OPTIONS_DEFINITIONS(M8_OPTIONS_ADD_OPTIONS_PO);
 
         return desc;
     }
@@ -43,7 +42,7 @@ namespace m8
         }
         else
         {
-            OPTIONS_DEFINITIONS(OPTIONS_READ_VALUES_PO)
+            M8_OPTIONS_DEFINITIONS(M8_OPTIONS_READ_VALUES_PO)
         }
 
 
@@ -57,11 +56,11 @@ namespace m8
         po::store(po::parse_config_file(file, desc), vm);
         po::notify(vm);
         
-        OPTIONS_DEFINITIONS(OPTIONS_READ_VALUES_PO)
+        M8_OPTIONS_DEFINITIONS(M8_OPTIONS_READ_VALUES_PO)
     }
 
     void Options::CreateOptionsFile(std::ostream& out)
     {
-        out OPTIONS_DEFINITIONS(OPTIONS_OUTPUT_FILE);
+        out M8_OPTIONS_DEFINITIONS(M8_OPTIONS_OUTPUT_FILE);
     }
 }

@@ -1,6 +1,6 @@
 ucm_set_runtime(STATIC)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   FIND_PACKAGE ( Threads REQUIRED )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
 endif()

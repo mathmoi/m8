@@ -116,7 +116,7 @@ namespace m8
         PerftResult CreateResult(const std::chrono::duration<double> &time_span);
         bool ReserveNode(PerftNode::Ptr node);
         void GetBoard(Board& board, PerftNode::Ptr node);
-        void PropagateResult(PerftNode::Ptr node);
+        void PropagateResultParent(PerftNode::Ptr node);
         void CompleteInternalNode(PerftNode::Ptr node);
         std::uint64_t CalculateSumChildren(PerftNode::Ptr node);
     };

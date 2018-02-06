@@ -9,6 +9,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "ShellIntrf.hpp"
+#include "../m8common/logging.hpp"
 
 namespace m8
 {
@@ -41,6 +42,8 @@ namespace m8
             // Get a command from the input stream.
             std::cout << invit_;
             std::getline(std::cin, input);
+
+            M8_INPUT << input;
 
             if (input.length() > 0)
             {

@@ -15,11 +15,11 @@
 #include "OptionsDefinitions.hpp"
 #include "Option.hpp"
 
-#define OPTIONS_PRIVATE_ATTRIBUTES(name, desc, type, default_value)            TypedOption<type> name##_;
-#define OPTIONS_DEFAULT_VALUES_INITIALISATION(name, desc, type, default_value) name##_ = default_value;
-#define OPTIONS_ACCESSORS(name, desc, type, default_value)                     TypedOption<type> name() const { return name##_; };
-#define OPTIONS_INITIALISATION(name, desc, type, default_value)                name##_(boost::replace_all_copy(std::string(#name), "_", "-"), desc, default_value),
-#define OPTIONS_CREATE_MAP(name, desc, type, default_value)                    options_.emplace(boost::replace_all_copy(std::string(#name), "_", "-"), name##_);
+#define M8_OPTIONS_PRIVATE_ATTRIBUTES(name, desc, type, default_value)            TypedOption<type> name##_;
+#define M8_OPTIONS_DEFAULT_VALUES_INITIALISATION(name, desc, type, default_value) name##_ = default_value;
+#define M8_OPTIONS_ACCESSORS(name, desc, type, default_value)                     TypedOption<type> name() const { return name##_; };
+#define M8_OPTIONS_INITIALISATION(name, desc, type, default_value)                name##_(boost::replace_all_copy(std::string(#name), "_", "-"), desc, default_value),
+#define M8_OPTIONS_CREATE_MAP(name, desc, type, default_value)                    options_.emplace(boost::replace_all_copy(std::string(#name), "_", "-"), name##_);
 
 namespace m8
 {
@@ -29,7 +29,7 @@ namespace m8
         typedef std::map<std::string, Option&> Storage;
 
         /// Get the only instance of the class (Singleton pattern)
-        inline static Options& instance();
+        inline static Options& get();
 
         /// Delete the copy constructor
         Options(Options const&) = delete;
@@ -38,7 +38,7 @@ namespace m8
         void operator=(Options const&) = delete;
 
         // Create the get functions for all the options
-        OPTIONS_DEFINITIONS(OPTIONS_ACCESSORS)
+        M8_OPTIONS_DEFINITIONS(M8_OPTIONS_ACCESSORS)
 
         /// Give read only access to the options map.
         inline const Storage& map() const { return options_; }
@@ -67,13 +67,13 @@ namespace m8
         /// Private constructor to prevent initialisation outside the class (Singleton 
         /// pattern).
         Options()
-            : OPTIONS_DEFINITIONS(OPTIONS_INITIALISATION) options_()
+            : M8_OPTIONS_DEFINITIONS(M8_OPTIONS_INITIALISATION) options_()
         {
-            OPTIONS_DEFINITIONS(OPTIONS_CREATE_MAP)
+            M8_OPTIONS_DEFINITIONS(M8_OPTIONS_CREATE_MAP)
         }
 
         // Generate the privates attributes that will contains the options values.
-        OPTIONS_DEFINITIONS(OPTIONS_PRIVATE_ATTRIBUTES)
+        M8_OPTIONS_DEFINITIONS(M8_OPTIONS_PRIVATE_ATTRIBUTES)
 
         Storage options_;
 
@@ -81,7 +81,7 @@ namespace m8
         static boost::program_options::options_description GenerateOptionsDescriptions();
     };
 
-    inline Options& Options::instance()
+    inline Options& Options::get()
     {
         static Options options;
         return options;

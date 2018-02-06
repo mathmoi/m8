@@ -1,16 +1,24 @@
 ucm_set_runtime(STATIC)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  FIND_PACKAGE ( Threads REQUIRED )
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    FIND_PACKAGE ( Threads REQUIRED )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
 endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DM8_MAX_LOG_SEVERITY=M8_SEVERITY_TRACE")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DM8_MAX_LOG_SEVERITY=M8_SEVERITY_INPUT")
 
 # We add boost
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)    
 set(Boost_USE_STATIC_RUNTIME     ON)
 find_package(Boost REQUIRED COMPONENTS program_options
-                                       filesystem)
+                                       filesystem
+                                       log)
 include_directories(${Boost_INCLUDE_DIRS})  
      
 ucm_add_dirs(../../src/m8common
