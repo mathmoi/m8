@@ -1,10 +1,13 @@
 /// @file   tests_main.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains the Catch framework main function.
 
 #define CATCH_CONFIG_RUNNER
+
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #include "catch.hpp"
+#pragma GCC diagnostic pop
 
 #include "../m8common/m8common.hpp"
 #include "../m8chess/m8chess.hpp"

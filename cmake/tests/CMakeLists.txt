@@ -2,7 +2,7 @@ ucm_set_runtime(STATIC)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   FIND_PACKAGE ( Threads REQUIRED )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -pedantic -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -Wno-unknown-pragmas -pedantic -std=c++11")
 endif()
 
 # We add boost
@@ -26,5 +26,5 @@ ucm_add_target(NAME m8_tests
                TYPE EXECUTABLE
                SOURCES ${sources_files})
 
-target_link_libraries(m8_tests ${Boost_LIBRARIES}
+target_link_libraries(m8_tests ${Boost_LIBRARIES} ${Boost_LIBRARIES}
                                ${CMAKE_THREAD_LIBS_INIT})

@@ -1,5 +1,5 @@
 /// @file   logging.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2018
 /// @brief  Contains functionalities to log informations to a log file.
 
@@ -63,9 +63,9 @@ namespace m8
     }
 
     //Defines a global logger initialization routine
-    BOOST_LOG_GLOBAL_LOGGER_INIT(logger, logger_type)
+    BOOST_LOG_GLOBAL_LOGGER_INIT(logger, LoggerType)
     {
-        logger_type lg;
+        LoggerType lg;
 
         logging::add_common_attributes();
 

@@ -144,7 +144,7 @@ namespace m8
         M8_EMPTY_LINE();
         M8_OUT_LINE(<< " Nodes: " << result.nodes);
         M8_OUT_LINE(<< " Time : " << result.seconds);
-        M8_OUT_LINE(<< " Nodes per second: " << AddMetricSuffix(result.nodes / static_cast<std::uint64_t>(result.seconds), 3));
+        M8_OUT_LINE(<< " Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(result.nodes / result.seconds), 3));
         M8_EMPTY_LINE();
     }
 
