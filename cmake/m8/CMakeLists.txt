@@ -32,5 +32,8 @@ ucm_add_target(NAME m8
                TYPE EXECUTABLE
                SOURCES ${sources_files})
 
+file(COPY        ../../resources/m8.json
+     DESTINATION .)
+
 target_link_libraries(m8 ${Boost_LIBRARIES}
                          ${CMAKE_THREAD_LIBS_INIT})

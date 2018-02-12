@@ -1,0 +1,45 @@
+{
+   "perft" : {
+      "threads" : 8,
+      "min-works-items" : 100
+   },
+   "max-log-severity" : 0,
+   "psqt" : {
+      "pawn": {
+         "columns" : [2, 0, 3, 0],
+         "rows" : [0, 0, 0, 0, 0, 0, 0, 0],
+         "corners": [0, 0],
+         "center" : [0, 0, 0]
+      },
+      "rook": {
+         "columns" : [0, 0, 0, 0],
+         "rows" : [0, 0, 0, 0, 0, 0, 0, 0],
+         "corners": [0, 0],
+         "center" : [0, 0, 0]
+      },
+      "knight": {
+         "columns" : [0, 0, 0, 0],
+         "rows" : [0, 0, 0, 0, 0, 0, 0, 0],
+         "corners": [0, 0],
+         "center" : [0, 0, 0]
+      },
+      "bishop": {
+         "columns" : [0, 0, 0, 0],
+         "rows" : [0, 0, 0, 0, 0, 0, 0, 0],
+         "corners": [0, 0],
+         "center" : [0, 0, 0]
+      },
+      "king": {
+         "columns" : [0, 0, 0, 0],
+         "rows" : [0, 0, 0, 0, 0, 0, 0, 0],
+         "corners": [0, 0],
+         "center" : [0, 0, 0]
+      },
+      "queen": {
+         "columns" : [0, 0, 0, 0],
+         "rows" : [0, 0, 0, 0, 0, 0, 0, 0],
+         "corners": [0, 0],
+         "center" : [0, 0, 0]
+      }
+   }
+}
