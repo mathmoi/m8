@@ -1,5 +1,5 @@
 /// @file   Options.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   January 2017
 /// @brief  Contains the declarations of the Options class that handles m8 command line 
 ///         parameters and m8.ini file.
@@ -17,7 +17,7 @@ namespace po = boost::program_options;
 namespace pt = boost::property_tree;
 
 #define M8_DESC_OPTIONS(name, desc, ref, type)      (name, po::value<type>(&options.ref), desc)
-#define M8_ADD_OPTIONS(name, desc, ref, type)       AddOption(name, desc, this->##ref);
+#define M8_ADD_OPTIONS(name, desc, ref, type)       AddOption(name, desc, this-> ref);
 
 namespace m8
 {
@@ -50,7 +50,7 @@ namespace m8
         {
             if (index < an_array.size())
             {
-                an_array[index++] = value_tree.second.get_value<T::value_type>();
+                an_array[index++] = value_tree.second.get_value<typename T::value_type>();
             }
         }
     }
