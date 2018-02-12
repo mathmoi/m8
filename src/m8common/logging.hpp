@@ -7,6 +7,7 @@
 #define M8_LOGGING_HPP_
 
 #include <boost/thread/thread.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <boost/log/trivial.hpp>
 #include <boost/log/attributes/scoped_attribute.hpp>
@@ -24,17 +25,19 @@
 
 namespace m8
 {
-#define M8_SEVERITY_TRACE       7
-#define M8_SEVERITY_DEBUG       6
-#define M8_SEVERITY_INPUT       5
-#define M8_SEVERITY_OUTPUT      4
-#define M8_SEVERITY_INFO        3
-#define M8_SEVERITY_WARNING     2
-#define M8_SEVERITY_ERROR       1
-#define M8_SEVERITY_FATAL       0
+#define M8_SEVERITY_TRACE       8
+#define M8_SEVERITY_DEBUG       7
+#define M8_SEVERITY_INPUT       6
+#define M8_SEVERITY_OUTPUT      5
+#define M8_SEVERITY_INFO        4
+#define M8_SEVERITY_WARNING     3
+#define M8_SEVERITY_ERROR       2
+#define M8_SEVERITY_FATAL       1
+#define M8_SEVERITY_NONE        0
 
-    enum severity_level
+    enum class severity_level
     {
+        none    = M8_SEVERITY_NONE,
         fatal   = M8_SEVERITY_FATAL,
         error   = M8_SEVERITY_ERROR,
         warning = M8_SEVERITY_WARNING,
@@ -42,7 +45,7 @@ namespace m8
         output  = M8_SEVERITY_OUTPUT,
         input   = M8_SEVERITY_INPUT,
         debug   = M8_SEVERITY_DEBUG,
-        trace   = M8_SEVERITY_TRACE
+        trace   = M8_SEVERITY_TRACE,
     };
 
     typedef boost::log::sources::severity_logger_mt<severity_level> LoggerType;
@@ -52,54 +55,74 @@ namespace m8
     std::ostream& operator<<(std::ostream& out, severity_level level);
 }
 
+namespace boost {
+    template<>
+    inline m8::severity_level lexical_cast(const std::string& str)
+    {
+        static const std::map<std::string, m8::severity_level> map = 
+        {
+            { "none",    m8::severity_level::none },
+            { "fatal",   m8::severity_level::fatal },
+            { "error",   m8::severity_level::error },
+            { "warning", m8::severity_level::warning },
+            { "info",    m8::severity_level::info },
+            { "output",  m8::severity_level::output },
+            { "input",   m8::severity_level::input },
+            { "debug",   m8::severity_level::debug },
+            { "trace",   m8::severity_level::trace }
+        };
+        return map.at(str);
+    }
+}
+
 #define M8_LOG(level)   BOOST_LOG_SEV(m8::logger::get(), level)
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_TRACE
-#   define M8_TRACE        M8_LOG(::m8::trace)
+#   define M8_TRACE        M8_LOG(::m8::severity_level::trace)
 #else
-#   define M8_TRACE        if (false) M8_LOG(::m8::trace)
+#   define M8_TRACE        if (false) M8_LOG(::m8::severity_level::trace)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_DEBUG
-#   define M8_DEBUG        M8_LOG(::m8::debug)
+#   define M8_DEBUG        M8_LOG(::m8::severity_level::debug)
 #else
-#   define M8_DEBUG        if (false) M8_LOG(::m8::debug)
+#   define M8_DEBUG        if (false) M8_LOG(::m8::severity_level::debug)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_INPUT
-#   define M8_INPUT        M8_LOG(::m8::input)
+#   define M8_INPUT        M8_LOG(::m8::severity_level::input)
 #else
-#   define M8_INPUT        if (false) M8_LOG(::m8::input)
+#   define M8_INPUT        if (false) M8_LOG(::m8::severity_level::input)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_OUTPUT
-#   define M8_OUTPUT       M8_LOG(::m8::output)
+#   define M8_OUTPUT       M8_LOG(::m8::severity_level::output)
 #else
-#   define M8_OUTPUT       if (false) M8_LOG(::m8::output)
+#   define M8_OUTPUT       if (false) M8_LOG(::m8::severity_level::output)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_INFO
-#   define M8_INFO         M8_LOG(::m8::info)
+#   define M8_INFO         M8_LOG(::m8::severity_level::info)
 #else
-#   define M8_INFO         if (false) M8_LOG(::m8::info)
+#   define M8_INFO         if (false) M8_LOG(::m8::severity_level::info)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_WARNING
-#   define M8_WARNING      M8_LOG(::m8::warning)
+#   define M8_WARNING      M8_LOG(::m8::severity_level::warning)
 #else
-#   define M8_WARNING      if (false) M8_LOG(::m8::warning)
+#   define M8_WARNING      if (false) M8_LOG(::m8::severity_level::warning)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_ERROR
-#   define M8_ERROR        M8_LOG(::m8::error)
+#   define M8_ERROR        M8_LOG(::m8::severity_level::error)
 #else
-#   define M8_ERROR        if (false) M8_LOG(::m8::error)
+#   define M8_ERROR        if (false) M8_LOG(::m8::severity_level::error)
 #endif
 
 #if M8_MAX_LOG_SEVERITY >= M8_SEVERITY_FATAL
-#   define M8_FATAL        M8_LOG(::m8::fatal)
+#   define M8_FATAL        M8_LOG(::m8::severity_level::fatal)
 #else
-#   define M8_FATAL        if (false) M8_LOG(::m8::fatal)
+#   define M8_FATAL        if (false) M8_LOG(::m8::severity_level::fatal)
 #endif
 
 #endif // M8_LOGGING_HPP_

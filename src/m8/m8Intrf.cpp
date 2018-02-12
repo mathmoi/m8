@@ -152,10 +152,10 @@ namespace m8
     {
         M8_EMPTY_LINE();
 
-        for (auto& pair : Options::get().map())
+        for (auto& pair : Options::get().modifiable_options_map())
         {
-            M8_OUT_LINE(<<pair.second.name() <<'=' <<pair.second.ToString());
-        }
+            M8_OUT_LINE(<<pair.second->name() <<'=' <<pair.second->ToString());
+        }   
 
         M8_EMPTY_LINE();
     }
@@ -172,10 +172,10 @@ namespace m8
     void m8Intrf::DisplayOption(const std::string& option_name) const
     {
         auto& options = Options::get();
-        auto it = options.map().find(option_name);
-        if (it != options.map().cend())
+        auto it = options.modifiable_options_map().find(option_name);
+        if (it != options.modifiable_options_map().cend())
         {
-            DisplayOption(it->second);
+            DisplayOption(*it->second);
         }
         else
         {
@@ -186,10 +186,10 @@ namespace m8
     void m8Intrf::EditOption(const std::string& option_name, const std::string& value) const
     {
         auto& options = Options::get();
-        auto it = options.map().find(option_name);
-        if (it != options.map().end())
+        auto it = options.modifiable_options_map().find(option_name);
+        if (it != options.modifiable_options_map().end())
         {
-            it->second.set_value(value);
+            it->second->set_value(value);
         }
         else
         {

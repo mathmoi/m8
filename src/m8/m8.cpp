@@ -17,35 +17,10 @@ namespace m8
 {
     bool ReadOptions(int argc, char* argv[])
     {
+        ReadOptionsFromFile("m8.json");
 
-        auto& options = m8::Options::get();
-
-        bool ini_file_exists = boost::filesystem::exists("m8.ini");
-        if (ini_file_exists)
-        {
-            std::ifstream m8_ini("m8.ini");
-            options.ReadOptions(m8_ini);
-            m8_ini.close();
-        }
-
-        bool stop_execution = options.ReadOptions(argc, argv, std::cout);
-
-        if (!ini_file_exists && options.ini().value())
-        {
-            std::ofstream ofile("m8.ini");
-            options.CreateOptionsFile(ofile);
-            ofile.close();
-        }
-
+        bool stop_execution = ReadOptionsFromCommandLine(argc, argv, std::cout);
         return stop_execution;
-    }
-
-    void LogOptions()
-    {
-        for (auto& pair : Options::get().map())
-        {
-            M8_INFO <<"Option " << pair.second.name() << '=' << pair.second.ToString();
-        }
     }
 }
 
@@ -65,7 +40,6 @@ int main(int argc, char* argv[])
 
     try {
         bool stop_execution = m8::ReadOptions(argc, argv);
-        m8::LogOptions();
 
         if (!stop_execution)
         {

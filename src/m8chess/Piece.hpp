@@ -51,14 +51,25 @@ namespace m8
        { 'R', kRook },
    };
 
+   /// Map that can be used to translate from character to piece type.
+   const std::unordered_map<std::string, PieceType> name_to_piece_type_map =
+   {
+       { "pawn",   kPawn },
+       { "knight", kKnight },
+       { "king",   kKing },
+       { "queen",  kQueen },
+       { "bishop", kBishop },
+       { "rook",   kRook },
+   };
+
    const std::unordered_map<PieceType, char> piece_type_to_char_map = 
    {
-       { kPawn, 'P'},
-       { kKnight, 'N'},
-       { kKing, 'K' },
-       { kQueen, 'Q' },
+       { kPawn,   'P' },
+       { kKnight, 'N' },
+       { kKing,   'K' },
+       { kQueen,  'Q' },
        { kBishop, 'B' },
-       { kRook, 'R' }
+       { kRook,   'R' }
    };
 
    /// Indicate if a value is a valid PieceType.
@@ -118,6 +129,23 @@ namespace m8
 
        auto it = char_to_piece_type_map.find(c);
        if (it != char_to_piece_type_map.end())
+       {
+           piece_type = it->second;
+       }
+
+       return piece_type;
+   }
+
+   /// Get the PieceType from a name.
+   ///
+   /// @returns The piece type or kNoPieceType if the name does not represents 
+   ///          a known piece type.
+   inline PieceType GetPieceTypeFromName(const std::string& name)
+   {
+       PieceType piece_type = kNoPieceType;
+
+       auto it = name_to_piece_type_map.find(name);
+       if (it != name_to_piece_type_map.end())
        {
            piece_type = it->second;
        }

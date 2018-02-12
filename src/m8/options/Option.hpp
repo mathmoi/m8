@@ -37,7 +37,7 @@ namespace m8
     {
     public:
         /// Constructor
-        TypedOption(const std::string& name, const std::string& description, T value)
+        TypedOption(const std::string& name, const std::string& description, T& value)
             : Option(name, description), value_(value)
         {}
 
@@ -48,7 +48,7 @@ namespace m8
         void set_value(const std::string& value) { value_ = boost::lexical_cast<T>(value); };
 
     private:
-        T value_;
+        T& value_;
     };
 }
 

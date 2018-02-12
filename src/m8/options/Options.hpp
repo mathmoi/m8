@@ -8,28 +8,94 @@
 #define M8_OPTIONS_HPP_
 
 #include <iostream>
+#include <array>
+#include <memory>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 #include "OptionsDefinitions.hpp"
 #include "Option.hpp"
-
-#define M8_OPTIONS_PRIVATE_ATTRIBUTES(name, desc, type, default_value)            TypedOption<type> name##_;
-#define M8_OPTIONS_DEFAULT_VALUES_INITIALISATION(name, desc, type, default_value) name##_ = default_value;
-#define M8_OPTIONS_ACCESSORS(name, desc, type, default_value)                     TypedOption<type> name() const { return name##_; };
-#define M8_OPTIONS_INITIALISATION(name, desc, type, default_value)                name##_(boost::replace_all_copy(std::string(#name), "_", "-"), desc, default_value),
-#define M8_OPTIONS_CREATE_MAP(name, desc, type, default_value)                    options_.emplace(boost::replace_all_copy(std::string(#name), "_", "-"), name##_);
+#include "../../m8common/logging.hpp"
+#include "../../m8chess/Sq.hpp"
+#include "../../m8chess/Piece.hpp"
 
 namespace m8
 {
-    class Options
+    /// Options for perft calculations.
+    struct PerftOptions
     {
-    public:
-        typedef std::map<std::string, Option&> Storage;
+        /// Numbers of threads to use to compute perft.
+        int threads = 8;
+
+        /// Minimum numbers of chunk to create to share between threads.
+        int min_works_items = 100;
+
+        /// Delete the copy constructor
+        PerftOptions(PerftOptions const&) = delete;
+
+        /// Delete the copy operator
+        void operator=(PerftOptions const&) = delete;
+
+        friend struct Options;
+
+    private:
+        /// Private constructor;
+        inline PerftOptions() {};
+    };
+
+    /// Options for perft calculations.
+    struct PsqtPieceOptions
+    {
+        /// Bonnus/malus for a piece on a given column. Only 4 values are necessary
+        /// because we can use symetry to get the values of the four right-most columns.
+        std::array<int, kNumColmnOnBoard / 2> columns = { 0, 0, 0, 0 };
+
+        /// Bonnus/malus for a piece on a given row.
+        std::array<int, kNumRowOnBoard> rows = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        /// Bonnus/malus for a piece on a corner square or a square off the corner.
+        std::array<int, 2> corner = { 0, 0 };
+
+        /// Bonnus/malus for a piece on a center square, a square off the center or a 
+        /// square off off the center.
+        std::array<int, 3> center = { 0, 0, 0 };
+
+        /// Delete the copy constructor
+        PsqtPieceOptions(PsqtPieceOptions const&) = delete;
+
+        /// Delete the copy operator
+        void operator=(PsqtPieceOptions const&) = delete;
+
+        friend class std::array<PsqtPieceOptions, kMaxPieceType + 1>;
+
+    private:
+        /// Private constructor;
+        inline PsqtPieceOptions() {};
+    };
+
+    struct Options
+    {
+        typedef std::map<std::string, std::shared_ptr<Option>> Storage;
 
         /// Get the only instance of the class (Singleton pattern)
-        inline static Options& get();
+        inline static Options& get()
+        {
+            static Options options;
+            return options;
+        };
+
+        /// Options for perft calculation
+        PerftOptions perft;
+
+        /// Maximum log severity level.
+        severity_level max_log_severity = severity_level::trace;
+
+        /// Value used to generate the piece-square table.
+        std::array<PsqtPieceOptions, kMaxPieceType + 1> psqt;
+
+        /// Give access to the options that can be modified through the user interface.
+        inline const Storage& modifiable_options_map() const { return options_; }
 
         /// Delete the copy constructor
         Options(Options const&) = delete;
@@ -37,55 +103,31 @@ namespace m8
         /// Delete the copy operator
         void operator=(Options const&) = delete;
 
-        // Create the get functions for all the options
-        M8_OPTIONS_DEFINITIONS(M8_OPTIONS_ACCESSORS)
-
-        /// Give read only access to the options map.
-        inline const Storage& map() const { return options_; }
-
-        /// Read the options from the command line
-        ///
-        /// @param argc  Number of arguments on the command line. This information is 
-        ///              passed to the main function.
-        /// @param argv  Values of the arguments.
-        /// @param out   Output stream the function can use to display informations to 
-        ///              the user.
-        /// @returns     A boolean value indicating if we must stop the execution. This 
-        ///              will be set to true if the users asked to display to availables
-        ///              options.
-        bool ReadOptions(int argc, char** argv, std::ostream& out);
-
-        /// Read the options from a file
-        ///
-        /// @param file  Stream opened on a file containings options.
-        void ReadOptions(std::istream& file);
-
-        /// Create a new options file on the provided stream.
-        void CreateOptionsFile(std::ostream& out);
-
     private:
-        /// Private constructor to prevent initialisation outside the class (Singleton 
-        /// pattern).
-        Options()
-            : M8_OPTIONS_DEFINITIONS(M8_OPTIONS_INITIALISATION) options_()
-        {
-            M8_OPTIONS_DEFINITIONS(M8_OPTIONS_CREATE_MAP)
-        }
+        /// Private constructor;
+        Options();
 
-        // Generate the privates attributes that will contains the options values.
-        M8_OPTIONS_DEFINITIONS(M8_OPTIONS_PRIVATE_ATTRIBUTES)
+        template<typename T>
+        void AddOption(const std::string& name, const std::string& desc, T& ref);
 
         Storage options_;
 
-        /// Generate the program_options options descriptions object
-        static boost::program_options::options_description GenerateOptionsDescriptions();
     };
 
-    inline Options& Options::get()
-    {
-        static Options options;
-        return options;
-    }
+    /// Read the properties from a configuration file.
+    void ReadOptionsFromFile(const std::string filename);
+
+    /// Read the options from the command line
+    ///
+    /// @param argc  Number of arguments on the command line. This information is 
+    ///              passed to the main function.
+    /// @param argv  Values of the arguments.
+    /// @param out   Output stream the function can use to display informations to 
+    ///              the user.
+    /// @returns     A boolean value indicating if we must stop the execution. This 
+    ///              will be set to true if the users asked to display to availables
+    ///              options.
+    bool ReadOptionsFromCommandLine(int argc, char** argv, std::ostream& out);
 }
 
 #endif // M8_OPTIONS_HPP_

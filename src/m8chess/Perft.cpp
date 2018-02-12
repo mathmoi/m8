@@ -82,8 +82,6 @@ namespace m8
 
     void Perft::CreateRootNodes()
     {
-        int parallel_perft_min_work_items = Options::get().parallel_perft_min_work_items().value();
-
         MoveGen move_gen(board_);
 
         root_ = std::make_shared<PerftNode>(nullptr, kNullMove, depth_);
@@ -93,7 +91,7 @@ namespace m8
         {
             count = AddLayer(root_, board_, move_gen);
             ++layers;
-        } while (layers < depth_ && count < parallel_perft_min_work_items);
+        } while (layers < depth_ && count < Options::get().perft.min_works_items);
     }
 
     bool Perft::ReserveNode(PerftNode::Ptr node)
@@ -229,7 +227,7 @@ namespace m8
 
     std::vector<std::future<void>> Perft::StartThreads()
     {
-        int threads = Options::get().parallel_perft_threads().value();
+        int threads = Options::get().perft.threads;
 
         std::vector<std::future<void>> futures;
         for (int i = 0; i < threads; ++i)

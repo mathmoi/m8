@@ -37,10 +37,22 @@ namespace m8
 
     std::ostream& operator<<(std::ostream& strm, severity_level level)
     {
-        static const char values[] = "FEWI<>DT";
+        static const std::map<m8::severity_level, std::string> map =
+        {
+            { m8::severity_level::none, "none" },
+            { m8::severity_level::fatal, "fatal" },
+            { m8::severity_level::error, "error" },
+            { m8::severity_level::warning, "warning" },
+            { m8::severity_level::info, "info" },
+            { m8::severity_level::output, "output" },
+            { m8::severity_level::input, "input" },
+            { m8::severity_level::debug, "debug" },
+            { m8::severity_level::trace, "trace" }
+        };
 
-        if (static_cast< std::size_t >(level) < (sizeof(values) - 1) / sizeof(char))
-            strm << values[level];
+        auto it = map.find(level);
+        if (it != map.end())
+            strm << it->second;
         else
             strm << static_cast< int >(level);
 
@@ -49,16 +61,29 @@ namespace m8
 
     bool FilterLogRecord(logging::value_ref< severity_level, tag::severity > const& level)
     {
-        return level <= Options::get().max_log_severity().value();
+        return level <= Options::get().max_log_severity;
     }
 
     void FormatLogRecord(logging::record_view const& rec, logging::formatting_ostream& strm)
     {
+        static const std::map<const m8::severity_level, char> map_severity =
+        {
+            { m8::severity_level::none, '_' },
+            { m8::severity_level::fatal, 'F' },
+            { m8::severity_level::error, 'E' },
+            { m8::severity_level::warning, 'W' },
+            { m8::severity_level::info, 'I' },
+            { m8::severity_level::output, '<' },
+            { m8::severity_level::input, '>' },
+            { m8::severity_level::debug, 'D' },
+            { m8::severity_level::trace, 'T' }
+        };
+
         auto date_formater = expr::stream << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%H:%M:%S.%f ");
 
         date_formater(rec, strm);
         strm << rec[thread_id] <<' ';
-        strm << rec[severity] <<' ';
+        strm << map_severity.at(rec[severity].get()) <<' ';
         strm << rec[expr::smessage];
     }
 
