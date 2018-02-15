@@ -4,6 +4,8 @@
 /// @brief  Contains the declarations of the Options class that handles m8 command line 
 ///         parameters and m8.ini file.
 
+#include <functional>
+
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
@@ -16,18 +18,18 @@
 namespace po = boost::program_options;
 namespace pt = boost::property_tree;
 
-#define M8_DESC_OPTIONS(name, desc, ref, type)      (name, po::value<type>(&options.ref), desc)
-#define M8_ADD_OPTIONS(name, desc, ref, type)       AddOption(name, desc, this-> ref);
+#define M8_DESC_OPTIONS(name, desc, type, getter, setter)       (name, po::value<type>()->notifier([&options](type v) { options.setter(v); }), desc)
+#define M8_ADD_OPTIONS(name, desc, type, getter, setter)        AddOption<type>(name, desc, [this](type v) { this->setter(v); }, [this]() { return this->getter(); });
 
 namespace m8
 {
-    template<typename T1, typename T2>
-    void TryReadOption(pt::ptree& tree, const std::string key, T2& ref)
+    template<typename T>
+    void TryReadOption(pt::ptree& tree, const std::string key, std::function<void(T)> setter)
     {
-        auto optional = tree.get_optional<T1>(key);
+        auto optional = tree.get_optional<T>(key);
         if (optional.is_initialized())
         {
-            ref = static_cast<T2>(optional.get());
+            setter(optional.get());
         }
     }
 
@@ -36,8 +38,8 @@ namespace m8
         auto perft_tree = tree.get_child_optional("perft");
         if (perft_tree.is_initialized())
         {
-            TryReadOption<int>(perft_tree.get(), "threads", options.threads);
-            TryReadOption<int>(perft_tree.get(), "min-works-items", options.min_works_items);
+            TryReadOption<int>(perft_tree.get(), "threads", [&options](int v) {options.set_threads(v); });
+            TryReadOption<int>(perft_tree.get(), "min-works-items", [&options](int v) {options.set_min_works_items(v); });
         }
     }
 
@@ -65,16 +67,22 @@ namespace m8
         }
     }
 
-    void ReadPsqtPieceOptions(pt::ptree& tree, PsqtPieceOptions& psqt_options)
+    std::vector<PsqtZoneValue> ReadPsqtZones(pt::ptree& tree)
     {
-        ReadArray(tree, "columns", psqt_options.columns);
-        ReadArray(tree, "rows", psqt_options.rows);
-        ReadArray(tree, "corners", psqt_options.corner);
-        ReadArray(tree, "center", psqt_options.center);
+        std::vector<PsqtZoneValue> list;
+
+        for (auto& zone_tree : tree)
+        {
+            list.emplace_back(zone_tree.second);
+        }
+
+        return list;
     }
 
-    void ReadPsqtOptions(pt::ptree& tree, std::array<PsqtPieceOptions, kMaxPieceType + 1>& psqt_pieces)
+    std::map<PieceType, std::vector<PsqtZoneValue>> ReadPsqtOptions(pt::ptree& tree)
     {
+        std::map<PieceType, std::vector<PsqtZoneValue>> map;
+
         auto psqt_tree = tree.get_child_optional("psqt");
         if (psqt_tree.is_initialized())
         {
@@ -83,7 +91,7 @@ namespace m8
                 auto piece_type = GetPieceTypeFromName(psqt_piece_tree.first);
                 if (IsPieceType(piece_type))
                 {
-                    ReadPsqtPieceOptions(psqt_piece_tree.second, psqt_pieces[piece_type]);
+                    map.insert(std::make_pair(piece_type, ReadPsqtZones(psqt_piece_tree.second)));
                 }
                 else
                 {
@@ -91,6 +99,8 @@ namespace m8
                 }
             }
         }
+
+        return map;
     }
 
     void ReadOptionsFromFile(const std::string filename)
@@ -100,11 +110,12 @@ namespace m8
 
        Options& options = Options::get();
 
-       TryReadOption<int>(tree, "max-log-severity", options.max_log_severity);
+       TryReadOption<std::string>(tree, "max-log-severity", [&options](std::string v) { options.set_max_log_severity(boost::lexical_cast<severity_level>(v)); });
 
-       ReadPerftOptions(tree, options.perft);
-       ReadPsqtOptions(tree, options.psqt);
+       ReadPerftOptions(tree, options.perft());
+       options.set_psqt(ReadPsqtOptions(tree));
     }
+
 
     po::options_description GenerateOptionsDescriptions()
     {
@@ -136,9 +147,9 @@ namespace m8
     }
 
     template<typename T>
-    void Options::AddOption(const std::string& name, const std::string& desc, T& ref)
+    void Options::AddOption(const std::string& name, const std::string& desc, typename TypedOption<T>::setter_type setter, typename TypedOption<T>::getter_type getter)
     {
-        options_.insert(Storage::value_type(name, std::make_shared<TypedOption<T>>(name, desc, ref)));
+        options_.insert(Storage::value_type(name, std::make_shared<TypedOption<T>>(name, desc, setter, getter)));
     }
 
     Options::Options()

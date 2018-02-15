@@ -91,7 +91,7 @@ namespace m8
         {
             count = AddLayer(root_, board_, move_gen);
             ++layers;
-        } while (layers < depth_ && count < Options::get().perft.min_works_items);
+        } while (layers < depth_ && count < Options::get().perft().min_works_items());
     }
 
     bool Perft::ReserveNode(PerftNode::Ptr node)
@@ -227,7 +227,7 @@ namespace m8
 
     std::vector<std::future<void>> Perft::StartThreads()
     {
-        int threads = Options::get().perft.threads;
+        int threads = Options::get().perft().threads();
 
         std::vector<std::future<void>> futures;
         for (int i = 0; i < threads; ++i)

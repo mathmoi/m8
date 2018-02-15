@@ -16,67 +16,18 @@
 
 #include "OptionsDefinitions.hpp"
 #include "Option.hpp"
+#include "PsqtZoneValue.hpp"
+#include "PerftOptions.hpp"
 #include "../../m8common/logging.hpp"
 #include "../../m8chess/Sq.hpp"
 #include "../../m8chess/Piece.hpp"
 
 namespace m8
 {
-    /// Options for perft calculations.
-    struct PerftOptions
-    {
-        /// Numbers of threads to use to compute perft.
-        int threads = 8;
-
-        /// Minimum numbers of chunk to create to share between threads.
-        int min_works_items = 100;
-
-        /// Delete the copy constructor
-        PerftOptions(PerftOptions const&) = delete;
-
-        /// Delete the copy operator
-        void operator=(PerftOptions const&) = delete;
-
-        friend struct Options;
-
-    private:
-        /// Private constructor;
-        inline PerftOptions() {};
-    };
-
-    /// Options for perft calculations.
-    struct PsqtPieceOptions
-    {
-        /// Bonnus/malus for a piece on a given column. Only 4 values are necessary
-        /// because we can use symetry to get the values of the four right-most columns.
-        std::array<int, kNumColmnOnBoard / 2> columns = { 0, 0, 0, 0 };
-
-        /// Bonnus/malus for a piece on a given row.
-        std::array<int, kNumRowOnBoard> rows = { 0, 0, 0, 0, 0, 0, 0, 0 };
-
-        /// Bonnus/malus for a piece on a corner square or a square off the corner.
-        std::array<int, 2> corner = { 0, 0 };
-
-        /// Bonnus/malus for a piece on a center square, a square off the center or a 
-        /// square off off the center.
-        std::array<int, 3> center = { 0, 0, 0 };
-
-        /// Delete the copy constructor
-        PsqtPieceOptions(PsqtPieceOptions const&) = delete;
-
-        /// Delete the copy operator
-        void operator=(PsqtPieceOptions const&) = delete;
-
-        friend class std::array<PsqtPieceOptions, kMaxPieceType + 1>;
-
-    private:
-        /// Private constructor;
-        inline PsqtPieceOptions() {};
-    };
-
     struct Options
     {
         typedef std::map<std::string, std::shared_ptr<Option>> Storage;
+        typedef std::map<PieceType, std::vector<PsqtZoneValue>> PsqtType;
 
         /// Get the only instance of the class (Singleton pattern)
         inline static Options& get()
@@ -85,15 +36,21 @@ namespace m8
             return options;
         };
 
-        /// Options for perft calculation
-        PerftOptions perft;
-
-        /// Maximum log severity level.
-        severity_level max_log_severity = severity_level::trace;
+        /// Options for perft calculation.
+        inline PerftOptions perft() { return perft_; }
 
         /// Value used to generate the piece-square table.
-        std::array<PsqtPieceOptions, kMaxPieceType + 1> psqt;
+        inline const PsqtType psqt() const { return psqt_; }
 
+        /// Set the values used to generate the piece-square table.
+        inline void set_psqt(PsqtType value) { psqt_ = value; }
+
+        /// Set the maximum log severity.
+        inline void set_max_log_severity(severity_level value) { max_log_severity_ = value; }
+
+        /// Maximum log severity level.
+        inline severity_level max_log_severity() const { return max_log_severity_; }
+        
         /// Give access to the options that can be modified through the user interface.
         inline const Storage& modifiable_options_map() const { return options_; }
 
@@ -108,9 +65,13 @@ namespace m8
         Options();
 
         template<typename T>
-        void AddOption(const std::string& name, const std::string& desc, T& ref);
+        void AddOption(const std::string& name, const std::string& desc, typename TypedOption<T>::setter_type setter, typename TypedOption<T>::getter_type getter);
 
         Storage options_;
+
+        severity_level max_log_severity_ = severity_level::trace;
+        PerftOptions perft_;
+        PsqtType psqt_;
 
     };
 

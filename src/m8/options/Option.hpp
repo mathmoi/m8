@@ -36,19 +36,31 @@ namespace m8
     class TypedOption : public Option
     {
     public:
-        /// Constructor
-        TypedOption(const std::string& name, const std::string& description, T& value)
-            : Option(name, description), value_(value)
+        /// Type of a method that allow to set the option.
+        typedef std::function<void(T)> setter_type;
+
+        /// Type of a method that allow to read the option.
+        typedef std::function<T()> getter_type;
+
+        /// Constructor.
+        ///
+        /// @param name         Name of the options.
+        /// @param description  Description of the option.
+        /// @param setter       Function used to set the option.
+        /// @param getter       Function used to read the option.
+        TypedOption(const std::string& name, const std::string& description, setter_type setter, getter_type getter)
+            : Option(name, description), setter_(setter), getter_(getter)
         {}
 
         T value() const { return value_; }
         void set_value(T value) { value_ = value; }
 
-        std::string ToString() const { return boost::lexical_cast<std::string>(value_); }
-        void set_value(const std::string& value) { value_ = boost::lexical_cast<T>(value); };
+        std::string ToString() const { return boost::lexical_cast<std::string>(getter_()); }
+        void set_value(const std::string& value) { setter_(boost::lexical_cast<T>(value)); };
 
     private:
-        T& value_;
+        setter_type setter_;
+        getter_type getter_;
     };
 }
 

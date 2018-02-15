@@ -26,19 +26,20 @@ namespace m8
         {};
     };
 
-    /**
-    * Convert a string into a numeric type.
-    *
-    * @param str String to convert
-    * @param failIfLeftoverChars Flag indicating if an exception must be raised
-    *                            if there is leftover characters.
-    */
+
+    /// Convert a string into a numeric type.
+    ///
+    /// @param str String to convert.
+    /// @param hex Indicate if the input string is in hexadecimal.
+    /// @param failIfLeftoverChars Flag indicating if an exception must be raised if there
+    ///                            is leftover characters.
     template<class T>
-    inline T ConvertTo(std::string str, bool failIfLeftoverChars = true)
+    inline T ConvertTo(std::string str, bool hex = false, bool failIfLeftoverChars = true)
     {
         std::istringstream stream(str);
         T retour;
         char c;
+        if (hex) stream >> std::hex;
         if (!(stream >> retour) || (failIfLeftoverChars && stream.get(c)))
             throw BadConvr("ConvertTo(\"" + str + "\")");
         return retour;
