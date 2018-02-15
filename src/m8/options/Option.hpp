@@ -1,5 +1,5 @@
 /// @file   Option.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   January 2017
 /// @brief  Contains the declarations of the Option class that represent a single option.
 
@@ -51,9 +51,6 @@ namespace m8
         TypedOption(const std::string& name, const std::string& description, setter_type setter, getter_type getter)
             : Option(name, description), setter_(setter), getter_(getter)
         {}
-
-        T value() const { return value_; }
-        void set_value(T value) { value_ = value; }
 
         std::string ToString() const { return boost::lexical_cast<std::string>(getter_()); }
         void set_value(const std::string& value) { setter_(boost::lexical_cast<T>(value)); };

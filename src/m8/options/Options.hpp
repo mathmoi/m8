@@ -1,5 +1,5 @@
 /// @file   Options.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   January 2017
 /// @brief  Contains the declarations of the Options class that handles m8 command line 
 ///         parameters and m8.ini file.
@@ -37,7 +37,7 @@ namespace m8
         };
 
         /// Options for perft calculation.
-        inline PerftOptions perft() { return perft_; }
+        inline PerftOptions& perft() { return perft_; }
 
         /// Value used to generate the piece-square table.
         inline const PsqtType psqt() const { return psqt_; }

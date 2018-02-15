@@ -14,3 +14,4 @@ regexp syntax
 ^VS/packages
 \.opendb$
 \.vspx$
+\.vscode/
