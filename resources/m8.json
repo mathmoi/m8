@@ -1,69 +1,145 @@
 {
-   "perft" : {
-      "threads" : 8,
-      "min-works-items" : 100
-   },
-   "max-log-severity" : "none",
-   "psqt" : {
-      "pawn": [
-         {  "name" : "Corners",
-            "zone" : "0x8100000000000081",
-            "value" : -50
-         },
-         {  "name" : "Center",
-            "zone" : "0x0000001818000000",
-            "value" : 50
-         }
-      ],
-      "rook": [
-         {  "name" : "Corners",
-            "zone" : "0x8100000000000081",
-            "value" : -50
-         },
-         {  "name" : "Center",
-            "zone" : "0x0000001818000000",
-            "value" : 50
-         }
-      ],
-      "knight": [
-         {  "name" : "Corners",
-            "zone" : "0x8100000000000081",
-            "value" : -50
-         },
-         {  "name" : "Center",
-            "zone" : "0x0000001818000000",
-            "value" : 50
-         }
-      ],
-      "bishop": [
-         {  "name" : "Corners",
-            "zone" : "0x8100000000000081",
-            "value" : -50
-         },
-         {  "name" : "Center",
-            "zone" : "0x0000001818000000",
-            "value" : 50
-         }
-      ],
-      "king": [
-         {  "name" : "Corners",
-            "zone" : "0x8100000000000081",
-            "value" : -50
-         },
-         {  "name" : "Center",
-            "zone" : "0x0000001818000000",
-            "value" : 50
-         }
-      ],
-      "queen": [
-         {  "name" : "Corners",
-            "zone" : "0x8100000000000081",
-            "value" : -50
-         },
-         {  "name" : "Center",
-            "zone" : "0x0000001818000000",
-            "value" : 50
-         }
-      ]
-   }
+  "perft": {
+    "threads": 8,
+    "min-works-items": 100
+  },
+  "max-log-severity": "none",
+  "psqt": {
+    "pawn": [
+      {
+        "name": "Row 7",
+        "zone": "0x00FF000000000000",
+        "value": 50
+      },
+      {
+        "name": "Row 6",
+        "zone": "0x0000FF0000000000",
+        "value": 20
+      },
+      {
+        "name": "Row 5",
+        "zone": "0x000000FF00000000",
+        "value": 10
+      },
+      {
+        "name": "Row 4",
+        "zone": "0x00000000FF000000",
+        "value": 0
+      },
+      {
+        "name": "Row 3 except edges",
+        "zone": "0x0000000000FF0000",
+        "value": -10
+      },
+      {
+        "name": "Row 2",
+        "zone": "0x000000000000FF00",
+        "value": 0
+      },
+      {
+        "name": "Shelter",
+        "zone": "0x000000000000E700",
+        "value": 10
+      },
+      {
+        "name": "center starting position",
+        "zone": "0x0000000000001800",
+        "value": -20
+      },
+      {
+        "name": "edges",
+        "zone": "0x0000818181000000",
+        "value": -5
+      },
+      {
+        "name": "Center",
+        "zone": "0x0000181818000000",
+        "value": 15
+      }
+    ],
+    "rook": [
+      {
+        "name": "A & h",
+        "zone": "0x0081818181818100",
+        "value": -5
+      },
+      {
+        "name": "7th",
+        "zone": "0x00FF000000000000",
+        "value": 10
+      },
+      {
+        "name": "D1 & e1",
+        "zone": "0x0000000000000018",
+        "value": 5
+      }
+    ],
+    "knight": [
+      {
+        "name": "center",
+        "zone": "0x0000001818000000",
+        "value": 20
+      },
+      {
+        "name": "off center",
+        "zone": "0x00003C24243C0000",
+        "value": 15
+      },
+      {
+        "name": "border",
+        "zone": "0xFF818181818181FF",
+        "value": -30
+      },
+      {
+        "name": "corners and off",
+        "zone": "0xC3C300000000C3C3",
+        "value": -20
+      }
+    ],
+    "bishop": [
+      {
+        "name": "border",
+        "zone": "0xFF818181818181FF",
+        "value": -10
+      },
+      {
+        "name": "Corners",
+        "zone": "0x8100000000000081",
+        "value": -10
+      },
+      {
+        "name": "Good zone",
+        "zone": "0x00003C7E7E7E0000",
+        "value": 5
+      },
+      {
+        "name": "Great zone",
+        "zone": "0x000018183C7E0000",
+        "value": 5
+      },
+      {
+        "name": "b2 & g2",
+        "zone": "0x0000000000004200",
+        "value": 5
+      }
+    ],
+    "king": [
+      {
+        "name": "Behind pawns",
+        "zone": "0x00000000000000E7",
+        "value": 20
+      },
+      {
+        "name": "Deep behinfd pawns",
+        "zone": "0x00000000000000C3",
+        "value": 10
+      },
+      {
+        "name": "Advanced",
+        "zone": "0xFFFFFFFFFF000000",
+        "value": -30
+      }
+    ],
+    "queen": []
+  }
 }
