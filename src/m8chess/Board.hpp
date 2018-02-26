@@ -13,6 +13,7 @@
 #include <string>
 
 #include "../m8common/m8common.hpp"
+#include "eval/PieceSqTable.hpp"
 
 #include "Piece.hpp"
 #include "Sq.hpp"
@@ -52,10 +53,7 @@ namespace m8
     class Board
     {
     public:
-
-        /// Default constructor
-        Board();
-
+        
         /// Constructor from an X-FEN string. An X-FEN string is a fen string
         /// with added functionalities to be used in Fischer Random Chess. A FEN
         /// string is a string that fully represent the state of a chess board.
@@ -159,11 +157,17 @@ namespace m8
         /// @param value New value for the full move clock.
         inline void set_full_move_clock(std::uint32_t value) { full_move_clock_ = value; };
 
+        /// Set the piece square table to use
+        void set_psqt(eval::PieceSqTablePtr psqt);
+
         /// Returns the position of the king of the given color.
         inline Sq king_sq(Color color) const { return GetLsb(bb_piece(NewPiece(kKing, color))); };
 
         /// Returns a fen string representing the current position on the board.
         std::string fen() const;
+
+        /// Value of the material on the board. Based on the piece-square table values.
+        inline int material_value() const { return material_value_; };
 
         /// Add a piece to the board. The square where we add the piece must be 
         /// empty.
@@ -237,6 +241,12 @@ namespace m8
 
         ///  Number of moves played.
         std::uint32_t full_move_clock_;
+
+        /// Pointer to the piece-square table to use.
+        eval::PieceSqTablePtr psqt_;
+
+        /// Value of the material on the board.
+        int material_value_;
 
         /// Move a piece on the board.
         ///
@@ -362,6 +372,9 @@ namespace m8
         /// @param taken Piece taken.
         /// @param to    Target square of the move.
         inline void RemoveCastlingRookCaptured(Piece taken, Sq to);
+
+        /// Calculate the material value from scratch.
+        int CalculateMaterialValue() const;
     };
 
     /// Overloading the << operator for an output stream and a Board. This 
@@ -450,6 +463,8 @@ namespace m8
 
         Color color = GetColor(piece);
         SetBit(bb_color_[color], sq);
+
+        material_value_ += (*psqt_)[piece][sq];
     }
 
     inline void Board::RemovePiece(Sq sq)
@@ -458,10 +473,14 @@ namespace m8
         assert(IsSqOnBoard(sq));
         assert(IsPiece(board_[sq]));
 
-        Color color = GetColor(board_[sq]);
+        Piece piece = board_[sq];
+
+        Color color = GetColor(piece);
         UnsetBit(bb_color_[color], sq);
 
-        UnsetBit(bb_piece_[board_[sq]], sq);
+        UnsetBit(bb_piece_[piece], sq);
+
+        material_value_ -= (*psqt_)[piece][sq];
 
         board_[sq] = kNoPiece;
     }
@@ -483,6 +502,8 @@ namespace m8
 
         bb_color_[GetColor(piece)] ^= diff;
         bb_piece_[piece] ^= diff;
+
+        material_value_ += (*psqt_)[piece][to] - (*psqt_)[piece][from];
     }
 
     inline void Board::MovePiece(Sq from, Sq to)

@@ -18,6 +18,7 @@
 #include "Option.hpp"
 #include "PsqtZoneValue.hpp"
 #include "PerftOptions.hpp"
+#include "EvalOptions.hpp"
 #include "../../m8common/logging.hpp"
 #include "../../m8chess/Sq.hpp"
 #include "../../m8chess/Piece.hpp"
@@ -45,6 +46,12 @@ namespace m8
         /// Set the values used to generate the piece-square table.
         inline void set_psqt(PsqtType value) { psqt_ = value; }
 
+        /// Value used by the evaluation function.
+        inline const EvalOptions& eval() const { return eval_; }
+
+        /// Set the value used by the evaluation function.
+        inline void set_eval(const EvalOptions& value) { eval_ = value; }
+        
         /// Set the maximum log severity.
         inline void set_max_log_severity(severity_level value) { max_log_severity_ = value; }
 
@@ -72,6 +79,7 @@ namespace m8
         severity_level max_log_severity_ = severity_level::trace;
         PerftOptions perft_;
         PsqtType psqt_;
+        EvalOptions eval_;
 
     };
 

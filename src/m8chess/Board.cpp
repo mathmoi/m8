@@ -13,11 +13,6 @@
 
 namespace m8
 {
-    Board::Board()
-    {
-        Clear();
-    }
-
     Board::Board(const std::string&  fen)
     {
         Clear();
@@ -363,7 +358,7 @@ namespace m8
         // Initialize the pieces bitboards
         for (Color color = kWhite; IsColor(color); ++color)
         {
-            for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
+            for (auto piece_type : all_piece_types)
             {
                 Piece piece = NewPiece(piece_type, color);
                 bb_piece_[piece] = kEmptyBb;
@@ -384,6 +379,9 @@ namespace m8
         colmn_enpas_ = kInvalColmn;
         half_move_clock_ = 0;
         full_move_clock_ = 0;
+
+        psqt_ = eval::GenerateEmptyPieceSqTable();
+        material_value_ = 0;
     }
 
     void DisplayPiece(std::ostream& out, Piece piece)
@@ -496,5 +494,27 @@ namespace m8
         DisplayColumnsChar(out);
 
         return out;
+    }
+
+    int Board::CalculateMaterialValue() const
+    {
+        int value = 0;
+        for (auto piece : all_pieces)
+        {
+            Bb bb = bb_piece_[piece];
+            while (bb)
+            {
+                Sq sq = RemoveLsb(bb);
+                value += (*psqt_)[piece][sq];
+            }
+        }
+
+        return value;
+    }
+
+    void Board::set_psqt(eval::PieceSqTablePtr psqt)
+    {
+        psqt_ = psqt;
+        material_value_ = CalculateMaterialValue();
     }
 }

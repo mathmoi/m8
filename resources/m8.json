@@ -4,6 +4,13 @@
     "min-works-items": 100
   },
   "max-log-severity": "none",
+  "eval" : {
+      "pawn" : 100,
+      "knight" : 320,
+      "bishop" : 333,
+      "rook" : 510,
+      "queen" : 880
+  },
   "psqt": {
     "pawn": [
       {

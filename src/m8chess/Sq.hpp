@@ -348,6 +348,19 @@ namespace m8
        return std::string({ GetColumnChar(GetColmn(sq)),
                             GetRowNumber(GetRow(sq)) });
    }
+
+   /// Returns a sq relative to each color. For exemple if e1 is given as input, e1 will 
+   /// be returned for white and e8 for blacks.
+   ///
+   /// @param color Color
+   /// @param row   Index of the row (0 to 7).
+   /// @return 
+   inline Sq GetColorWiseSq(Color color, Sq sq) {
+       Colmn colmn = GetColmn(sq);
+       Row row = GetRow(sq);
+
+       return NewSq(colmn, GetColorWiseRow(color, row));
+   }
 }
 
 #endif // M8_SQ_HPP_

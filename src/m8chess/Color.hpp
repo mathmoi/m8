@@ -17,6 +17,9 @@ namespace m8
     const Color kWhite = 0;
     const Color kBlack = 1;
 
+    const Color kMinColor = kWhite;
+    const Color kMaxColor = kBlack;
+
     /// Indicate if a value is a valid color
     ///
     /// @param color The value to evaluate

@@ -13,36 +13,6 @@
 using namespace m8;
 using namespace std;
 
-TEST_CASE("Test Board()")
-{
-   Board board;
-
-   REQUIRE(board.side_to_move() == kWhite);
-
-   for (Sq sq = kA1; IsSqOnBoard(sq); ++sq)
-   {
-      REQUIRE(board[sq] == kNoPiece);
-   }
-
-   for (Color color = kWhite; IsColor(color); ++color)
-   {
-      for (PieceType piece_type = kMinPieceType; IsPieceType(piece_type); ++piece_type)
-      {
-         REQUIRE(board.bb_piece(NewPiece(piece_type, color)) == kEmptyBb);
-      }
-   }
-
-   REQUIRE(board.bb_color(kWhite) == kEmptyBb);
-   REQUIRE(board.bb_color(kBlack) == kEmptyBb);
-
-   REQUIRE(board.casle(kWhite, kQueenSideCastle) == false);
-   REQUIRE(board.casle(kWhite, kKingSideCastle) == false);
-   REQUIRE(board.casle(kBlack, kQueenSideCastle) == false);
-   REQUIRE(board.casle(kBlack, kKingSideCastle) == false);
-
-   REQUIRE(IsColmnOnBoard(board.colmn_enpas()) == false);
-}
-
 TEST_CASE("Test Board(fen)")
 {
    // Initial postion test
@@ -140,7 +110,7 @@ TEST_CASE("Test Board(fen) 4")
 
 TEST_CASE("Test side_to_move()")
 {
-   Board board;
+   Board board(kStartingPositionFEN);
 
    REQUIRE(board.side_to_move() == kWhite);
 
@@ -159,7 +129,7 @@ TEST_CASE("Test side_to_move()")
 
 TEST_CASE("Test colmn_enpas()")
 {
-   Board board;
+   Board board(kStartingPositionFEN);
 
    REQUIRE(!IsColmnOnBoard(board.colmn_enpas()));
 
@@ -172,7 +142,7 @@ TEST_CASE("Test colmn_enpas()")
 
 TEST_CASE("Test casle()")
 {
-   Board board;
+   Board board("4k3/8/8/8/8/8/8/4K3 b - - 0 1 ");
 
    SECTION("white queen side castle")
    {
@@ -249,7 +219,7 @@ TEST_CASE("Test casle()")
 
 TEST_CASE("Test AddPiece()")
 {
-   Board board;
+   Board board("8/8/8/8/8/8/8/8 b - - 0 1 ");
    Piece white_pawn = NewPiece(kPawn, kWhite);
    Piece black_queen = NewPiece(kQueen, kBlack);
    Piece white_queen = NewPiece(kQueen, kWhite);
@@ -288,7 +258,7 @@ TEST_CASE("Test AddPiece()")
 
 TEST_CASE("Test RemovePiece()")
 {
-   Board board;
+   Board board("4k3/8/8/8/8/8/8/4K3 b - - 0 1 ");
    Piece white_pawn = NewPiece(kPawn, kWhite);
 
    board.AddPiece(kA2, white_pawn);
@@ -304,7 +274,7 @@ TEST_CASE("Test RemovePiece()")
 
 TEST_CASE("Test MovePiece()")
 {
-   Board board;
+   Board board("4k3/8/8/8/8/8/8/4K3 b - - 0 1 ");
    Piece white_pawn = NewPiece(kPawn, kWhite);
 
    board.AddPiece(kA2, white_pawn);

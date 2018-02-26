@@ -13,6 +13,8 @@
 #include "options/Options.hpp"
 #include "../m8common/logging.hpp"
 
+#include "../m8chess/eval/PieceSqTable.hpp"
+
 namespace m8
 {
     bool ReadOptions(int argc, char* argv[])
@@ -44,7 +46,7 @@ int main(int argc, char* argv[])
         if (!stop_execution)
         {
             m8::InitializePreCalc();
-
+            
             m8::m8Intrf intrf;
             intrf.Execute();
         }

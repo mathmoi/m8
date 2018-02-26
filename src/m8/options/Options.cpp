@@ -43,6 +43,19 @@ namespace m8
         }
     }
 
+    EvalOptions ReadEvalOptions(pt::ptree& tree)
+    {
+        EvalOptions options;
+
+        TryReadOption<int>(tree, "eval.pawn", [&options](int v) {options.set_pawn(v); });
+        TryReadOption<int>(tree, "eval.knight", [&options](int v) {options.set_knight(v); });
+        TryReadOption<int>(tree, "eval.bishop", [&options](int v) {options.set_bishop(v); });
+        TryReadOption<int>(tree, "eval.rook", [&options](int v) {options.set_rook(v); });
+        TryReadOption<int>(tree, "eval.queen", [&options](int v) {options.set_queen(v); });
+
+        return options;
+    }
+
     template<typename T>
     void ReadArray(pt::ptree& tree, T& an_array)
     {
@@ -114,6 +127,7 @@ namespace m8
 
        ReadPerftOptions(tree, options.perft());
        options.set_psqt(ReadPsqtOptions(tree));
+       options.set_eval(ReadEvalOptions(tree));
     }
 
 
