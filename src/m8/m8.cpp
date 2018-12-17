@@ -13,7 +13,7 @@
 #include "options/Options.hpp"
 #include "../m8common/logging.hpp"
 
-#include "../m8chess/eval/PieceSqTable.hpp"
+#include "../m8common/ThreadPool.hpp"
 
 namespace m8
 {
@@ -35,7 +35,6 @@ namespace m8
 ///          terminated correctly and another value otherwise.
 int main(int argc, char* argv[])
 {
-
     int ret = 0;
 
     M8_LOG_SCOPE_THREAD();
@@ -46,6 +45,30 @@ int main(int argc, char* argv[])
         if (!stop_execution)
         {
             m8::InitializePreCalc();
+
+            // TODO : Remove this testing code
+            m8::ThreadPool pool(2);
+            pool.Push([] {
+                for (int x=0; x < 6; ++x)
+                {
+                    std::cout << "working " << x << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                }
+            });
+            pool.Push([] {
+                for (int x = 0; x < 6; ++x)
+                {
+                    std::cout << "working " << x << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                }
+            });
+            pool.Push([] {
+                for (int x = 0; x < 6; ++x)
+                {
+                    std::cout << "working " << x << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                }
+            });
             
             m8::m8Intrf intrf;
             intrf.Execute();

@@ -59,7 +59,7 @@ namespace m8 { namespace eval {
         auto psqt = std::make_shared<PieceSqTable>();
 
         for (Color color = kMinColor; IsColor(color); ++color)
-        {
+        {   
             for (auto piece_zones : Options::get().psqt())
             {
                 ApplyZonesToPsqt(piece_zones.first, color, piece_zones.second, psqt);

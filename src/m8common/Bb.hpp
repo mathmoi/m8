@@ -252,6 +252,7 @@ namespace m8
 
 #else
       // This is a 64 bit friendly of GetMsb using debruijn multiplication
+      const std::uint64_t debruijn64 = UINT64_C(0x07EDD5E59A4E28C2);
       const unsigned int index64[64] =
       {
          0, 47,  1, 56, 48, 27,  2, 60,

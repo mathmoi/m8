@@ -1,4 +1,4 @@
-/// @file	Engine.hpp
+ /// @file	Engine.hpp
 /// @author Mathieu Pagé
 /// @date	November 2017
 /// @brief	Contains the Engine class that encapsulate all m8 functionalities.
