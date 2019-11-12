@@ -17,6 +17,8 @@ namespace m8 { namespace search
     class SearchThread
     {
     private:
+		/// We use the pointer to implementation idiom because SearchThread must be copyable
+		/// and the std::thread class is not.
         class Impl
         {
         public:

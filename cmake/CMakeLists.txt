@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
+include(cotire.cmake)
 include(ucm.cmake)
 
 project(m8)

@@ -9,10 +9,11 @@
 #include <cstdint>
 
 #include "m8Intrf.hpp"
+#include "options/Options.hpp"
 #include "../m8common/stringHelpers.hpp"
 #include "../m8common/Utils.hpp"
-#include "options/Options.hpp"
 #include "../m8common/logging.hpp"
+#include "../m8common/console.hpp"
 
 // This macro can be used in the m8Intrf class to output both to std::cout and to the log system.
 #define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
@@ -21,9 +22,8 @@
 namespace m8
 {
     m8Intrf::m8Intrf()
-        : engine_(),
+        : engine_(std::bind(&m8Intrf::DisplayEngineMove, this, std::placeholders::_1)),
           shell_intrf_()
-        
     {
         SetupShellInterf();
     }
@@ -71,6 +71,10 @@ namespace m8
             "Get or set the value of an option",
             "option {name} [value]",
             std::bind(&m8Intrf::HandleOption, this, std::placeholders::_1)));
+		shell_intrf_.AddCmd(ShellCmd("go",
+			"Force the engine to play the side to move and to start playing",
+			"go",
+			std::bind(&m8Intrf::HandleGo, this)));
     }
 
     void m8Intrf::HandleExit()
@@ -212,4 +216,38 @@ namespace m8
             M8_OUT_LINE(<< "Usage : option {name} [value]");
         }
     }
+
+	void m8Intrf::HandleGo()
+	{
+		// If the engine is already searching, do nothing.
+		if (engine_.state() != EngineState::Searching)
+		{
+			if (engine_.state() != EngineState::Ready)
+			{
+				M8_OUT_LINE(<< "The engine is not ready");
+			}
+			else
+			{
+				engine_.Go();
+			}
+		}
+	}
+
+	void m8Intrf::DisplayEngineMove(const std::string& move)
+	{
+		ClearLine();
+		M8_OUT_LINE(<< " m8 plays " << move);
+		shell_intrf_.DisplayInvit();
+	}
+
+	void m8Intrf::ClearLine()
+	{
+		auto width = GetConsoleWidth();
+		std::cout << '\r';
+		for (auto x = 0; x < width; ++x)
+		{
+			std::cout << ' ';
+		}
+		std::cout << '\r';
+	}
 }

@@ -47,21 +47,28 @@ namespace m8
       /// Handles the display command.
       void HandleDisplay() const;
 
-      /// Handled the fen command.
+      /// Handleds the fen command.
       void HandleFen(std::vector<std::string> args_list);
 
-      /// Handle the perft command.
+      /// Handles the perft command.
       void HandlePerft(std::vector<std::string> args_list);
 
-      /// Handle the options command.
+      /// Handles the options command.
       void HandleOptions() const;
 
-      /// Handle the option command.
+      /// Handles the option command.
       void HandleOption(std::vector<std::string> args_list) const;
+
+	  /// Handles the go command.
+	  void HandleGo();
 
       void DisplayOption(const Option& option) const;
       void DisplayOption(const std::string& option_name) const;
       void EditOption(const std::string& option_name, const std::string& value) const;
+
+	  void DisplayEngineMove(const std::string& move);
+
+	  void ClearLine();
    };
 
 }

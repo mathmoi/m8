@@ -202,9 +202,6 @@ namespace m8
 
     private:
 
-        /// Initialize the board with no pieces.
-        void Clear();
-
         /// Array containing the piece on each square of the board.
         std::array<Piece, kNumSqOnBoard> board_;
 
@@ -247,6 +244,9 @@ namespace m8
 
         /// Value of the material on the board.
         int material_value_;
+
+		/// Initialize the board with no pieces.
+		void Clear();
 
         /// Move a piece on the board.
         ///

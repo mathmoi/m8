@@ -20,6 +20,8 @@
 
 namespace m8
 {
+	// TODO : It seems that the MoveGen class does not really have a state. Does it really need to be a class then?
+
     /// Class containing all the functionalitues necessary to generate moves.
     class MoveGen
     {

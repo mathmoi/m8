@@ -15,6 +15,8 @@
 
 #endif
 
+#include <chrono>
+
 namespace m8
 {
     /// Class allowing to efficiently measure precise time intervals.

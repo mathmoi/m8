@@ -40,7 +40,7 @@ namespace m8
         while (!abort_)
         {
             // Get a command from the input stream.
-            std::cout << invit_;
+			DisplayInvit();
             std::getline(std::cin, input);
 
             M8_INPUT << input;
@@ -89,4 +89,9 @@ namespace m8
             }
         }
     }
+
+	void ShellIntrf::DisplayInvit() const
+	{
+		std::cout << invit_;
+	}
 }

@@ -50,7 +50,7 @@ namespace m8
       inline void operator()(const std::vector<std::string> param_list) const
       {
          funct_(param_list);
-      };
+      }
 
    private:
 
@@ -107,6 +107,9 @@ namespace m8
 
       /// Display a list of the commands and their descriptions
       void DisplayHelp() const;
+
+	  /// Display the invite
+	  void DisplayInvit() const;
 
    private:
 
