@@ -356,19 +356,24 @@ namespace m8
         }
     }
 
-    void OutputCheckAndMateCharacter(std::ostream& out, Move move, Board& board, const MoveGen& generator)
+    void OutputCheckAndMateCharacter(std::ostream& out, Move move, const Board& board, const MoveGen& generator)
     {
+        // We remove the constness of the board in order to modify it to check for Mat. 
+        // This is not great, but we promise to put it back like it was when we are done 
+        // with it.
+        Board& modifiable_board = const_cast<Board&>(board);
+
         Color color_after_move = OpposColor(GetColor(GetPiece(move)));
 
-        UnmakeInfo unmake_info = board.Make(move);
+        UnmakeInfo unmake_info = modifiable_board.Make(move);
         if (IsInCheck(color_after_move, board, generator))
         {
-            out << (IsMat(board) ? '#' : '+');
+            out << (IsMat(modifiable_board) ? '#' : '+');
         };
-        board.Unmake(move, unmake_info);
+        modifiable_board.Unmake(move, unmake_info);
     }
 
-    void OutputDisambiguationCharacters(std::ostream& out, Move move, Board& board, const MoveGen& generator)
+    void OutputDisambiguationCharacters(std::ostream& out, Move move, const Board& board, const MoveGen& generator)
     {
         Piece piece = GetPiece(move);
         if (GetPieceType(piece) != kPawn)
@@ -394,7 +399,7 @@ namespace m8
         }
     }
 
-    std::string RenderSAN(Move move, Board& board)
+    std::string RenderSAN(Move move, const Board& board)
     {
         std::ostringstream out;
 

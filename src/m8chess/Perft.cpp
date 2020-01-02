@@ -14,6 +14,11 @@
 
 namespace m8
 {
+    Perft::~Perft()
+    {
+        JoinThreads();
+    }
+
     std::uint64_t Perft::RunPerft(int depth, Board& board, const MoveGen& move_gen)
     {
         std::uint64_t count = 0;
@@ -21,7 +26,7 @@ namespace m8
         MoveList moves;
         Move* last = move_gen.GenerateAllMoves(moves.data());
 
-        for (Move* next = moves.data(); next < last; ++next)
+        for (Move* next = moves.data(); next < last && !abort_; ++next)
         {
             UnmakeInfo unmake_info = board.Make(*next);
 
@@ -172,9 +177,9 @@ namespace m8
             PropagateResultParent(node->parent());
         }
 
-        if (node->parent() == root_)
+        if (node->parent() == root_ && !abort_)
         {
-            SendPartialResult(node->move(), sum);
+            partial_result_callback_(node->move(), sum);
         }
     }
 
@@ -205,78 +210,89 @@ namespace m8
         }
     }
 
+    void Perft::IncrementRunningThreads()
+    {
+        std::lock_guard<std::mutex> lock(perft_mutex_);
+        ++running_threads_;
+    }
+
+    bool Perft::DecrementRunningThreads()
+    {
+        std::lock_guard<std::mutex> lock(perft_mutex_);
+        --running_threads_;
+        return running_threads_ == 0;
+    }
+
+    void Perft::SendResult()
+    {
+        using namespace std::chrono;
+        auto end = high_resolution_clock::now();
+        duration<double> time_span = duration_cast<duration<double>>(end - start_);
+
+        result_callback_(root_->count().get(), time_span.count());
+    }
+
     void Perft::RunWorkerThread()
     {
         M8_LOG_SCOPE_THREAD();
         M8_DEBUG << "Thread started";
 
+        IncrementRunningThreads();
+
         PerftNode::Ptr node = PickNode(root_);
         while (node)
         {
             ComputeNode(node);
-            if (node->parent() == root_)
+            if (node->parent() == root_ && !abort_)
             {
-                SendPartialResult(node->move(), node->count().get());
+                partial_result_callback_(node->move(), node->count().get());
             }
             
             node = PickNode(root_);
         }
 
+        bool last_thread = DecrementRunningThreads();
+        if (last_thread && !abort_)
+        {
+            SendResult();
+        }
+        
         M8_DEBUG << "Thread finished";
     }
 
-    std::vector<std::future<void>> Perft::StartThreads()
+    void Perft::StartThreads()
     {
         int threads = Options::get().perft().threads();
 
-        std::vector<std::future<void>> futures;
         for (int i = 0; i < threads; ++i)
         {
-            futures.push_back(std::async(std::launch::async, &Perft::RunWorkerThread, this));
+            threads_.push_back(std::thread(&Perft::RunWorkerThread, this));
         }
-
-        return futures; 
     }
 
-    void Perft::JoinThreads(std::vector<std::future<void>>& futures)
+    void Perft::JoinThreads()
     {
-        for (auto& future : futures)
+        for (auto& thread : threads_)
         {
-            future.get();
+            if (thread.joinable())
+            {
+                thread.join();
+            }
         }
     }
 
-    PerftResult Perft::CreateResult(const std::chrono::duration<double> &time_span)
+    void Perft::RunParallel()
     {
-        PerftResult result;
-        
-        result.nodes = root_->count().get();
-        result.seconds = time_span.count();
-
-        return result;
-    }
-
-    PerftResult Perft::RunParallel()
-    {
-        using namespace std::chrono;
-
         CreateRootNodes();
 
-        auto start = high_resolution_clock::now();
+        start_ = std::chrono::high_resolution_clock::now();
 
-        auto futures = StartThreads();
-        JoinThreads(futures);
-
-        auto end = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(end - start);
-        
-        return CreateResult(time_span);
+        StartThreads();
     }
 
-    void Perft::SendPartialResult(Move move, std::uint64_t count)
+    void Perft::Abort()
     {
-        std::lock_guard<std::mutex> lock(callback_mutex_);
-
-        callback_(move, count);
+        abort_ = true;
+        JoinThreads();
     }
 }

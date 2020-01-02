@@ -11,7 +11,7 @@
 
 #include "../Piece.hpp"
 
-namespace m8 { namespace eval
+namespace m8::eval
 {
     /// Type of a piece square table.
     typedef std::array<int, 64> SinglePieceSqTable;
@@ -25,6 +25,6 @@ namespace m8 { namespace eval
     ///
     /// @returns A shared pointer to a newly created piece-square table.
     PieceSqTablePtr GeneratePieceSqTable();
-}}
+}
 
 #endif // M8_EVAL_PSQT_HPP_

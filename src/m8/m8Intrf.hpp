@@ -6,9 +6,12 @@
 #ifndef M8_M8_INTRF_HPP_
 #define M8_M8_INTRF_HPP_
 
+#include <mutex>
+
 #include "ShellIntrf.hpp"
-#include "Engine.hpp"
+#include "engine/Engine.hpp"
 #include "options/Options.hpp"
+
 
 namespace m8
 {
@@ -25,13 +28,19 @@ namespace m8
 
    private:
 
-      Engine engine_;
+      engine::Engine engine_;
+	  bool xboard_;
 
       /// Object that implements the shell interface.
       ShellIntrf shell_intrf_;
 
+      mutable std::mutex output_mutex_;
+
       /// Setup the shell interface.
       void SetupShellInterf();
+
+	  /// Setup the xboard mode.
+	  void SetupXboardMode();
 
       /// Handles the exit command.
       void HandleExit();
@@ -41,33 +50,28 @@ namespace m8
       /// @params args_list Arguments of the command inputed by the user.
       void HandleUserMove(std::vector<std::string> args_list) const;
 
-      /// Handles the help command.
       void HandleHelp() const;
-
-      /// Handles the display command.
       void HandleDisplay() const;
-
-      /// Handleds the fen command.
       void HandleFen(std::vector<std::string> args_list);
-
-      /// Handles the perft command.
       void HandlePerft(std::vector<std::string> args_list);
-
-      /// Handles the options command.
       void HandleOptions() const;
-
-      /// Handles the option command.
       void HandleOption(std::vector<std::string> args_list) const;
-
-	  /// Handles the go command.
+	  void HandleXboard();
+	  void HandleProtover(std::vector<std::string> args_list);
 	  void HandleGo();
+      void HandleStop();
+	  void HandleNew();
+	  void HandleAccepted();
 
       void DisplayOption(const Option& option) const;
       void DisplayOption(const std::string& option_name) const;
       void EditOption(const std::string& option_name, const std::string& value) const;
 
 	  void DisplayEngineMove(const std::string& move);
+      void DisplayPerftPartialResult(std::string move, std::uint64_t count);
+      void DisplayPerftResult(std::uint64_t count, double seconds);
 
+      void CallEngineCommand(std::function<void()> call, const std::string& command);
 	  void ClearLine();
    };
 

@@ -10,10 +10,13 @@
 
 #include <vector>
 #include <thread>
+#include <mutex>
 #include <functional>
+#include <memory>
 
 #include "../Board.hpp"
 #include "SearchResult.hpp"
+#include "Minimax.hpp"
 
 namespace m8 { namespace search
 {
@@ -23,7 +26,6 @@ namespace m8 { namespace search
 		Ready,
 		Searching
 	};
-
 
     /// Manage the seach for the engine.
     class Search
@@ -41,6 +43,9 @@ namespace m8 { namespace search
 		/// Update the internal board. This cannnot be called when the search is underway.
 		void set_board(const Board& board);
 
+		/// returns the search state.
+		inline SearchState state() const { return state_; };
+
 		/// Start the search
 		void Start();
 
@@ -48,14 +53,16 @@ namespace m8 { namespace search
 		void Stop();
 
     private:
-        Board board_;
-		SearchState state_;
 		std::thread search_thread_;
+		std::mutex mutex_;
+        
+		Board board_;
+		SearchState state_;
+		std::unique_ptr<Minimax> ptr_minimax_;
 
 		SearchCompletedCallback search_completed_callback_;
 
 		void RunSearchThread();
-		
     };
 
 }}

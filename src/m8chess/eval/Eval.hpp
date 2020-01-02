@@ -11,7 +11,7 @@
 
 #include "../Board.hpp"
 
-namespace m8 { namespace eval
+namespace m8::eval
 {   
 	typedef std::int32_t EvalType;
 
@@ -44,6 +44,6 @@ namespace m8 { namespace eval
 			return value;
 		}
 	}
-}}
+}
 
 #endif // M8_EVAL_HPP_

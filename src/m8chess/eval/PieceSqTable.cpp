@@ -6,7 +6,7 @@
 #include "PieceSqTable.hpp"
 #include "../../m8/options/Options.hpp"
 
-namespace m8 { namespace eval {
+namespace m8::eval {
 
     PieceSqTablePtr GenerateEmptyPieceSqTable()
     {
@@ -68,6 +68,4 @@ namespace m8 { namespace eval {
 
         return psqt;
     }
-
-
-}}
+}

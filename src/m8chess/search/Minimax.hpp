@@ -24,8 +24,12 @@ namespace m8 { namespace search {
 		/// Start a search on a given position.
 		SearchResult Search(std::uint32_t depth);
 
+		/// Stop the search
+		void Stop();
+
 	private:
 		Board board_;
+		bool continue_;
 
 		eval::EvalType SearchInternal(std::uint32_t depth);
 

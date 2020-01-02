@@ -22,7 +22,8 @@
 namespace m8
 {
     m8Intrf::m8Intrf()
-        : engine_(std::bind(&m8Intrf::DisplayEngineMove, this, std::placeholders::_1)),
+        : engine_(),
+		  xboard_(false),
           shell_intrf_()
     {
         SetupShellInterf();
@@ -75,7 +76,37 @@ namespace m8
 			"Force the engine to play the side to move and to start playing",
 			"go",
 			std::bind(&m8Intrf::HandleGo, this)));
+        shell_intrf_.AddCmd(ShellCmd("stop",
+            "Stops the current operation",
+            "stop",
+            std::bind(&m8Intrf::HandleStop, this)));
+		shell_intrf_.AddCmd(ShellCmd("xboard",
+			"Enable xboard mode",
+			"xboard",
+			std::bind(&m8Intrf::HandleXboard, this)));
+		shell_intrf_.AddCmd(ShellCmd("new",
+			"Start a new game",
+			"new",
+			std::bind(&m8Intrf::HandleNew, this)));
     }
+
+	void m8Intrf::SetupXboardMode()
+	{
+		xboard_ = true;
+		shell_intrf_.set_invit("");
+
+		shell_intrf_.AddCmd(ShellCmd("protover", 
+			"Indicate to the engine the xboard protocol version",
+			"protover {vesion}",
+			std::bind(&m8Intrf::HandleProtover, this, std::placeholders::_1)));
+
+		shell_intrf_.AddCmd(ShellCmd("accepted",
+			"Indicate to the engine that a feature was accepted",
+			"protover {Feature name}",
+			std::bind(&m8Intrf::HandleAccepted, this)));
+
+
+	}
 
     void m8Intrf::HandleExit()
     {
@@ -89,6 +120,8 @@ namespace m8
 
     void m8Intrf::HandleDisplay() const
     {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+
         M8_EMPTY_LINE();
         M8_OUT_LINE(<< engine_.board());
         M8_EMPTY_LINE();
@@ -98,6 +131,7 @@ namespace m8
     {
         if (args_list.size() == 1)
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<<' ' << engine_.board().fen());
         }
         else
@@ -106,10 +140,11 @@ namespace m8
 
             try
             {
-                engine_.set_fen(fen);
+                CallEngineCommand([this, fen]() { engine_.set_fen(fen); }, "fen");
             }
             catch (InvalFenError)
             {
+                std::lock_guard<std::mutex> lock(output_mutex_);
                 M8_OUT_LINE(<< "Invalid fen string.");
             }
         }
@@ -120,6 +155,7 @@ namespace m8
         // Check number of arguments
         if (args_list.size() != 2)
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : perft {Depth}");
             return;
         }
@@ -132,28 +168,30 @@ namespace m8
         }
         catch (BadConvr exc)
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : perft {Depth}");
             return;
         }
 
         if (depth < 1 || 255 < depth)
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<<"The depth must be between 1 and 255");
         }
-
-        M8_EMPTY_LINE();
-
-        auto result = engine_.Perft(depth, [](std::string move, std::uint64_t count) { M8_OUT_LINE(<< ' ' << move << '\t' << count); });
-
-        M8_EMPTY_LINE();
-        M8_OUT_LINE(<< " Nodes: " << result.nodes);
-        M8_OUT_LINE(<< " Time : " << result.seconds);
-        M8_OUT_LINE(<< " Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(result.nodes / result.seconds), 3));
-        M8_EMPTY_LINE();
+        else
+        {
+            CallEngineCommand([this, depth]()
+                              { engine_.Perft(depth,
+                                              std::bind(&m8Intrf::DisplayPerftPartialResult, this, std::placeholders::_1, std::placeholders::_2),
+                                              std::bind(&m8Intrf::DisplayPerftResult, this, std::placeholders::_1, std::placeholders::_2)); },
+                              "perft");
+        }
     }
 
     void m8Intrf::HandleOptions() const
     {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+
         M8_EMPTY_LINE();
 
         for (auto& pair : Options::get().modifiable_options_map())
@@ -166,6 +204,8 @@ namespace m8
 
     void m8Intrf::DisplayOption(const Option& option) const
     {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+
         M8_EMPTY_LINE();
         M8_OUT_LINE(<<"Option name: " << option.name());
         M8_OUT_LINE(<<"Description: " << option.description());
@@ -183,6 +223,8 @@ namespace m8
         }
         else
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+
             M8_OUT_LINE(<< "Option \"" << option_name << "\" does not exist.");
         }
     }
@@ -197,6 +239,8 @@ namespace m8
         }
         else
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+
             M8_OUT_LINE(<< "Option \"" << option_name << "\" does not exist.");
         }
     }
@@ -213,16 +257,33 @@ namespace m8
         }
         else
         {
+            std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : option {name} [value]");
         }
     }
 
+	void m8Intrf::HandleXboard()
+	{
+		SetupXboardMode();
+		std::cout << std::endl;
+	}
+
+	void m8Intrf::HandleProtover(std::vector<std::string> args_list)
+	{
+        std::lock_guard<std::mutex> lock(output_mutex_);
+		M8_OUT_LINE(<< "feature myname=\"m8 0.1\"");
+		M8_OUT_LINE(<< "feature done=1");
+	}
+
 	void m8Intrf::HandleGo()
 	{
+        // TODO : Reimplement this
+
+        /*
 		// If the engine is already searching, do nothing.
-		if (engine_.state() != EngineState::Searching)
+		if (engine_.state() != engine::EngineStateEnum::Searching)
 		{
-			if (engine_.state() != EngineState::Ready)
+			if (engine_.state() != engine::EngineStateEnum::Ready)
 			{
 				M8_OUT_LINE(<< "The engine is not ready");
 			}
@@ -231,14 +292,63 @@ namespace m8
 				engine_.Go();
 			}
 		}
+        */
+	}
+
+    void m8Intrf::HandleStop()
+    {
+        CallEngineCommand([this]() {engine_.Stop(); }, "stop");
+    }
+
+	void m8Intrf::HandleNew()
+	{
+        // TODO : Continue here
+		//engine_.New();
+	}
+
+	void m8Intrf::HandleAccepted()
+	{
+		// Do nothing
 	}
 
 	void m8Intrf::DisplayEngineMove(const std::string& move)
 	{
+        std::lock_guard<std::mutex> lock(output_mutex_);
 		ClearLine();
 		M8_OUT_LINE(<< " m8 plays " << move);
 		shell_intrf_.DisplayInvit();
 	}
+
+    void m8Intrf::DisplayPerftPartialResult(std::string move, std::uint64_t count)
+    {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+
+        ClearLine();
+        M8_OUT_LINE(<< ' ' << move << '\t' << count);
+    }
+
+    void m8Intrf::DisplayPerftResult(std::uint64_t count, double seconds)
+    {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+        ClearLine();
+        M8_OUT_LINE(<< std::endl
+                    << " Nodes: " << count << std::endl
+                    << " Time : " << seconds << std::endl
+                    << " Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(count / seconds), 3) << std::endl);
+        shell_intrf_.DisplayInvit();
+    }
+
+    void m8Intrf::CallEngineCommand(std::function<void()> call, const std::string& command)
+    {
+        try {
+            call();
+        }
+        catch (engine::InvalidEngineCommandException ex)
+        {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< "Error (" << ex.what() << "): " <<command);
+        }
+    }
 
 	void m8Intrf::ClearLine()
 	{

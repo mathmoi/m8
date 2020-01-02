@@ -37,29 +37,45 @@ namespace m8 { namespace search
 	void Search::Start()
 	{
 		assert(state_ == SearchState::Ready);
-
+		
 		state_ = SearchState::Searching;
 
 		if (search_thread_.joinable())
 		{
 			search_thread_.join();
 		}
+
+		ptr_minimax_ = std::make_unique<Minimax>(board_);
 		search_thread_ = std::thread(&Search::RunSearchThread, this);
 	}
 
 	void Search::Stop()
 	{
+		if (state_ == SearchState::Searching)
+		{
+			std::lock_guard<std::mutex> lock(mutex_);
 
+			if (state_ == SearchState::Searching)
+			{
+				ptr_minimax_->Stop();
+			}
+		}
 	}
 
 	void Search::RunSearchThread()
 	{
 		M8_LOG_SCOPE_THREAD();
 
-		Minimax minimax(board_);
-		auto search_result = minimax.Search(4);
+		auto search_result = ptr_minimax_->Search(4);
 
-		state_ = SearchState::Ready;
+		{
+			std::lock_guard<std::mutex> lock(mutex_);
+
+			ptr_minimax_.reset(nullptr);
+			state_ = SearchState::Ready;
+		}
+
 		search_completed_callback_(search_result);
+
 	}
 }}

@@ -2,7 +2,7 @@ ucm_set_runtime(STATIC)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     FIND_PACKAGE ( Threads REQUIRED )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -Wno-unknown-pragmas -pedantic -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -Wno-unknown-pragmas -pedantic")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
@@ -38,3 +38,5 @@ configure_file(../../resources/m8.json
 
 target_link_libraries(m8 ${Boost_LIBRARIES}
                          ${CMAKE_THREAD_LIBS_INIT})
+
+set_property(TARGET m8 PROPERTY CXX_STANDARD 17)

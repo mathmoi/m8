@@ -12,6 +12,7 @@
 #include <mutex>
 #include <future>
 #include <vector>
+#include <chrono>
 
 #include <boost/optional.hpp>
 
@@ -85,23 +86,33 @@ namespace m8
     {
     public:
         typedef std::function<void(Move, std::uint64_t)> PartialResultCallback;
+        typedef std::function<void(std::uint64_t, double)> ResultCallback;
 
         /// Constructor
-        inline Perft(int depth, Board& board, PartialResultCallback callback)
-            : depth_(depth), board_(board), callback_(callback)
+        inline Perft(int depth, const Board& board, PartialResultCallback partial_result_callback, ResultCallback result_callback)
+            : depth_(depth), abort_(false), board_(board), partial_result_callback_(partial_result_callback), result_callback_(result_callback), running_threads_(0)
         {}
-        
-        /// Run the test in prallel
-        PerftResult RunParallel();
 
-        void RunWorkerThread();
+        /// Destructor.
+        ~Perft();
+        
+        /// Run the test in prallel.
+        void RunParallel();
+
+        /// Stop the current perft operation.
+        void Abort();
 
     private:
         int depth_;
+        bool abort_;
         Board board_;
-        PartialResultCallback callback_;
-        std::mutex callback_mutex_;
+        PartialResultCallback partial_result_callback_;
+        ResultCallback result_callback_;
+        std::mutex perft_mutex_;
+        int running_threads_;
+        std::chrono::high_resolution_clock::time_point start_;
         PerftNode::Ptr root_;
+        std::vector<std::thread> threads_;
 
         void CreateRootNodes();
         int AddLayer(PerftNode::Ptr node, Board& board, const MoveGen& move_gen);
@@ -109,16 +120,18 @@ namespace m8
         std::uint64_t RunPerft(int depth, Board& board, const MoveGen& move_gen);
         
         PerftNode::Ptr PickNode(PerftNode::Ptr root);
-        void SendPartialResult(Move move, std::uint64_t count);
         void ComputeNode(PerftNode::Ptr node);
-        std::vector<std::future<void>> StartThreads();
-        void JoinThreads(std::vector<std::future<void>>& futures);
-        PerftResult CreateResult(const std::chrono::duration<double> &time_span);
+        void StartThreads();
+        void JoinThreads();
         bool ReserveNode(PerftNode::Ptr node);
         void GetBoard(Board& board, PerftNode::Ptr node);
         void PropagateResultParent(PerftNode::Ptr node);
         void CompleteInternalNode(PerftNode::Ptr node);
         std::uint64_t CalculateSumChildren(PerftNode::Ptr node);
+        void RunWorkerThread();
+        void IncrementRunningThreads();
+        bool DecrementRunningThreads();
+        void SendResult();
     };
 }
 

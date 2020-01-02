@@ -12,6 +12,8 @@ namespace m8 { namespace search
 	// TODO : Detect Mate and nulls
 	SearchResult Minimax::Search(std::uint32_t depth)
 	{
+		continue_ = true;
+
 		MoveGen move_gen(board_);
 		MoveList moves;
 		Move* last = move_gen.GenerateAllMoves(moves.data());
@@ -19,7 +21,7 @@ namespace m8 { namespace search
 		eval::EvalType max_value = eval::kMinEval;
 		Move best_move = kNullMove;
 
-		for (Move* next = moves.data(); next < last; ++next)
+		for (Move* next = moves.data(); next < last && continue_; ++next)
 		{
 			UnmakeInfo unmake_info = board_.Make(*next);
 
@@ -47,7 +49,14 @@ namespace m8 { namespace search
 			board_.Unmake(*next, unmake_info);
 		}
 
-		return SearchResult(max_value, best_move);
+		if (continue_)
+		{
+			return SearchResult(max_value, best_move);
+		}
+		else
+		{
+			return SearchResult(0, kNullMove);
+		} 
 	}
 
 	eval::EvalType Minimax::SearchInternal(std::uint32_t depth)
@@ -58,7 +67,7 @@ namespace m8 { namespace search
 
 		eval::EvalType max_value = eval::kMinEval;
 
-		for (Move* next = moves.data(); next < last; ++next)
+		for (Move* next = moves.data(); next < last && continue_; ++next)
 		{
 			UnmakeInfo unmake_info = board_.Make(*next);
 
@@ -94,5 +103,10 @@ namespace m8 { namespace search
 		}
 
 		return max_value;
+	}
+
+	void Minimax::Stop()
+	{
+		continue_ = false;
 	}
 }}
