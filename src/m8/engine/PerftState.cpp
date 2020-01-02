@@ -13,11 +13,6 @@ namespace m8::engine {
 	{
 		perft_.RunParallel();
 	}
-	
-	void PerftState::EndState()
-	{
-
-	}
 
 	void PerftState::HandleResult(std::uint64_t count, double seconds)
 	{

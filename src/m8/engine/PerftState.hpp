@@ -37,9 +37,6 @@ namespace m8::engine {
 		/// Method that is run before a state is replaced by a new state
 		virtual void BeginState();
 
-		/// Method that is run when a state becomes the new current state.
-		virtual void EndState();
-
 		/// Stops the current operation.
 		virtual void Stop();
 

@@ -18,7 +18,7 @@ namespace m8 { namespace search {
 
 		/// Constructor
 		inline Minimax(const Board& board)
-			: board_(board)
+			: board_(board), continue_(true)
 		{};
 
 		/// Start a search on a given position.
