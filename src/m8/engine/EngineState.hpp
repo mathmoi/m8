@@ -1,5 +1,5 @@
 /// @file	EngineState.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	Decembre 2019
 /// @brief	Contains the EngineState class. This is an abstract class that represent the
 ///         state of the engine at a given time.
@@ -48,6 +48,9 @@ namespace m8::engine {
               board_(source->board_),
               engine_color_(source->engine_color_)
         {}
+
+        /// Destructor.
+        virtual inline ~EngineState() {};
 
         /// Accessor for the board
         ///

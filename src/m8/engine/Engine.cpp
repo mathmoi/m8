@@ -1,5 +1,5 @@
 /// @file	Engine.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	November 2017
 /// @brief	Contains the Engine class that encapsulate all m8 functionalities.
 
@@ -37,7 +37,7 @@ namespace m8::engine
 
 			state_->BeginState();
 		}
-	};
+	}
 
     /*Engine::Engine(EngineMoveCallback engine_move_callback)
         : state_(EngineStateEnum::Ready),

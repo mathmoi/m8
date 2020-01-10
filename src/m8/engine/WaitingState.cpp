@@ -1,5 +1,5 @@
 /// @file	WaitingState.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	January 2020
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.
@@ -21,7 +21,7 @@ namespace m8::engine
 	{	
 		Move move = ParseMove(str_move);
 
-		UnmakeInfo unmake_info = this->board().Make(move);
+		this->board().Make(move);
 
 		auto thinking_state = new ThinkingState(this);
 		ChangeState(thinking_state);
@@ -35,7 +35,7 @@ namespace m8::engine
 		{
 			move = ParseSAN(str_move, this->board());
 		}
-		catch (InvalidSANMoveException ex)
+		catch (const InvalidSANMoveException& ex)
 		{
 			throw InvalidMoveException("Invalid Move : " + str_move);
 		}

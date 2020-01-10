@@ -172,7 +172,7 @@ namespace m8
             {
                 CallEngineCommand([this, fen]() { engine_.set_fen(fen); }, "fen");
             }
-            catch (InvalFenError)
+            catch (const InvalFenError&)
             {
                 std::lock_guard<std::mutex> lock(output_mutex_);
                 M8_OUT_LINE(<< "Invalid fen string.");
@@ -196,7 +196,7 @@ namespace m8
         {
             depth = ConvertTo<int>(args_list[1]);
         }
-        catch (BadConvr exc)
+        catch (const BadConvr& exc)
         {
             std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : perft {Depth}");
@@ -374,7 +374,7 @@ namespace m8
             {
                 engine_.UserMove(move);
             }
-            catch (engine::InvalidMoveException ex)
+            catch (const engine::InvalidMoveException& ex)
             {
                 M8_OUT_LINE(<< "Illegal move: " << move);
             }
@@ -421,7 +421,7 @@ namespace m8
         try {
             call();
         }
-        catch (engine::InvalidEngineCommandException ex)
+        catch (const engine::InvalidEngineCommandException& ex)
         {
             std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Error (" << ex.what() << "): " <<command);
