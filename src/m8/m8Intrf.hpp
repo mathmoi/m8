@@ -12,7 +12,6 @@
 #include "engine/Engine.hpp"
 #include "options/Options.hpp"
 
-
 namespace m8
 {
    /// Class that implements m8's shell-like interface.
@@ -42,14 +41,10 @@ namespace m8
 	  /// Setup the xboard mode.
 	  void SetupXboardMode();
 
-      /// Handles the exit command.
+      engine::EngineCallbacks CreateEngineCallbacks();
+
       void HandleExit();
-
-      /// Handles a user move.
-      ///
-      /// @params args_list Arguments of the command inputed by the user.
       void HandleUserMove(std::vector<std::string> args_list);
-
       void HandleHelp() const;
       void HandleDisplay() const;
       void HandleFen(std::vector<std::string> args_list);
@@ -61,7 +56,6 @@ namespace m8
 	  void HandleGo();
       void HandleStop();
 	  void HandleNew();
-	  void HandleAccepted();
       void HandlePing(std::vector<std::string> args_list);
 
       void DisplayOption(const Option& option) const;
@@ -74,10 +68,7 @@ namespace m8
 
       void CallEngineCommand(std::function<void()> call, const std::string& command);
 	  void ClearLine() const;
-
-      engine::EngineCallbacks CreateEngineCallbacks();
    };
-
 }
 
 #endif // M8_M8_INTRF_HPP_

@@ -124,7 +124,7 @@ namespace m8
 		shell_intrf_.AddCmd(ShellCmd("accepted",
 			"Indicate to the engine that a feature was accepted",
 			"protover {Feature name}",
-			std::bind(&m8Intrf::HandleAccepted, this)));
+            std::bind([] {})));
 
         shell_intrf_.AddCmd(ShellCmd("ping",
             "Ask the engine if it's ready to handle more commands",
@@ -196,7 +196,7 @@ namespace m8
         {
             depth = ConvertTo<int>(args_list[1]);
         }
-        catch (const BadConvr& exc)
+        catch (const BadConvr&)
         {
             std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : perft {Depth}");
@@ -339,11 +339,6 @@ namespace m8
         CallEngineCommand([this]() {engine_.New(); }, "new");
 	}
 
-	void m8Intrf::HandleAccepted()
-	{
-		// Do nothing
-	}
-
     void m8Intrf::HandlePing(std::vector<std::string> args_list)
     {
         std::lock_guard<std::mutex> lock(output_mutex_);
@@ -374,7 +369,7 @@ namespace m8
             {
                 engine_.UserMove(move);
             }
-            catch (const engine::InvalidMoveException& ex)
+            catch (const engine::InvalidMoveException&)
             {
                 M8_OUT_LINE(<< "Illegal move: " << move);
             }
