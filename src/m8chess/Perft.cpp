@@ -272,11 +272,20 @@ namespace m8
 
     void Perft::JoinThreads()
     {
+        M8_DEBUG << "Perft::JoinThreads";
+
         for (auto& thread : threads_)
         {
             if (thread.joinable())
             {
-                thread.join();
+                if (thread.get_id() == std::this_thread::get_id())
+                {
+                    thread.detach();
+                }
+                else
+                {
+                    thread.join();
+                }
             }
         }
     }
