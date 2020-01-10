@@ -11,6 +11,8 @@
 #include "ShellIntrf.hpp"
 #include "../m8common/logging.hpp"
 
+#define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
+
 namespace m8
 {
     ShellCmd::ShellCmd(const std::string& name,
@@ -69,7 +71,7 @@ namespace m8
                     }
                     else
                     {
-                        std::cout << "Command not found (" << token_list[0] << ")" << std::endl;
+                        M8_OUT_LINE(<< "Command not found (" << token_list[0] << ")");
                     }
                 }
             }
@@ -78,14 +80,18 @@ namespace m8
 
     void ShellIntrf::DisplayHelp() const
     {
-        std::cout << "Available commands:" << std::endl;
+        M8_OUT_LINE(<< "Available commands:");
         for (auto cmd : cmd_list_)
         {
             if (cmd.second.des().length() > 0)
             {
+                // Ouput on the console
                 std::cout << ' ';
                 std::cout.width(12);
                 std::cout <<std::left << cmd.second.name() <<' ' << cmd.second.des() << std::endl;
+
+                // Replicate output un the log file
+                M8_OUTPUT << ' ' << cmd.second.name() << ' ' << cmd.second.des();
             }
         }
     }

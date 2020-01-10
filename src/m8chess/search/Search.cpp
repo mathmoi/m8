@@ -63,7 +63,7 @@ namespace m8 { namespace search
 	}
 
 	void Search::RunSearchThread()
-	{
+ 	{
 		M8_LOG_SCOPE_THREAD();
 
 		auto search_result = ptr_minimax_->Search(4);

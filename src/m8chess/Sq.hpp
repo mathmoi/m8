@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <string>
 
 #include "Color.hpp"
 

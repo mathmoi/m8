@@ -48,7 +48,7 @@ namespace m8
       /// Handles a user move.
       ///
       /// @params args_list Arguments of the command inputed by the user.
-      void HandleUserMove(std::vector<std::string> args_list) const;
+      void HandleUserMove(std::vector<std::string> args_list);
 
       void HandleHelp() const;
       void HandleDisplay() const;
@@ -62,6 +62,7 @@ namespace m8
       void HandleStop();
 	  void HandleNew();
 	  void HandleAccepted();
+      void HandlePing(std::vector<std::string> args_list);
 
       void DisplayOption(const Option& option) const;
       void DisplayOption(const std::string& option_name) const;
@@ -72,7 +73,9 @@ namespace m8
       void DisplayPerftResult(std::uint64_t count, double seconds);
 
       void CallEngineCommand(std::function<void()> call, const std::string& command);
-	  void ClearLine();
+	  void ClearLine() const;
+
+      engine::EngineCallbacks CreateEngineCallbacks();
    };
 
 }

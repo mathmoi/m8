@@ -10,6 +10,7 @@
 
 #include "m8Intrf.hpp"
 #include "options/Options.hpp"
+#include "engine/InvalidMoveException.hpp"
 #include "../m8common/stringHelpers.hpp"
 #include "../m8common/Utils.hpp"
 #include "../m8common/logging.hpp"
@@ -22,11 +23,22 @@
 namespace m8
 {
     m8Intrf::m8Intrf()
-        : engine_(),
+        : engine_(CreateEngineCallbacks()),
 		  xboard_(false),
           shell_intrf_()
     {
         SetupShellInterf();
+    }
+
+    engine::EngineCallbacks m8Intrf::CreateEngineCallbacks()
+    {
+        engine::EngineCallbacks callbacks;
+
+        callbacks.partial_perft_result_callback = std::bind(&m8Intrf::DisplayPerftPartialResult, this, std::placeholders::_1, std::placeholders::_2);
+        callbacks.perft_result_callback = std::bind(&m8Intrf::DisplayPerftResult, this, std::placeholders::_1, std::placeholders::_2);
+        callbacks.search_result_callback = std::bind(&m8Intrf::DisplayEngineMove, this, std::placeholders::_1);
+
+        return callbacks;
     }
 
     void m8Intrf::Execute()
@@ -88,6 +100,15 @@ namespace m8
 			"Start a new game",
 			"new",
 			std::bind(&m8Intrf::HandleNew, this)));
+
+        shell_intrf_.AddCmd(ShellCmd("",
+            "Handle a move by the user",
+            "",
+            std::bind(&m8Intrf::HandleUserMove, this, std::placeholders::_1)));
+        shell_intrf_.AddCmd(ShellCmd("usermove",
+            "Handle a move by the user",
+            "usermove {move}",
+            std::bind(&m8Intrf::HandleUserMove, this, std::placeholders::_1)));
     }
 
 	void m8Intrf::SetupXboardMode()
@@ -105,7 +126,16 @@ namespace m8
 			"protover {Feature name}",
 			std::bind(&m8Intrf::HandleAccepted, this)));
 
+        shell_intrf_.AddCmd(ShellCmd("ping",
+            "Ask the engine if it's ready to handle more commands",
+            "ping {N}",
+            std::bind(&m8Intrf::HandlePing, this, std::placeholders::_1)));
 
+        // TODO : Implement theses commands correctly
+        shell_intrf_.AddCmd(ShellCmd("random", "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("post", "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("hard", "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("undo", "", "", std::bind([] {})));
 	}
 
     void m8Intrf::HandleExit()
@@ -180,11 +210,7 @@ namespace m8
         }
         else
         {
-            CallEngineCommand([this, depth]()
-                              { engine_.Perft(depth,
-                                              std::bind(&m8Intrf::DisplayPerftPartialResult, this, std::placeholders::_1, std::placeholders::_2),
-                                              std::bind(&m8Intrf::DisplayPerftResult, this, std::placeholders::_1, std::placeholders::_2)); },
-                              "perft");
+            CallEngineCommand([this, depth]() { engine_.Perft(depth); }, "perft");
         }
     }
 
@@ -271,7 +297,15 @@ namespace m8
 	void m8Intrf::HandleProtover(std::vector<std::string> args_list)
 	{
         std::lock_guard<std::mutex> lock(output_mutex_);
+        M8_OUT_LINE(<< "feature done=0");
 		M8_OUT_LINE(<< "feature myname=\"m8 0.1\"");
+        M8_OUT_LINE(<< "feature sigint=0");
+        M8_OUT_LINE(<< "feature sigterm=0");
+        M8_OUT_LINE(<< "feature setboard=1");
+        M8_OUT_LINE(<< "feature ping=1");
+        M8_OUT_LINE(<< "feature playother=0");
+        M8_OUT_LINE(<< "feature colors=0");
+        M8_OUT_LINE(<< "feature san=1");
 		M8_OUT_LINE(<< "feature done=1");
 	}
 
@@ -284,7 +318,7 @@ namespace m8
 		if (engine_.state() != engine::EngineStateEnum::Searching)
 		{
 			if (engine_.state() != engine::EngineStateEnum::Ready)
-			{
+			{. 
 				M8_OUT_LINE(<< "The engine is not ready");
 			}
 			else
@@ -302,8 +336,7 @@ namespace m8
 
 	void m8Intrf::HandleNew()
 	{
-        // TODO : Continue here
-		//engine_.New();
+        CallEngineCommand([this]() {engine_.New(); }, "new");
 	}
 
 	void m8Intrf::HandleAccepted()
@@ -311,12 +344,57 @@ namespace m8
 		// Do nothing
 	}
 
+    void m8Intrf::HandlePing(std::vector<std::string> args_list)
+    {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+        M8_OUT_LINE(<< "pong " <<args_list[1]);
+    }
+
+    void m8Intrf::HandleUserMove(std::vector<std::string> args_list)
+    {
+        std::string move;
+
+        if (args_list.size() == 1)
+        {
+            move = args_list[0];
+        }
+        else if (args_list.size() == 2 && args_list[0] == "usermove")
+        {
+            move = args_list[1];
+        }
+        else
+        {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< "Usage : usermove {move}");
+        }
+
+        if (move.length() > 0)
+        {
+            try
+            {
+                engine_.UserMove(move);
+            }
+            catch (engine::InvalidMoveException ex)
+            {
+                M8_OUT_LINE(<< "Illegal move: " << move);
+            }
+        }
+    }
+
 	void m8Intrf::DisplayEngineMove(const std::string& move)
 	{
         std::lock_guard<std::mutex> lock(output_mutex_);
-		ClearLine();
-		M8_OUT_LINE(<< " m8 plays " << move);
-		shell_intrf_.DisplayInvit();
+
+        if (xboard_)
+        {
+            M8_OUT_LINE(<< "move " << move);
+        }
+        else
+        {
+            ClearLine();
+            M8_OUT_LINE(<< " m8 plays " << move);
+            shell_intrf_.DisplayInvit();
+        }
 	}
 
     void m8Intrf::DisplayPerftPartialResult(std::string move, std::uint64_t count)
@@ -350,7 +428,7 @@ namespace m8
         }
     }
 
-	void m8Intrf::ClearLine()
+	void m8Intrf::ClearLine() const
 	{
 		auto width = GetConsoleWidth();
 		std::cout << '\r';

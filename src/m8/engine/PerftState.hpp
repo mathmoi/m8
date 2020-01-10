@@ -23,15 +23,12 @@ namespace m8::engine {
 
 		/// Constructor from a previous state
 		PerftState(EngineState* source,
-			       int depth,
-			       EngineState::PartialPerftResultCallback partial_result_callback,
-			       EngineState::PerftResultCallback result_callback)
-			: EngineState(source),
+			       int depth)
+			: EngineState("PerftState", source),
 			  perft_(depth,
 				     source->board(),
-				     [partial_result_callback, this](Move move, std::uint64_t count) { partial_result_callback(m8::RenderSAN(move, this->board()), count); },
-				     std::bind(&PerftState::HandleResult, this, std::placeholders::_1, std::placeholders::_2)),
-			  result_callback_(result_callback)
+				     [this](Move move, std::uint64_t count) { callbacks().partial_perft_result_callback(m8::RenderSAN(move, this->board()), count); },
+				     std::bind(&PerftState::HandleResult, this, std::placeholders::_1, std::placeholders::_2))
 		{}
 
 		/// Method that is run before a state is replaced by a new state
@@ -42,7 +39,6 @@ namespace m8::engine {
 
 	private:
 		m8::Perft perft_;
-		EngineState::PerftResultCallback result_callback_;
 
 		inline void partial_result_handler(Move move, std::uint64_t count) {};
 

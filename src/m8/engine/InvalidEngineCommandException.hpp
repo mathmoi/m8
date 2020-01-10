@@ -15,8 +15,8 @@ namespace m8::engine {
 	{
 	public:
 		/// Constructor.
-		InvalidEngineCommandException()
-			: std::runtime_error("Command not legal now")
+		InvalidEngineCommandException(const std::string& command)
+			: std::runtime_error("Command not legal now: " + command)
 		{}
 	};
 }

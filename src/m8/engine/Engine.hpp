@@ -10,6 +10,7 @@
 #include <string>
 
 #include "EngineState.hpp"
+#include "EngineCallbacks.hpp"
 
 namespace m8::engine
 {
@@ -21,7 +22,7 @@ namespace m8::engine
 
     public:
         /// Constructor
-        Engine();
+        Engine(EngineCallbacks callbacks);
 
         /// Destructor
         ~Engine();
@@ -39,14 +40,7 @@ namespace m8::engine
         /// Run a perft tests.
         ///
         /// @param depth                   Depth of the test to run.
-        /// @param partial_result_callback Method to call after each root move to give a 
-        ///                                subcount of the nodes.
-        /// @param result_callback         Method to call when the tests is finished to 
-        ///                                return the nodes count and the time used to 
-        ///                                perform the test.
-        inline void Perft(int depth,
-                          EngineState::PartialPerftResultCallback partial_result_callback,
-                          EngineState::PerftResultCallback result_callback) { return state_->Perft(depth, partial_result_callback, result_callback); };
+        inline void Perft(int depth) { return state_->Perft(depth); };
 
         /// Set the engine to play the current side and start playing.
         void Go() { state_->Go(); };
@@ -56,6 +50,9 @@ namespace m8::engine
 
         /// Terminate the current game and prepare the engine to play a new game.
         void New() { state_->New(); };
+
+        /// Accept a move to play on the current board.
+        void UserMove(std::string move) { state_->UserMove(move); };
 
     private:
         EngineState* state_;

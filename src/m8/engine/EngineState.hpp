@@ -9,11 +9,13 @@
 
 #include <memory>
 #include <stdexcept>
+#include <string>
 
 #include "../../m8chess/Perft.hpp"
 #include "../../m8chess/Color.hpp"	
 #include "../../m8chess/Board.hpp"
 
+#include "EngineCallbacks.hpp"
 #include "InvalidEngineCommandException.hpp"
 
 namespace m8::engine {
@@ -25,19 +27,24 @@ namespace m8::engine {
     class EngineState
     {
     public:
-        typedef std::function<void(std::string, std::uint64_t)> PartialPerftResultCallback;
-        typedef std::function<void(std::uint64_t, double)> PerftResultCallback;
 
         /// Default constructor
-        EngineState(Engine* engine)
-            : engine_(engine),
+        EngineState(std::string state_name,
+                    Engine* engine,
+                    const EngineCallbacks callbacks)
+            : state_name_(state_name),
+              engine_(engine),
+              callbacks_(callbacks),
               board_(kStartingPositionFEN),
               engine_color_(kBlack)
         {}
 
         /// Constructor from a previous state
-        EngineState(EngineState* source)
-            : engine_(source->engine_),
+        EngineState(std::string state_name, 
+                    EngineState* source)
+            : state_name_(state_name),
+              engine_(source->engine_),
+              callbacks_(source->callbacks_),
               board_(source->board_),
               engine_color_(source->engine_color_)
         {}
@@ -45,12 +52,15 @@ namespace m8::engine {
         /// Accessor for the board
         ///
         /// @returns The board
-        inline const Board& board() const { return board_; };
+        inline Board& board() { return board_; };
 
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
         virtual inline void set_fen(std::string fen) { board_ = Board(fen); };
+
+        /// Return the name of the state
+        inline const std::string& state_name() const { return state_name_; }
 
         /// Method that is run before a state is replaced by a new state
         virtual inline void BeginState() {};
@@ -61,43 +71,40 @@ namespace m8::engine {
         /// Run a perft tests.
         ///
         /// @param depth                   Depth of the test to run.
-        /// @param partial_result_callback Method to call after each root move to give a 
-        ///                                subcount of the nodes.
-        /// @param result_callback         Method to call when the tests is finished to 
-        ///                                return the nodes count and the time used to 
-        ///                                perform the test.
-        virtual inline void Perft(int depth,
-                                  PartialPerftResultCallback partial_result_callback,
-                                  PerftResultCallback result_callback)
-        {
-            throw InvalidEngineCommandException();
-        };
+        virtual inline void Perft(int depth) { throw InvalidEngineCommandException("Perft"); }
 
         /// Set the engine to play the current side and start playing.
-        virtual inline void Go()
-        {
-            throw InvalidEngineCommandException();
-        };
+        virtual inline void Go() { throw InvalidEngineCommandException("Go"); }
 
         /// Stops the current operation.
-        virtual inline void Stop()
-        {
-            throw InvalidEngineCommandException();
-        }
+        virtual inline void Stop() { throw InvalidEngineCommandException("Stop"); }
 
         /// Terminate the current game and prepare the engine to play a new game.
-        virtual inline void New()
-        {
-            throw InvalidEngineCommandException();
-        };
+        virtual inline void New() { throw InvalidEngineCommandException("New"); }
+
+        /// Accept a move to play on the current board.
+        virtual inline void UserMove(std::string move) { throw InvalidEngineCommandException("UserMove"); }
 
     protected:
 
         /// Change the state of the engine
         void ChangeState(EngineState* new_state);
 
+        /// Get the color played by the engine.
+        inline Color engine_color() const { return engine_color_; };
+
+        /// Set the color played by the engine
+        inline void set_engine_color(Color new_engine_color) { engine_color_ = new_engine_color; };
+
+        /// Accessor for the callbacks
+        inline const EngineCallbacks callbacks() const { return callbacks_; }
+
     private:
+        std::string state_name_;
+
         Engine* engine_;
+
+        EngineCallbacks callbacks_;
 
         Board board_;
         Color engine_color_;

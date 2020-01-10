@@ -1,8 +1,8 @@
 /// @file	WaitingState.hpp
 /// @author Mathieu Pagé
-/// @date	Decembre 2019
+/// @date	January 2020
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
-///         waiting for commands.
+///         waiting for the user to play.
 
 #ifndef M8_ENGINE_WAITING_STATE_HPP_
 #define M8_ENGINE_WAITING_STATE_HPP_
@@ -15,27 +15,15 @@ namespace m8::engine {
 	class WaitingState : public EngineState
 	{
 	public:
-		/// Default constructor
-		WaitingState(Engine* engine)
-			: EngineState(engine)
-		{};
 
 		/// Constructor from a previous state
-		WaitingState(EngineState* source)
-			: EngineState(source)
-		{}
+		WaitingState(EngineState* source);
 
-		/// Run a perft tests.
-		///
-		/// @param depth                   Depth of the test to run.
-		/// @param partial_result_callback Method to call after each root move to give a 
-		///                                subcount of the nodes.
-		/// @param result_callback         Method to call when the tests is finished to 
-		///                                return the nodes count and the time used to 
-		///                                perform the test.
-		virtual void Perft(int depth,
-			               EngineState::PartialPerftResultCallback partial_result_callback,
-			               EngineState::PerftResultCallback        result_callback);
+		/// Accept a move to play on the current board.
+		virtual void UserMove(std::string move);
+
+	private:
+		Move ParseMove(const std::string& str_move);
 	};
 }
 

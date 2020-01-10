@@ -20,7 +20,7 @@ namespace m8::eval
 
 	const EvalType kEvalNull   = 0;
 	const EvalType kEvalMat    = 1000000;
-	const EvalType kMaxMat = 10000;
+	const EvalType kMaxMat     = 10000;
 
     /// Evaluate a position.
     inline EvalType Evaluate(const Board& board)
@@ -43,6 +43,11 @@ namespace m8::eval
 		{
 			return value;
 		}
+	}
+
+	inline double GetEvaluationInPawns(EvalType value)
+	{
+		return value / 100.0;
 	}
 }
 

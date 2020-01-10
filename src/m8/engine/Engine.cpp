@@ -5,16 +5,18 @@
 
 #include <iostream>
 
+#include "../../m8common/logging.hpp"
+
 #include "Engine.hpp"
-#include "WaitingState.hpp"
+#include "ObservingState.hpp"
 
 #include "../../m8chess/SAN.hpp"
 
 namespace m8::engine
 {
-	Engine::Engine()
+	Engine::Engine(EngineCallbacks callbacks)
 	{
-		state_ = new WaitingState(this);
+		state_ = new ObservingState(this, callbacks);
 	}
 
 	Engine::~Engine()
@@ -26,6 +28,8 @@ namespace m8::engine
 	{
 		if (new_state != state_)
 		{
+			M8_DEBUG << "ChangeState from " << state_->state_name() << " to " << new_state->state_name();
+
 			state_->EndState();
 
 			delete state_;
