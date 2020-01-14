@@ -367,7 +367,7 @@ namespace m8
         {
             try
             {
-                engine_.UserMove(move);
+                CallEngineCommand([this, move]() {engine_.UserMove(move); }, move);
             }
             catch (const engine::InvalidMoveException&)
             {

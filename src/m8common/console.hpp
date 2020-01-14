@@ -25,7 +25,7 @@ namespace m8 {
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		
 		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-		columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		columns = csbi.srWindow.Right - csbi.srWindow.Left;
 #elif defined(__GNUC__)
 		struct winsize size;
 		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);

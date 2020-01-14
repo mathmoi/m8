@@ -5,6 +5,8 @@
 ///         search. The search algorithm itself is contained elswhere, but is access by
 ///         the enigne class trough the search class.
 
+#include <thread>
+
 #include "Search.hpp"
 #include "Minimax.hpp"
 #include "../eval/Eval.hpp"
@@ -23,7 +25,14 @@ namespace m8 { namespace search
 	{
 		if (search_thread_.joinable())
 		{
-			search_thread_.join();
+			if (search_thread_.get_id() == std::this_thread::get_id())
+			{
+				search_thread_.detach();
+			}
+			else
+			{
+				search_thread_.join();
+			}
 		}
 	}
 
