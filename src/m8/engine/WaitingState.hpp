@@ -22,6 +22,15 @@ namespace m8::engine {
 		/// Accept a move to play on the current board.
 		virtual void UserMove(std::string move);
 
+		/// Terminate the current game and prepare the engine to play a new game.
+		virtual void New();
+
+		/// Set the engine to play the current side and start playing.
+		virtual void Go();
+
+		/// Set the engine to play neither color.
+		virtual void Force();
+
 	private:
 		Move ParseMove(const std::string& str_move);
 	};

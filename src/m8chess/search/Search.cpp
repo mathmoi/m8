@@ -49,6 +49,7 @@ namespace m8 { namespace search
 		
 		state_ = SearchState::Searching;
 
+		// TODO : We should make sure Search objects are not reausable. This would then become obsolete.
 		if (search_thread_.joinable())
 		{
 			search_thread_.join();
@@ -58,16 +59,29 @@ namespace m8 { namespace search
 		search_thread_ = std::thread(&Search::RunSearchThread, this);
 	}
 
-	void Search::Stop()
+	bool Search::StopSearch()
 	{
+		bool was_searching = false;
 		if (state_ == SearchState::Searching)
 		{
 			std::lock_guard<std::mutex> lock(mutex_);
 
 			if (state_ == SearchState::Searching)
 			{
-				ptr_minimax_->Stop();
+				was_searching = true;
+				state_ = SearchState::Stopped;
 			}
+		}
+
+		return was_searching;
+	}
+
+	void Search::Stop()
+	{
+		bool was_searching = StopSearch();
+		if (was_searching)
+		{
+			ptr_minimax_->Stop();
 		}
 	}
 
@@ -75,16 +89,12 @@ namespace m8 { namespace search
  	{
 		M8_LOG_SCOPE_THREAD();
 
-		auto search_result = ptr_minimax_->Search(4);
+		auto search_result = ptr_minimax_->Search(5);
 
+		bool was_searching = StopSearch();
+		if (was_searching)
 		{
-			std::lock_guard<std::mutex> lock(mutex_);
-
-			ptr_minimax_.reset(nullptr);
-			state_ = SearchState::Ready;
+			search_completed_callback_(search_result);
 		}
-
-		search_completed_callback_(search_result);
-
 	}
 }}

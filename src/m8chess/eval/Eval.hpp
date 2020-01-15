@@ -25,6 +25,11 @@ namespace m8::eval
     /// Evaluate a position.
     inline EvalType Evaluate(const Board& board)
     {
+		if (board.material_value() != 0)
+		{
+			auto x = 0;
+		}
+
         return (1 - 2 * static_cast<int>(board.side_to_move())) * board.material_value();
     }
 

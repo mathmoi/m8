@@ -1,5 +1,5 @@
 /// @file	WaitingState.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	January 2020
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.
@@ -8,6 +8,7 @@
 
 #include "InvalidMoveException.hpp"
 #include "ThinkingState.hpp"
+#include "ObservingState.hpp"
 
 #include "WaitingState.hpp"
 
@@ -41,6 +42,26 @@ namespace m8::engine
 		}
 
 		return move;
+	}
+
+	void WaitingState::New()
+	{
+		set_fen(kStartingPositionFEN);
+		set_engine_color(kBlack);
+	}
+
+	void WaitingState::Go()
+	{
+		set_engine_color(board().side_to_move());
+
+		auto thinking_state = new ThinkingState(this);
+		ChangeState(thinking_state);
+	}
+
+	void WaitingState::Force()
+	{
+		auto observing_state = new ObservingState(this);
+		ChangeState(observing_state);
 	}
 }
 

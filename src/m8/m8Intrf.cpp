@@ -88,6 +88,7 @@ namespace m8
 			"Force the engine to play the side to move and to start playing",
 			"go",
 			std::bind(&m8Intrf::HandleGo, this)));
+        // TODO : Est-ce que cette commande est obsolete, puisqu'on utilise "force"
         shell_intrf_.AddCmd(ShellCmd("stop",
             "Stops the current operation",
             "stop",
@@ -100,7 +101,6 @@ namespace m8
 			"Start a new game",
 			"new",
 			std::bind(&m8Intrf::HandleNew, this)));
-
         shell_intrf_.AddCmd(ShellCmd("",
             "Handle a move by the user",
             "",
@@ -109,6 +109,10 @@ namespace m8
             "Handle a move by the user",
             "usermove {move}",
             std::bind(&m8Intrf::HandleUserMove, this, std::placeholders::_1)));
+        shell_intrf_.AddCmd(ShellCmd("force",
+            "Set the engine to play neither color",
+            "force",
+            std::bind(&m8Intrf::HandleForce, this)));
     }
 
 	void m8Intrf::SetupXboardMode()
@@ -311,23 +315,13 @@ namespace m8
 
 	void m8Intrf::HandleGo()
 	{
-        // TODO : Reimplement this
-
-        /*
-		// If the engine is already searching, do nothing.
-		if (engine_.state() != engine::EngineStateEnum::Searching)
-		{
-			if (engine_.state() != engine::EngineStateEnum::Ready)
-			{. 
-				M8_OUT_LINE(<< "The engine is not ready");
-			}
-			else
-			{
-				engine_.Go();
-			}
-		}
-        */
+        CallEngineCommand([this]() {engine_.Go(); }, "go");
 	}
+
+    void m8Intrf::HandleForce()
+    {
+        CallEngineCommand([this]() {engine_.Force(); }, "force");
+    }
 
     void m8Intrf::HandleStop()
     {

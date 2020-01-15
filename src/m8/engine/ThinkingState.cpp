@@ -8,32 +8,50 @@
 #include <iostream>
 #include <functional>
 
+#include "../../m8common/logging.hpp"
+
 #include "../../m8chess/SAN.hpp"
 
 #include "WaitingState.hpp"
-
 #include "ThinkingState.hpp"
+#include "ObservingState.hpp"
 
 namespace m8::engine
 {
 	ThinkingState::ThinkingState(EngineState* source)
 		: EngineState("ThinkingState", source),
 		search_(source->board(),
-			    std::bind(&ThinkingState::HandleSearchResult, this, std::placeholders::_1))
+			    std::bind(&ThinkingState::HandleSearchResult, this, std::placeholders::_1)),
+		searching_(true)
 	{}
 
 	void ThinkingState::BeginState()
 	{
+		M8_DEBUG << this->board().fen();
 		search_.Start();
 	}
 
 	void ThinkingState::HandleSearchResult(search::SearchResult result)
 	{
-		std::string move = RenderSAN(result.GetBestMove(), this->board());
+		bool was_searching = false;
 
-		MakeEngineMove(result);
-		SendResultToUser(move, result);
-		SwitchToWaitingState();
+		{
+			auto lock = std::lock_guard(state_mutex_);
+			if (searching_)
+			{
+				was_searching = true;
+				std::string move = RenderSAN(result.GetBestMove(), this->board());
+
+				MakeEngineMove(result);
+				SendResultToUser(move, result);
+				searching_ = false;
+			}
+		}
+
+		if (was_searching)
+		{
+			SwitchToWaitingState();
+		}
 	}
 	void ThinkingState::SwitchToWaitingState()
 	{
@@ -50,5 +68,35 @@ namespace m8::engine
 	void ThinkingState::MakeEngineMove(m8::search::SearchResult& result)
 	{
 		this->board().Make(result.GetBestMove());
+	}
+
+	void ThinkingState::Force()
+	{
+		auto was_searching = StopSearch();
+		if (was_searching)
+		{
+			SwitchToObservingState();
+		}
+	}
+
+	void ThinkingState::SwitchToObservingState()
+	{
+		auto observing_state = new ObservingState(this);
+		ChangeState(observing_state);
+	}
+
+	bool ThinkingState::StopSearch()
+	{
+		auto lock = std::lock_guard(state_mutex_);
+		
+		bool was_searching = searching_;
+
+		if (searching_)
+		{
+			search_.Stop();
+			searching_ = false;
+		}
+
+		return was_searching;
 	}
 }

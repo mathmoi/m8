@@ -54,6 +54,7 @@ namespace m8
 	  void HandleXboard();
 	  void HandleProtover(std::vector<std::string> args_list);
 	  void HandleGo();
+      void HandleForce();
       void HandleStop();
 	  void HandleNew();
       void HandlePing(std::vector<std::string> args_list);

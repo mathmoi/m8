@@ -24,7 +24,8 @@ namespace m8 { namespace search
 	enum class SearchState
 	{
 		Ready,
-		Searching
+		Searching,
+		Stopped
 	};
 
     /// Manage the seach for the engine.
@@ -63,6 +64,7 @@ namespace m8 { namespace search
 		SearchCompletedCallback search_completed_callback_;
 
 		void RunSearchThread();
+		bool StopSearch();
     };
 
 }}

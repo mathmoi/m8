@@ -9,6 +9,7 @@
 #include "ObservingState.hpp"
 #include "WaitingState.hpp"
 #include "PerftState.hpp"
+#include "ThinkingState.hpp"
 
 namespace m8::engine {
 
@@ -25,5 +26,13 @@ namespace m8::engine {
 
 		auto waiting_state = new WaitingState(this);
 		ChangeState(waiting_state);
+	}
+
+	void ObservingState::Go()
+	{
+		set_engine_color(board().side_to_move());
+
+		auto thinking_state = new ThinkingState(this);
+		ChangeState(thinking_state);
 	}
 }

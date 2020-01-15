@@ -34,6 +34,12 @@ namespace m8::engine {
 
 		/// Terminate the current game and prepare the engine to play a new game.
 		virtual void New();
+
+		/// Set the engine to play the current side and start playing.
+		virtual void Go();
+
+		/// Set the engine to play neither color.
+		virtual inline void Force() { /* do nothing */ }
 	};
 }
 

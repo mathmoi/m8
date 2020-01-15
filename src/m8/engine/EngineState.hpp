@@ -79,6 +79,9 @@ namespace m8::engine {
         /// Set the engine to play the current side and start playing.
         virtual inline void Go() { throw InvalidEngineCommandException("Go"); }
 
+        /// Set the engine to play neither color.
+        virtual inline void Force() { throw InvalidEngineCommandException("Force"); }
+
         /// Stops the current operation.
         virtual inline void Stop() { throw InvalidEngineCommandException("Stop"); }
 
