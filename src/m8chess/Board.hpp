@@ -61,8 +61,12 @@ namespace m8
         /// For more information check here:
         /// http://chessprogramming.wikispaces.com/Forsyth-Edwards+Notation
         ///
-        /// @param fen X-FEN string that represent the board state to recreate.
-        Board(const std::string&  fen);
+        /// @param fen   X-FEN string that represent the board state to recreate.
+        /// @param psqt  Pointer to a piece-square table to use for material evaluation 
+        ///              by the board. The board is responsible for this part of the
+        ///              evaluation for performance reasons.
+        Board(const std::string&  fen,
+              eval::PieceSqTablePtr psqt = eval::GenerateEmptyPieceSqTable());
 
         /// Index operator. Returns the piece that is on a given square.
         ///

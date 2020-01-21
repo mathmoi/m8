@@ -66,8 +66,9 @@ namespace m8
 	  void DisplayEngineMove(const std::string& move);
       void DisplayPerftPartialResult(std::string move, std::uint64_t count);
       void DisplayPerftResult(std::uint64_t count, double seconds);
+      void DisplayBoard() const;
 
-      void CallEngineCommand(std::function<void()> call, const std::string& command);
+      bool CallEngineCommand(std::function<void()> call, const std::string& command);
 	  void ClearLine() const;
    };
 }

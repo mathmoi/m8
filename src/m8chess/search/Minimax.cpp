@@ -36,7 +36,7 @@ namespace m8 { namespace search
 				}
 				else
 				{
-					value = eval::Evaluate(board_);
+					value = -eval::Evaluate(board_);
 				}
 
 				if (value > max_value)
@@ -82,7 +82,7 @@ namespace m8 { namespace search
 				}
 				else
 				{
-					value = eval::Evaluate(board_);
+					value = -eval::Evaluate(board_);
 				}
 
 				if (value > max_value)

@@ -124,6 +124,8 @@ namespace m8
        Options& options = Options::get();
 
        TryReadOption<std::string>(tree, "max-log-severity", [&options](std::string v) { options.set_max_log_severity(boost::lexical_cast<severity_level>(v)); });
+       TryReadOption<std::string>(tree, "display-auto", [&options](std::string v) { options.set_display_auto(boost::lexical_cast<bool>(v)); });
+       TryReadOption<std::string>(tree, "display-eval", [&options](std::string v) { options.set_display_eval(boost::lexical_cast<bool>(v)); });
 
        ReadPerftOptions(tree, options.perft());
        options.set_psqt(ReadPsqtOptions(tree));

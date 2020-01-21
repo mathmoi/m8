@@ -3,6 +3,7 @@
 /// @date   Feburary 2018
 /// @brief  Contains functionalities to log informations to a log file.
 
+#include <process.h>
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -23,6 +24,7 @@
 #include "../m8/options/Options.hpp"
 
 #include "logging.hpp"
+#include "Utils.hpp"
 
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
@@ -97,8 +99,8 @@ namespace m8
         boost::shared_ptr<sinks::text_file_backend> backend =
             boost::make_shared<sinks::text_file_backend>
             (
-                keywords::file_name = "m8_%Y%m%d%H%M%S.%N.log"
-                );
+                keywords::file_name = std::string("m8_%Y%m%d%H%M%S.") + ToString(_getpid()) + ".log"
+            );
 
         // Create the sink to a log file
         typedef sinks::synchronous_sink<sinks::text_file_backend> text_sink;

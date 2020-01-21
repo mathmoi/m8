@@ -45,6 +45,14 @@ namespace m8
         return retour;
     }
 
+    template<class T>
+    std::string ToString(T value)
+    {
+        std::ostringstream out;
+        out << value;
+        return out.str();
+    }
+
     /// Convert a number to string using the bigest metric suffixe possible.
     ///
     /// @param number    Number to convert to a string.

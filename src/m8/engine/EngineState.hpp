@@ -31,11 +31,13 @@ namespace m8::engine {
         /// Default constructor
         EngineState(std::string state_name,
                     Engine* engine,
+                    eval::PieceSqTablePtr psqt,
                     const EngineCallbacks callbacks)
             : state_name_(state_name),
               engine_(engine),
               callbacks_(callbacks),
-              board_(kStartingPositionFEN),
+              psqt_(psqt),
+              board_(kStartingPositionFEN, psqt),
               engine_color_(kBlack)
         {}
 
@@ -45,6 +47,7 @@ namespace m8::engine {
             : state_name_(state_name),
               engine_(source->engine_),
               callbacks_(source->callbacks_),
+              psqt_(source->psqt_),
               board_(source->board_),
               engine_color_(source->engine_color_)
         {}
@@ -60,7 +63,7 @@ namespace m8::engine {
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        virtual inline void set_fen(std::string fen) { board_ = Board(fen); };
+        virtual inline void set_fen(std::string fen) { board_ = Board(fen, psqt_); };
 
         /// Return the name of the state
         inline const std::string& state_name() const { return state_name_; }
@@ -112,6 +115,7 @@ namespace m8::engine {
 
         EngineCallbacks callbacks_;
 
+        eval::PieceSqTablePtr psqt_;
         Board board_;
         Color engine_color_;
     };

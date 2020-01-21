@@ -230,6 +230,20 @@ TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByColumn_CorrectStringReturned")
                "Rce6+");
 }
 
+TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByColumn2_CorrectStringReturned")
+{
+    RenderTest("8/1p6/p2k2p1/P2n2rp/8/R7/1P5r/2KR4 w - h6 0 38",
+               NewMove(kA3, kD3, kWhiteRook),
+               "Rad3");
+}
+
+TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByColumn3_CorrectStringReturned")
+{
+    RenderTest("8/1p6/p2k2p1/P2n2rp/8/R7/1P5r/2KR4 w - h6 0 38",
+               NewMove(kD1, kD3, kWhiteRook),
+               "Rdd3");
+}
+
 TEST_CASE("RenderSAN_AmbiguousMoveDifferentiatedByRow_CorrectStringReturned")
 {
     RenderTest("2r1k3/8/8/8/8/2r5/8/4K3 b - - 0 1",

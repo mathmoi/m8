@@ -11,6 +11,7 @@
 
 #include "EngineState.hpp"
 #include "EngineCallbacks.hpp"
+#include "../../m8chess/eval/Eval.hpp"
 
 namespace m8::engine
 {
@@ -22,7 +23,8 @@ namespace m8::engine
 
     public:
         /// Constructor
-        Engine(EngineCallbacks callbacks);
+        Engine(eval::PieceSqTablePtr psqt,
+               EngineCallbacks callbacks);
 
         /// Destructor
         ~Engine();
@@ -56,6 +58,9 @@ namespace m8::engine
 
         /// Accept a move to play on the current board.
         void UserMove(std::string move) { state_->UserMove(move); };
+
+        /// Returns the current evaluation;
+        eval::EvalType current_evaluation() const;
 
     private:
         EngineState* state_;

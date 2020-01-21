@@ -13,7 +13,10 @@
 
 namespace m8
 {
-    Board::Board(const std::string&  fen)
+    Board::Board(const std::string& fen,
+                 eval::PieceSqTablePtr psqt)
+        : psqt_(psqt),
+          material_value_(0)
     {
         Clear();
 
@@ -379,9 +382,6 @@ namespace m8
         colmn_enpas_ = kInvalColmn;
         half_move_clock_ = 0;
         full_move_clock_ = 0;
-
-        psqt_ = eval::GenerateEmptyPieceSqTable();
-        material_value_ = 0;
     }
 
     void DisplayPiece(std::ostream& out, Piece piece)

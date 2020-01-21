@@ -387,14 +387,20 @@ namespace m8
             Bb candidates = generator.GenerateAttacksTo(piece, to);
             candidates = RemovePinnedCandidates(candidates, color, to, board, generator);
 
-            if (GetPopct(candidates & GetRowBb(row)) > 1)
+            if (GetPopct(candidates) > 1)
             {
-                out << GetColumnChar(colmn);
-            }
-
-            if (GetPopct(candidates & GetColmnBb(colmn)) > 1)
-            {
-                out << GetRowNumber(row);
+                if (GetPopct(candidates & GetColmnBb(colmn)) == 1)
+                {
+                    out << GetColumnChar(colmn);
+                }
+                else if (GetPopct(candidates & GetRowBb(row)) == 1)
+                {
+                    out << GetRowNumber(row);
+                }
+                else
+                {
+                    out << GetColumnChar(colmn) << GetRowNumber(row);
+                }
             }
         }
     }

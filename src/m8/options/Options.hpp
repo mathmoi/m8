@@ -57,6 +57,18 @@ namespace m8
 
         /// Maximum log severity level.
         inline severity_level max_log_severity() const { return max_log_severity_; }
+
+        /// Set a value indicating if the evaluation should be displayed with the board.
+        inline void set_display_eval(bool value) { display_eval_ = value; }
+
+        /// Return an value indicating if the evaluation should be displayed with the board.
+        inline bool display_eval() const { return display_eval_; }
+
+        /// Set the value indicating if the board should be displayed automatically
+        inline void set_display_auto(bool value) { display_auto_ = value; }
+
+        /// Get the value indicating if the board should be displayed automatically
+        inline bool display_auto() const { return display_auto_; }
         
         /// Give access to the options that can be modified through the user interface.
         inline const Storage& modifiable_options_map() const { return options_; }
@@ -80,7 +92,8 @@ namespace m8
         PerftOptions perft_;
         PsqtType psqt_;
         EvalOptions eval_;
-
+        bool display_eval_;
+        bool display_auto_;
     };
 
     /// Read the properties from a configuration file.

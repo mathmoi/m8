@@ -4,6 +4,8 @@
     "min-works-items": 100
   },
   "max-log-severity": "none",
+  "display-eval": 1,
+  "display-auto": 1,
   "eval" : {
       "pawn" : 100,
       "knight" : 320,

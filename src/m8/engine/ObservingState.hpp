@@ -18,8 +18,9 @@ namespace m8::engine {
 	public:
 		/// Default constructor
 		ObservingState(Engine* engine,
+			           eval::PieceSqTablePtr psqt,
 			           EngineCallbacks callbacks)
-			: EngineState("ObservingState", engine, callbacks)
+			: EngineState("ObservingState", engine, psqt, callbacks)
 		{};
 
 		/// Constructor from a previous state
@@ -32,6 +33,9 @@ namespace m8::engine {
 		/// @param depth                   Depth of the test to run.
 		virtual void Perft(int depth);
 
+		/// Accept a move to play on the current board.
+		virtual void UserMove(std::string move);
+
 		/// Terminate the current game and prepare the engine to play a new game.
 		virtual void New();
 
@@ -40,6 +44,9 @@ namespace m8::engine {
 
 		/// Set the engine to play neither color.
 		virtual inline void Force() { /* do nothing */ }
+
+	private:
+		Move ParseMove(const std::string& str_move);
 	};
 }
 

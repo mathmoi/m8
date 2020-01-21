@@ -4,10 +4,6 @@
 /// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
 ///         searching for a move to play
 
-// TODO : Remove this
-#include <iostream>
-#include <functional>
-
 #include "../../m8common/logging.hpp"
 
 #include "../../m8chess/SAN.hpp"

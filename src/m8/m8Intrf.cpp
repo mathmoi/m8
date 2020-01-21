@@ -23,7 +23,8 @@
 namespace m8
 {
     m8Intrf::m8Intrf()
-        : engine_(CreateEngineCallbacks()),
+        : engine_(eval::GeneratePieceSqTable(),
+                  CreateEngineCallbacks()),
 		  xboard_(false),
           shell_intrf_()
     {
@@ -155,10 +156,7 @@ namespace m8
     void m8Intrf::HandleDisplay() const
     {
         std::lock_guard<std::mutex> lock(output_mutex_);
-
-        M8_EMPTY_LINE();
-        M8_OUT_LINE(<< engine_.board());
-        M8_EMPTY_LINE();
+        DisplayBoard();
     }
 
     void m8Intrf::HandleFen(std::vector<std::string> args_list)
@@ -361,7 +359,13 @@ namespace m8
         {
             try
             {
-                CallEngineCommand([this, move]() {engine_.UserMove(move); }, move);
+                auto sucess = CallEngineCommand([this, move]() {engine_.UserMove(move); }, move);
+                
+                if (sucess && Options::get().display_auto())
+                {
+                    std::lock_guard<std::mutex> lock(output_mutex_);
+                    DisplayBoard();
+                }
             }
             catch (const engine::InvalidMoveException&)
             {
@@ -382,6 +386,12 @@ namespace m8
         {
             ClearLine();
             M8_OUT_LINE(<< " m8 plays " << move);
+
+            if (Options::get().display_auto())
+            {
+                DisplayBoard();
+            }
+
             shell_intrf_.DisplayInvit();
         }
 	}
@@ -405,16 +415,35 @@ namespace m8
         shell_intrf_.DisplayInvit();
     }
 
-    void m8Intrf::CallEngineCommand(std::function<void()> call, const std::string& command)
+    void m8Intrf::DisplayBoard() const
     {
+        M8_EMPTY_LINE();
+        M8_OUT_LINE(<< engine_.board());
+
+        if (Options::get().display_eval())
+        {
+            M8_OUT_LINE(<< "Current evaluation: " << engine_.current_evaluation());
+        }
+
+        M8_EMPTY_LINE();
+    }
+
+    bool m8Intrf::CallEngineCommand(std::function<void()> call, const std::string& command)
+    {
+        bool sucess = true;
+
         try {
             call();
         }
         catch (const engine::InvalidEngineCommandException& ex)
         {
+            sucess = false;
+
             std::lock_guard<std::mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Error (" << ex.what() << "): " <<command);
         }
+
+        return sucess;
     }
 
 	void m8Intrf::ClearLine() const

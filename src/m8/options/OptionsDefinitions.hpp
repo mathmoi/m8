@@ -22,7 +22,16 @@
           m8::severity_level,                                               \
           max_log_severity,                                                 \
           set_max_log_severity)                                             \
-
+    macro("display-auto",                                                   \
+          "Indicate if the board should be displayed after each moves",     \
+          bool,                                                             \
+          display_auto,                                                     \
+          set_display_auto)                                                 \
+    macro("display-eval",                                                   \
+          "Indicate if the evaluation should be displayed with the board",  \
+          bool,                                                             \
+          display_eval,                                                     \
+          set_display_eval)                                                 \
                                    
 #endif // M8_OPTIONS_DEFINITIONS_HPP_
 
