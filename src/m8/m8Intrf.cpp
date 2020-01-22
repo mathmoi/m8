@@ -136,6 +136,11 @@ namespace m8
             "ping {N}",
             std::bind(&m8Intrf::HandlePing, this, std::placeholders::_1)));
 
+        shell_intrf_.AddCmd(ShellCmd("setboard",
+            "Set the position of the board as a XFen string",
+            "setboard [XFenString]",
+            std::bind(&m8Intrf::HandleFen, this, std::placeholders::_1)));
+
         // TODO : Implement theses commands correctly
         shell_intrf_.AddCmd(ShellCmd("random", "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("post", "", "", std::bind([] {})));
