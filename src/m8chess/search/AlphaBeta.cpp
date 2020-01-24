@@ -7,26 +7,74 @@
 #include <chrono>
 
 #include "../eval/Eval.hpp"
+#include "../MoveGen.hpp"
+#include "../Checkmate.hpp"
 
 #include "AlphaBeta.hpp"
 
-namespace m8 { namespace search {
+namespace m8::search {
 
 	AlphaBeta::AlphaBeta(const Board& board)
-		: board_(board)
+		: board_(board),
+		  continue_(true),
+		  best_move_(kNullMove)
 	{}
 
-	void AlphaBeta::ExecuteMinimax(std::uint32_t depth)
+	template<bool root, bool qsearch>
+	eval::EvalType AlphaBeta::Search(eval::EvalType alpha, eval::EvalType beta, std::int_fast16_t depth)
 	{
-		for (auto x = 0; x < 15; ++x)
+		if (!root && depth <= 0)
 		{
-			iteration_finished_callback_(x, std::chrono::duration<double>(x), x);
-
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(1s);
+			return eval::Evaluate(board_);
 		}
 
-		auto eval = eval::Evaluate(board_);
-		search_finished_callback_(eval);
+		MoveList moves;
+		Move* last = GenerateAllMoves(board_, moves.data());
+
+		for (Move* next = moves.data(); next < last && continue_; ++next)
+		{
+			eval::EvalType value;
+
+			UnmakeInfo unmake_info = board_.Make(*next);
+
+			if (IsInvalidCheckPosition(board_))
+			{
+				board_.Unmake(*next, unmake_info);
+			}
+			else
+			{
+				value = -Search<false, false>(-beta, -alpha, depth - 1);
+				value = eval::AddDepthToMate(value);
+				board_.Unmake(*next, unmake_info);
+
+				if (value >= beta)
+				{
+					return beta;
+				}
+
+				if (value > alpha)
+				{
+					alpha = value;
+					if (root)
+					{
+						best_move_ = *next;
+					}
+				}
+			}
+		}
+
+		return alpha;
 	}
-}}
+
+	SearchResult AlphaBeta::Search(std::uint32_t depth)
+	{
+		auto value = Search<true, false>(-eval::kMinEval, eval::kMaxEval, depth);
+		return SearchResult(value, best_move_);
+	}
+
+	void AlphaBeta::Stop()
+	{
+		continue_ = false;
+	}
+
+}

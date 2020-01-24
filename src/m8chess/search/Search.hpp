@@ -16,7 +16,8 @@
 
 #include "../Board.hpp"
 #include "SearchResult.hpp"
-#include "Minimax.hpp"
+#include "Minimax.hpp" // TODO : Remove
+#include "AlphaBeta.hpp"
 
 namespace m8 { namespace search
 {
@@ -59,7 +60,7 @@ namespace m8 { namespace search
         
 		Board board_;
 		SearchState state_;
-		std::unique_ptr<Minimax> ptr_minimax_;
+		std::unique_ptr<AlphaBeta> ptr_alpha_beta;
 
 		SearchCompletedCallback search_completed_callback_;
 

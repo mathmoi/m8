@@ -13,6 +13,8 @@
 #include "../Board.hpp"
 #include "../../m8common/ThreadPool.hpp"
 
+#include "SearchResult.hpp"
+
 namespace m8 {
 	namespace search
 	{
@@ -21,29 +23,23 @@ namespace m8 {
 		{
 		public:
 
-			/// Constructor
+			/// Constructor.
 			AlphaBeta(const Board& board);
 
+			// TODO : Remove depth from the Search method and replace by proper time management
 			/// Start a search on a given position.
-			void ExecuteMinimax(std::uint32_t depth);
+			SearchResult Search(std::uint32_t depth);
+
+			/// Stop the search
+			void Stop();
 
 		private:
 			Board board_;
+			bool continue_;
+			Move best_move_; // TODO : Remove this hack by returning a proper PV.
 
-			/// Callback function for the end of the search.
-			///
-			/// The first parameter is the evaluation.
-			std::function<void(std::uint32_t)> search_finished_callback_;
-
-			/// Callback function for the end of an iteration.
-			///
-			/// Parameter 1 : depth
-			/// Parameter 2 : Time since the begining of the search
-			/// Parameter 3 : Evaluation
-			std::function<void(std::int32_t,
-				               std::chrono::duration<double>,
-				               std::uint32_t)> iteration_finished_callback_;
-
+			template<bool root, bool qsearch>
+			eval::EvalType Search(eval::EvalType alpha, eval::EvalType beta, std::int_fast16_t depth);
 		};
 
 	}

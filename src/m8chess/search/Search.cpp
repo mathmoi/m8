@@ -55,7 +55,7 @@ namespace m8 { namespace search
 			search_thread_.join();
 		}
 
-		ptr_minimax_ = std::make_unique<Minimax>(board_);
+		ptr_alpha_beta = std::make_unique<AlphaBeta>(board_);
 		search_thread_ = std::thread(&Search::RunSearchThread, this);
 	}
 
@@ -81,7 +81,7 @@ namespace m8 { namespace search
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
-			ptr_minimax_->Stop();
+			ptr_alpha_beta->Stop();
 		}
 	}
 
@@ -89,7 +89,7 @@ namespace m8 { namespace search
  	{
 		M8_LOG_SCOPE_THREAD();
 
-		auto search_result = ptr_minimax_->Search(5);
+		auto search_result = ptr_alpha_beta->Search(7);
 
 		bool was_searching = StopSearch();
 		if (was_searching)

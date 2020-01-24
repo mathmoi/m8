@@ -45,7 +45,7 @@ namespace m8 { namespace search
 			}
 
 			board_.Unmake(*next, unmake_info);
-		}
+		}	
 
 		if (continue_)
 		{
