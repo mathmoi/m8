@@ -167,9 +167,9 @@ namespace m8
     /// IF candidate are pinned_candidates we keep them only if the ray defined by
     /// the piece and the destination is the same as the ray defined by the piece
     /// and it's king. This way the piece still protects it's king.
-    Bb RemovePinnedCandidates(Bb candidates, Color color, Sq to, const Board& board, const MoveGen& move_generator)
+    Bb RemovePinnedCandidates(Bb candidates, Color color, Sq to, const Board& board)
     {
-        Bb pinned_candidates = candidates & move_generator.GetPinnedPieces(color);
+        Bb pinned_candidates = candidates & GetPinnedPieces(board, color);
         if (pinned_candidates)
         {
             Sq king_sq = board.king_sq(color);
@@ -191,7 +191,6 @@ namespace m8
     void GetOriginSq(ParseInfo& info, const Board& board)
     {
         Bb candidates;
-        MoveGen generator(board);
 
         if (!IsPiece(info.piece_taken) && GetPieceType(info.piece) == kPawn)
         {
@@ -199,11 +198,11 @@ namespace m8
         }
         else
         {
-            candidates = generator.GenerateAttacksTo(info.piece, info.to);
+            candidates = GenerateAttacksTo(board, info.piece, info.to);
         }
 
         candidates &= info.from_filter;
-        candidates = RemovePinnedCandidates(candidates, info.side_to_move, info.to, board, generator);
+        candidates = RemovePinnedCandidates(candidates, info.side_to_move, info.to, board);
 
         if (GetPopct(candidates) != 1)
         {
@@ -356,7 +355,7 @@ namespace m8
         }
     }
 
-    void OutputCheckAndMateCharacter(std::ostream& out, Move move, const Board& board, const MoveGen& generator)
+    void OutputCheckAndMateCharacter(std::ostream& out, Move move, const Board& board)
     {
         // We remove the constness of the board in order to modify it to check for Mat. 
         // This is not great, but we promise to put it back like it was when we are done 
@@ -366,14 +365,14 @@ namespace m8
         Color color_after_move = OpposColor(GetColor(GetPiece(move)));
 
         UnmakeInfo unmake_info = modifiable_board.Make(move);
-        if (IsInCheck(color_after_move, board, generator))
+        if (IsInCheck(color_after_move, board))
         {
             out << (IsMat(modifiable_board) ? '#' : '+');
         };
         modifiable_board.Unmake(move, unmake_info);
     }
 
-    void OutputDisambiguationCharacters(std::ostream& out, Move move, const Board& board, const MoveGen& generator)
+    void OutputDisambiguationCharacters(std::ostream& out, Move move, const Board& board)
     {
         Piece piece = GetPiece(move);
         if (GetPieceType(piece) != kPawn)
@@ -384,8 +383,8 @@ namespace m8
             Colmn colmn = GetColmn(from);
             Row row = GetRow(from);
 
-            Bb candidates = generator.GenerateAttacksTo(piece, to);
-            candidates = RemovePinnedCandidates(candidates, color, to, board, generator);
+            Bb candidates = GenerateAttacksTo(board, piece, to);
+            candidates = RemovePinnedCandidates(candidates, color, to, board);
 
             if (GetPopct(candidates) > 1)
             {
@@ -412,15 +411,13 @@ namespace m8
         CastleType castle_type = GetCastling(move);
         if (castle_type == kNoCastling)
         {
-            MoveGen generator(board);
-
             OutputCharPieceForSan(out, move);
             OutputPawnCaptureOriginColumn(out, move);
-            OutputDisambiguationCharacters(out, move, board, generator);
+            OutputDisambiguationCharacters(out, move, board);
             OutputCaptureCharacter(out, move);
             OutputDestination(out, move);
             OutputPromotion(out, move);
-            OutputCheckAndMateCharacter(out, move, board, generator);
+            OutputCheckAndMateCharacter(out, move, board);
         }
         else
         {

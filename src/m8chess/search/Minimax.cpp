@@ -9,14 +9,12 @@
 
 namespace m8 { namespace search
 {
-	// TODO : Detect Mate and nulls
 	SearchResult Minimax::Search(std::uint32_t depth)
 	{
 		continue_ = true;
 
-		MoveGen move_gen(board_);
 		MoveList moves;
-		Move* last = move_gen.GenerateAllMoves(moves.data());
+		Move* last = GenerateAllMoves(board_, moves.data());
 
 		eval::EvalType max_value = eval::kMinEval;
 		Move best_move = kNullMove;
@@ -27,7 +25,7 @@ namespace m8 { namespace search
 
 			eval::EvalType value;
 
-			if (!IsInvalidCheckPosition(board_, move_gen))
+			if (!IsInvalidCheckPosition(board_))
 			{
 				if (depth > 1)
 				{
@@ -61,9 +59,8 @@ namespace m8 { namespace search
 
 	eval::EvalType Minimax::SearchInternal(std::uint32_t depth)
 	{
-		MoveGen move_gen(board_);
 		MoveList moves;
-		Move* last = move_gen.GenerateAllMoves(moves.data());
+		Move* last = GenerateAllMoves(board_, moves.data());
 
 		eval::EvalType max_value = eval::kMinEval;
 
@@ -73,7 +70,7 @@ namespace m8 { namespace search
 
 			eval::EvalType value;
 
-			if (!IsInvalidCheckPosition(board_, move_gen))
+			if (!IsInvalidCheckPosition(board_))
 			{
 				if (depth > 1)
 				{
@@ -97,7 +94,7 @@ namespace m8 { namespace search
 		// detect mate and stalemate and returns appropriate evaluations
 		if (max_value == eval::kMinEval)
 		{
-			max_value = IsInCheck(board_.side_to_move(), board_, move_gen)
+			max_value = IsInCheck(board_.side_to_move(), board_)
 				? -eval::kEvalMat
 				: eval::kEvalNull;
 		}

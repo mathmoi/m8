@@ -19,20 +19,20 @@ namespace m8
         JoinThreads();
     }
 
-    std::uint64_t Perft::RunPerft(int depth, Board& board, const MoveGen& move_gen)
+    std::uint64_t Perft::RunPerft(int depth, Board& board)
     {
         std::uint64_t count = 0;
 
         MoveList moves;
-        Move* last = move_gen.GenerateAllMoves(moves.data());
+        Move* last = GenerateAllMoves(board, moves.data());
 
         for (Move* next = moves.data(); next < last && !abort_; ++next)
         {
             UnmakeInfo unmake_info = board.Make(*next);
 
-            if (!IsInCheck(OpposColor(board.side_to_move()), board, move_gen))
+            if (!IsInCheck(OpposColor(board.side_to_move()), board))
             {
-                count += (depth == 1 ? 1 : RunPerft(depth - 1, board, move_gen));
+                count += (depth == 1 ? 1 : RunPerft(depth - 1, board));
             }
 
             board.Unmake(*next, unmake_info);
@@ -41,7 +41,7 @@ namespace m8
         return count;
     }
 
-    int Perft::AddLayer(PerftNode::Ptr node, Board& board, const MoveGen& move_gen)
+    int Perft::AddLayer(PerftNode::Ptr node, Board& board)
     {
         int count = 0;
 
@@ -55,19 +55,19 @@ namespace m8
         {
             for (auto child : node->children())
             {
-                count += AddLayer(child, board, move_gen);
+                count += AddLayer(child, board);
             }
         }
         else
         {
             MoveList moves;
-            Move* last = move_gen.GenerateAllMoves(moves.data());
+            Move* last = GenerateAllMoves(board, moves.data());
 
             for (Move* next = moves.data(); next < last; ++next)
             {
                 UnmakeInfo unmake_info = board.Make(*next);
 
-                if (!IsInCheck(OpposColor(board.side_to_move()), board, move_gen))
+                if (!IsInCheck(OpposColor(board.side_to_move()), board))
                 {
                     node->AddChild(std::make_shared<PerftNode>(node, *next, node->depth() - 1));
                     ++count;
@@ -87,14 +87,12 @@ namespace m8
 
     void Perft::CreateRootNodes()
     {
-        MoveGen move_gen(board_);
-
         root_ = std::make_shared<PerftNode>(nullptr, kNullMove, depth_);
         int count;
         int layers = 0;
         do
         {
-            count = AddLayer(root_, board_, move_gen);
+            count = AddLayer(root_, board_);
             ++layers;
         } while (layers < depth_ && count < Options::get().perft().min_works_items());
     }
@@ -197,9 +195,8 @@ namespace m8
     {
         Board board(board_);
         GetBoard(board, node);
-        MoveGen move_gen(board);
 
-        std::uint64_t count = (node->depth() > 0 ? RunPerft(node->depth(), board, move_gen) : 1);
+        std::uint64_t count = (node->depth() > 0 ? RunPerft(node->depth(), board) : 1);
 
         node->set_count(count);
         node->set_state(PerftNodeState::Done);

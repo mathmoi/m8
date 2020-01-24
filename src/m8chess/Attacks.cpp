@@ -406,6 +406,12 @@ namespace m8
         }
     }
 
+    /// Generate a bitboard of the square attacked by a rook on a given square given a
+    /// specific occupation of the board.
+    ///
+    /// @param from Position of the rook.
+    /// @param occupation Occupation of the board.
+    /// @return A bitboard indicating the squares attacked by the rook.
     Bb GenerateRookAttackForOccupancy(Sq from, Bb occupation)
     {
         Bb bb_attack = kEmptyBb;
@@ -486,6 +492,12 @@ namespace m8
         }
     }
 
+    /// Generate a bitboard of the square attacked by a bishop on a given square given
+    /// a specific occupation of the board.
+    ///
+    /// @param from Position of the bishop.
+    /// @param occupation Occupation of the board.
+    /// @return A bitboard indicating the squares attacked by the bishop.
     Bb GenerateBishopAttackForOccupancy(Sq from, Bb occupation)
     {
         Bb bb_attack = kEmptyBb;

@@ -115,9 +115,9 @@ namespace m8
         std::vector<std::thread> threads_;
 
         void CreateRootNodes();
-        int AddLayer(PerftNode::Ptr node, Board& board, const MoveGen& move_gen);
+        int AddLayer(PerftNode::Ptr node, Board& board);
 
-        std::uint64_t RunPerft(int depth, Board& board, const MoveGen& move_gen);
+        std::uint64_t RunPerft(int depth, Board& board);
         
         PerftNode::Ptr PickNode(PerftNode::Ptr root);
         void ComputeNode(PerftNode::Ptr node);
