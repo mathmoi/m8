@@ -10,17 +10,16 @@
 #include <limits>
 
 #include "../Board.hpp"
+#include "../Types.hpp"
 
 namespace m8::eval
 {   
-	typedef std::int32_t EvalType;
-
-	const EvalType kMinEval    = std::numeric_limits<EvalType>::min();
-	const EvalType kMaxEval    = std::numeric_limits<EvalType>::max();
+	const EvalType kMinEval = std::numeric_limits<EvalType>::min() + 100;
+	const EvalType kMaxEval    = std::numeric_limits<EvalType>::max() - 100;
 
 	const EvalType kEvalNull   = 0;
-	const EvalType kEvalMat    = 1000000;
-	const EvalType kMaxMat     = 10000;
+	const EvalType kEvalMat    = 100000;
+	const EvalType kMaxMat     = 1000;
 
     /// Evaluate a position.
     inline EvalType Evaluate(const Board& board)

@@ -14,15 +14,20 @@
 
 namespace m8::search {
 
-	AlphaBeta::AlphaBeta(const Board& board)
+	AlphaBeta::AlphaBeta(const Board& board,
+		                 SearchObserver* observer)
 		: board_(board),
 		  continue_(true),
-		  best_move_(kNullMove)
+		  best_move_(kNullMove),
+		  nodes_counter_(0),
+		  observer_(observer)
 	{}
 
 	template<bool root, bool qsearch>
-	eval::EvalType AlphaBeta::Search(eval::EvalType alpha, eval::EvalType beta, std::int_fast16_t depth)
+	EvalType AlphaBeta::Search(EvalType alpha, EvalType beta, DepthType depth)
 	{
+		++nodes_counter_;
+
 		if (!root && depth <= 0)
 		{
 			return eval::Evaluate(board_);
@@ -30,10 +35,11 @@ namespace m8::search {
 
 		MoveList moves;
 		Move* last = GenerateAllMoves(board_, moves.data());
+		Move* first = moves.data();
 
-		for (Move* next = moves.data(); next < last && continue_; ++next)
+		for (Move* next = first; next < last && continue_; ++next)
 		{
-			eval::EvalType value;
+			EvalType value;
 
 			UnmakeInfo unmake_info = board_.Make(*next);
 
@@ -55,9 +61,12 @@ namespace m8::search {
 				if (value > alpha)
 				{
 					alpha = value;
-					if (root)
+
+					// If it is a new best move we notify the user.
+					if (root && *next != best_move_)
 					{
 						best_move_ = *next;
+						observer_->OnNewBestMove(best_move_, alpha, depth, 0, nodes_counter_);
 					}
 				}
 			}
@@ -66,10 +75,16 @@ namespace m8::search {
 		return alpha;
 	}
 
-	SearchResult AlphaBeta::Search(std::uint32_t depth)
+	SearchResult AlphaBeta::Search(DepthType depth)
 	{
-		auto value = Search<true, false>(-eval::kMinEval, eval::kMaxEval, depth);
-		return SearchResult(value, best_move_);
+		observer_->OnBeginSearch();
+
+		auto value = Search<true, false>(eval::kMinEval, eval::kMaxEval, depth);
+		auto result = SearchResult(value, best_move_, nodes_counter_);
+
+		observer_->OnSearchCompleted(result.best_move_, 0);
+
+		return result;
 	}
 
 	void AlphaBeta::Stop()

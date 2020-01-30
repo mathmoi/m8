@@ -10,13 +10,14 @@
 #include <thread>
 
 #include "../../m8chess/search/Search.hpp"
+#include "../../m8chess/Types.hpp"
 
 #include "EngineState.hpp"
 
 namespace m8::engine {
 
 	/// Class controlling the engine behavior in the waiting state.
-	class ThinkingState : public EngineState
+	class ThinkingState : public EngineState, public search::SearchObserver
 	{
 	public:
 
@@ -28,6 +29,15 @@ namespace m8::engine {
 
 		/// Set the engine to play neither color.
 		virtual void Force();
+
+		/// Method called when a new best move is found at the root.
+		void OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
+		/// Method called when an iteration is completed.
+		void OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
+		/// Method when the search is completed.
+		void OnSearchCompleted(Move move, double time);
 				
 	private:
 		search::Search search_;
@@ -35,11 +45,8 @@ namespace m8::engine {
 
 		std::mutex state_mutex_;
 
-		void HandleSearchResult(search::SearchResult result);
 		void SwitchToWaitingState();
 		void SwitchToObservingState();
-		void SendResultToUser(const std::string& move, m8::search::SearchResult& result);
-		void MakeEngineMove(m8::search::SearchResult& result);
 		bool StopSearch();
 	};
 }

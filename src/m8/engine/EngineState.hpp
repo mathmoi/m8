@@ -14,6 +14,7 @@
 #include "../../m8chess/Perft.hpp"
 #include "../../m8chess/Color.hpp"	
 #include "../../m8chess/Board.hpp"
+#include "../../m8chess/search/SearchObserver.hpp"
 
 #include "EngineCallbacks.hpp"
 #include "InvalidEngineCommandException.hpp"
@@ -32,13 +33,15 @@ namespace m8::engine {
         EngineState(std::string state_name,
                     Engine* engine,
                     eval::PieceSqTablePtr psqt,
-                    const EngineCallbacks callbacks)
+                    const EngineCallbacks callbacks,
+                    search::SearchObserver* observer)
             : state_name_(state_name),
               engine_(engine),
               callbacks_(callbacks),
               psqt_(psqt),
               board_(kStartingPositionFEN, psqt),
-              engine_color_(kBlack)
+              engine_color_(kBlack),
+              observer_(observer)
         {}
 
         /// Constructor from a previous state
@@ -49,7 +52,8 @@ namespace m8::engine {
               callbacks_(source->callbacks_),
               psqt_(source->psqt_),
               board_(source->board_),
-              engine_color_(source->engine_color_)
+              engine_color_(source->engine_color_),
+              observer_(source->observer_)
         {}
 
         /// Destructor.
@@ -108,6 +112,9 @@ namespace m8::engine {
         /// Accessor for the callbacks
         inline const EngineCallbacks callbacks() const { return callbacks_; }
 
+        /// Accessor for the observer
+        inline search::SearchObserver* observer() const { return observer_; }
+
     private:
         std::string state_name_;
 
@@ -118,6 +125,8 @@ namespace m8::engine {
         eval::PieceSqTablePtr psqt_;
         Board board_;
         Color engine_color_;
+
+        search::SearchObserver* observer_;
     };
 }
 

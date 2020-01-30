@@ -13,11 +13,12 @@
 #include <mutex>
 #include <functional>
 #include <memory>
+#include <chrono>
 
 #include "../Board.hpp"
 #include "SearchResult.hpp"
-#include "Minimax.hpp" // TODO : Remove
-#include "AlphaBeta.hpp"
+#include "SearchObserver.hpp"
+#include "IterativeDeepening.hpp"
 
 namespace m8 { namespace search
 {
@@ -30,14 +31,13 @@ namespace m8 { namespace search
 	};
 
     /// Manage the seach for the engine.
-    class Search
+    class Search : public SearchObserver
     {
     public:
-		typedef std::function<void (const SearchResult&)> SearchCompletedCallback;
-
+		
         /// Constructor
         Search(const Board& board,
-			   SearchCompletedCallback search_completed_callback);
+			   SearchObserver* observer);
 
 		/// Destructor
 		~Search();
@@ -54,16 +54,25 @@ namespace m8 { namespace search
 		/// Stop the search
 		void Stop();
 
+		/// Method called when a new best move is found at the root.
+		void OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
+		/// Method called when an iteration is completed.
+		void OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
     private:
 		std::thread search_thread_;
 		std::mutex mutex_;
         
 		Board board_;
 		SearchState state_;
-		std::unique_ptr<AlphaBeta> ptr_alpha_beta;
+		std::unique_ptr<IterativeDeepening> ptr_iterative_deepening_;
 
-		SearchCompletedCallback search_completed_callback_;
+		SearchObserver* observer_;
 
+		std::chrono::steady_clock::time_point start_time_;
+
+		double GetSearchTime() const;
 		void RunSearchThread();
 		bool StopSearch();
     };

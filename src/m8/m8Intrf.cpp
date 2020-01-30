@@ -11,6 +11,7 @@
 #include "m8Intrf.hpp"
 #include "options/Options.hpp"
 #include "engine/InvalidMoveException.hpp"
+#include "../m8chess/SAN.hpp"
 #include "../m8common/stringHelpers.hpp"
 #include "../m8common/Utils.hpp"
 #include "../m8common/logging.hpp"
@@ -24,7 +25,8 @@ namespace m8
 {
     m8Intrf::m8Intrf()
         : engine_(eval::GeneratePieceSqTable(),
-                  CreateEngineCallbacks()),
+                  CreateEngineCallbacks(),
+                  this),
 		  xboard_(false),
           shell_intrf_()
     {
@@ -37,7 +39,6 @@ namespace m8
 
         callbacks.partial_perft_result_callback = std::bind(&m8Intrf::DisplayPerftPartialResult, this, std::placeholders::_1, std::placeholders::_2);
         callbacks.perft_result_callback = std::bind(&m8Intrf::DisplayPerftResult, this, std::placeholders::_1, std::placeholders::_2);
-        callbacks.search_result_callback = std::bind(&m8Intrf::DisplayEngineMove, this, std::placeholders::_1);
 
         return callbacks;
     }
@@ -379,28 +380,6 @@ namespace m8
         }
     }
 
-	void m8Intrf::DisplayEngineMove(const std::string& move)
-	{
-        std::lock_guard<std::mutex> lock(output_mutex_);
-
-        if (xboard_)
-        {
-            M8_OUT_LINE(<< "move " << move);
-        }
-        else
-        {
-            ClearLine();
-            M8_OUT_LINE(<< " m8 plays " << move);
-
-            if (Options::get().display_auto())
-            {
-                DisplayBoard();
-            }
-
-            shell_intrf_.DisplayInvit();
-        }
-	}
-
     void m8Intrf::DisplayPerftPartialResult(std::string move, std::uint64_t count)
     {
         std::lock_guard<std::mutex> lock(output_mutex_);
@@ -433,6 +412,111 @@ namespace m8
         M8_EMPTY_LINE();
     }
 
+    void m8Intrf::DisplaySearchTableHeader() const
+    {
+        const std::string fixed_column_names(" | depth |   time   | score |   n   |");
+
+        auto console_width = std::max<int>(GetConsoleWidth(), 80);
+        auto fixed_columns_width = fixed_column_names.size();
+        auto available_width = console_width - fixed_columns_width;
+        auto header_width = console_width - 1;
+        auto pv_width = available_width - 1;
+        auto before_pv = (pv_width - 2) / 2;
+        auto after_pv = pv_width - before_pv - 2;
+
+        {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+
+            ClearLine();
+            M8_OUT_LINE(<< ' ' << std::string(header_width, '-') << std::endl
+                << " | pro  |  temps   | score | nodes  |" << std::string(before_pv, ' ') << "pv" << std::string(after_pv, ' ') << "|" << std::endl
+                << ' ' << std::string(header_width, '-'));
+        }
+    }
+
+    void m8Intrf::DisplaySearchTableLine(bool is_iteration_complete, std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes) const
+    {
+        using namespace std;
+
+        if (depth > 3 && time > 0.01)
+        {
+            std::ostringstream out;
+
+            // display depth
+            out << " |" << std::setw(3) << depth;
+
+            if (is_iteration_complete)
+            {
+                out << "->";
+            }
+            else
+            {
+                out << "  ";
+            }
+
+            out << " |";
+
+            // display the time
+            auto minutes = static_cast<int>(time / 60);
+            auto seconds = time - minutes * 60;
+            out << setw(3) << minutes << ":"
+                << setw(5) << setfill('0') << fixed << setprecision(2) << seconds << setfill(' ') << " |";
+
+            // display evaluation
+            out << setw(6) << FormaterEval(eval) << " | ";
+
+            // Display nodes count
+            out << setw(6) << AddMetricSuffix(nodes, 1) << " |";
+
+            // Display pv
+            auto console_width = std::max<int>(GetConsoleWidth(), 80);
+            auto pv_width = console_width - 40;
+            out << ' ' << setw(pv_width) << left << move << " |";
+
+            {
+                std::lock_guard<std::mutex> lock(output_mutex_);
+
+                ClearLine();
+                M8_OUT_LINE(<< out.str());
+            }
+            
+        }
+    }
+
+    void m8Intrf::DisplaySearchOutputXboard(std::string move, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const
+    {
+        std::lock_guard<std::mutex> lock(output_mutex_);
+        M8_OUT_LINE(<<depth <<' ' <<eval <<' ' <<static_cast<int>(seconds * 100) <<' ' <<move);
+    }
+    
+    void m8Intrf::DisplaySearchTableFooter() const
+    {
+        auto console_width = std::max<int>(GetConsoleWidth(), 80);
+        auto footer_width = console_width - 1;
+
+        {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') << std::endl);
+        }
+        
+    }
+
+    std::string m8Intrf::FormaterEval(int eval) const
+    {
+        using namespace std;
+
+        ostringstream out;
+
+        if (eval < -eval::kEvalMat + eval::kMaxMat)
+            out << "-MAT-" << eval - eval::kEvalMat;
+        else if (eval > eval::kEvalMat - eval::kMaxMat)
+            out << "MAT-" << eval::kEvalMat - eval;
+        else
+            out << setiosflags(ios::fixed) << setprecision(2) << eval / 100.0f;
+
+        return out.str();
+    }
+
     bool m8Intrf::CallEngineCommand(std::function<void()> call, const std::string& command)
     {
         bool sucess = true;
@@ -461,4 +545,60 @@ namespace m8
 		}
 		std::cout << '\r';
 	}
+
+    void m8Intrf::OnBeginSearch()
+    {
+        if (!xboard_)
+        {
+            DisplaySearchTableHeader();
+        }
+    }
+
+    void m8Intrf::OnNewBestMove(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+    {
+        if (xboard_)
+        {
+            DisplaySearchOutputXboard(move, eval, depth, time, nodes);
+        }
+        else
+        {
+            DisplaySearchTableLine(false, move, eval, depth, time, nodes);
+        }
+    }
+
+    void m8Intrf::OnIterationCompleted(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+    {
+        if (xboard_)
+        {
+            DisplaySearchOutputXboard(move, eval, depth, time, nodes);
+        }
+        else
+        {
+            DisplaySearchTableLine(true, move, eval, depth, time, nodes);
+        }
+    }
+
+    void m8Intrf::OnSearchCompleted(std::string move, double time)
+    {
+        DisplaySearchTableFooter();
+
+        if (xboard_)
+        {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< "move " << move);
+        }
+        else
+        {
+            std::lock_guard<std::mutex> lock(output_mutex_);
+            ClearLine();
+            M8_OUT_LINE(<< " m8 plays " << move);
+
+            if (Options::get().display_auto())
+            {
+                DisplayBoard();
+            }
+
+            shell_intrf_.DisplayInvit();
+        }
+    }
 }

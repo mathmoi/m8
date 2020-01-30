@@ -8,32 +8,29 @@
 
 #include "../eval/Eval.hpp"
 #include "../Move.hpp"
+#include "../Types.hpp"
 
-namespace m8 { namespace search {
+namespace m8::search {
 
 	/// Implements the minimax search algorithm
 	struct SearchResult
 	{
 	public:
 
-		/// Constructor
-		inline SearchResult(eval::EvalType value, Move best_move)
+		// Constructor.
+		SearchResult(EvalType value = 0,
+			         Move best_move = kNullMove,
+					 NodeCounterType nodes = 0)
 			: value_(value),
-			  best_move_(best_move)
-		{};
+			  best_move_(best_move),
+			  nodes_(nodes)
+		{}
 
-		/// Returns the value.
-		eval::EvalType GetValue() const { return value_; }
-
-		/// Returns the best move
-		Move GetBestMove() const { return best_move_; }
-
-	private:
-		eval::EvalType value_;
-		Move           best_move_;
+		EvalType        value_;
+		Move            best_move_;
+		NodeCounterType nodes_;
 
 	};
-
-}}
+}
 
 #endif // M8_SEARCH_RESULT_HPP_

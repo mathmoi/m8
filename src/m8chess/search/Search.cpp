@@ -1,4 +1,4 @@
-/// @file   Search.cpp
+/// @file   Search.cpp 
 /// @author Mathieu Pagé
 /// @date   March 2018
 /// @brief  Contains the Search class. This class is responsible to manage the engine's 
@@ -15,10 +15,10 @@
 namespace m8 { namespace search
 {
     Search::Search(const Board& board,
-	               SearchCompletedCallback search_completed_callback)
+	               SearchObserver* observer)
 		: board_(board),
 		  state_(SearchState::Ready),
-		  search_completed_callback_(search_completed_callback)
+		  observer_(observer)
     {}
 
 	Search::~Search()
@@ -47,6 +47,7 @@ namespace m8 { namespace search
 	{
 		assert(state_ == SearchState::Ready);
 		
+		start_time_ = std::chrono::steady_clock::now();
 		state_ = SearchState::Searching;
 
 		// TODO : We should make sure Search objects are not reausable. This would then become obsolete.
@@ -55,7 +56,7 @@ namespace m8 { namespace search
 			search_thread_.join();
 		}
 
-		ptr_alpha_beta = std::make_unique<AlphaBeta>(board_);
+		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, this);
 		search_thread_ = std::thread(&Search::RunSearchThread, this);
 	}
 
@@ -72,7 +73,6 @@ namespace m8 { namespace search
 				state_ = SearchState::Stopped;
 			}
 		}
-
 		return was_searching;
 	}
 
@@ -81,7 +81,7 @@ namespace m8 { namespace search
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
-			ptr_alpha_beta->Stop();
+			ptr_iterative_deepening_->Stop();
 		}
 	}
 
@@ -89,12 +89,31 @@ namespace m8 { namespace search
  	{
 		M8_LOG_SCOPE_THREAD();
 
-		auto search_result = ptr_alpha_beta->Search(7);
+		observer_->OnBeginSearch();
+
+		auto search_result = ptr_iterative_deepening_->Search(8);
 
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
-			search_completed_callback_(search_result);
+			observer_->OnSearchCompleted(search_result.best_move_, GetSearchTime());
 		}
+	}
+
+	double Search::GetSearchTime() const
+	{
+		auto now = std::chrono::steady_clock::now();
+		auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - start_time_);
+		return time_span.count();
+	}
+
+	void Search::OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	{
+		observer_->OnNewBestMove(move, eval, depth, GetSearchTime(), nodes);
+	}
+
+	void Search::OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	{
+		observer_->OnIterationCompleted(move, eval, depth, GetSearchTime(), nodes);
 	}
 }}

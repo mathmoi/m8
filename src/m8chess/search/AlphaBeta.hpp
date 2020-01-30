@@ -11,9 +11,11 @@
 #include <chrono>
 
 #include "../Board.hpp"
+#include "../Types.hpp"
 #include "../../m8common/ThreadPool.hpp"
 
 #include "SearchResult.hpp"
+#include "SearchObserver.hpp"
 
 namespace m8 {
 	namespace search
@@ -22,13 +24,13 @@ namespace m8 {
 		class AlphaBeta
 		{
 		public:
-
 			/// Constructor.
-			AlphaBeta(const Board& board);
+			AlphaBeta(const Board& board,
+				      SearchObserver* observer);
 
 			// TODO : Remove depth from the Search method and replace by proper time management
 			/// Start a search on a given position.
-			SearchResult Search(std::uint32_t depth);
+			SearchResult Search(DepthType depth);
 
 			/// Stop the search
 			void Stop();
@@ -37,9 +39,12 @@ namespace m8 {
 			Board board_;
 			bool continue_;
 			Move best_move_; // TODO : Remove this hack by returning a proper PV.
+			NodeCounterType nodes_counter_; // TODO : Replace this with a proper stats counter struct.
+
+			SearchObserver* observer_;
 
 			template<bool root, bool qsearch>
-			eval::EvalType Search(eval::EvalType alpha, eval::EvalType beta, std::int_fast16_t depth);
+			EvalType Search(EvalType alpha, EvalType beta, DepthType depth);
 		};
 
 	}

@@ -11,6 +11,7 @@
 
 #include "EngineState.hpp"
 #include "EngineCallbacks.hpp"
+#include "../../m8chess/search/SearchObserver.hpp"
 #include "../../m8chess/eval/Eval.hpp"
 
 namespace m8::engine
@@ -24,7 +25,8 @@ namespace m8::engine
     public:
         /// Constructor
         Engine(eval::PieceSqTablePtr psqt,
-               EngineCallbacks callbacks);
+               EngineCallbacks callbacks,
+               search::SearchObserver* observer);
 
         /// Destructor
         ~Engine();
@@ -60,7 +62,7 @@ namespace m8::engine
         void UserMove(std::string move) { state_->UserMove(move); };
 
         /// Returns the current evaluation;
-        eval::EvalType current_evaluation() const;
+        EvalType current_evaluation() const;
 
     private:
         EngineState* state_;

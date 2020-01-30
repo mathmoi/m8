@@ -15,7 +15,7 @@
 namespace m8
 {
    /// Class that implements m8's shell-like interface.
-   class m8Intrf
+   class m8Intrf : public search::SearchObserver
    {
    public:
 
@@ -24,6 +24,18 @@ namespace m8
 
       /// Execute the interface.
       void Execute();
+
+      /// Method called when the search starts.
+      void OnBeginSearch();
+
+      /// Method called when a new best move is found at the root.
+      void OnNewBestMove(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
+      /// Method called when an iteration is completed.
+      void OnIterationCompleted(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
+      /// Method when the search is completed.
+      void OnSearchCompleted(std::string move, double time);
 
    private:
 
@@ -63,10 +75,15 @@ namespace m8
       void DisplayOption(const std::string& option_name) const;
       void EditOption(const std::string& option_name, const std::string& value) const;
 
-	  void DisplayEngineMove(const std::string& move);
       void DisplayPerftPartialResult(std::string move, std::uint64_t count);
       void DisplayPerftResult(std::uint64_t count, double seconds);
       void DisplayBoard() const;
+
+      void DisplaySearchTableHeader() const;
+      void DisplaySearchTableLine(bool is_iteration_complete, std::string move, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
+      void DisplaySearchTableFooter() const;
+      void DisplaySearchOutputXboard(std::string move, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
+      std::string FormaterEval(int eval) const;
 
       bool CallEngineCommand(std::function<void()> call, const std::string& command);
 	  void ClearLine() const;

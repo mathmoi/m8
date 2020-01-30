@@ -31,7 +31,7 @@ namespace m8 { namespace search {
 		Board board_;
 		bool continue_;
 
-		eval::EvalType SearchInternal(std::uint32_t depth);
+		EvalType SearchInternal(std::uint32_t depth);
 
 	};
 }}

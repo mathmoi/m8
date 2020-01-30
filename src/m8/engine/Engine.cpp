@@ -15,9 +15,10 @@
 namespace m8::engine
 {
 	Engine::Engine(eval::PieceSqTablePtr psqt,
-		           EngineCallbacks callbacks)
+		           EngineCallbacks callbacks,
+		           search::SearchObserver* observer)
 	{
-		state_ = new ObservingState(this, psqt, callbacks);
+		state_ = new ObservingState(this, psqt, callbacks, observer);
 	}
 
 	Engine::~Engine()
@@ -40,7 +41,7 @@ namespace m8::engine
 		}
 	}
 
-	eval::EvalType Engine::current_evaluation() const
+	EvalType Engine::current_evaluation() const
 	{
 		return eval::Evaluate(state_->board());
 	}

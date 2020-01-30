@@ -16,14 +16,14 @@ namespace m8 { namespace search
 		MoveList moves;
 		Move* last = GenerateAllMoves(board_, moves.data());
 
-		eval::EvalType max_value = eval::kMinEval;
+		EvalType max_value = eval::kMinEval;
 		Move best_move = kNullMove;
 
 		for (Move* next = moves.data(); next < last && continue_; ++next)
 		{
 			UnmakeInfo unmake_info = board_.Make(*next);
 
-			eval::EvalType value;
+			EvalType value;
 
 			if (!IsInvalidCheckPosition(board_))
 			{
@@ -57,18 +57,18 @@ namespace m8 { namespace search
 		} 
 	}
 
-	eval::EvalType Minimax::SearchInternal(std::uint32_t depth)
+	EvalType Minimax::SearchInternal(std::uint32_t depth)
 	{
 		MoveList moves;
 		Move* last = GenerateAllMoves(board_, moves.data());
 
-		eval::EvalType max_value = eval::kMinEval;
+		EvalType max_value = eval::kMinEval;
 
 		for (Move* next = moves.data(); next < last && continue_; ++next)
 		{
 			UnmakeInfo unmake_info = board_.Make(*next);
 
-			eval::EvalType value;
+			EvalType value;
 
 			if (!IsInvalidCheckPosition(board_))
 			{

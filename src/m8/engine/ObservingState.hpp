@@ -1,4 +1,4 @@
-/// @file	ObservingState.hpp
+/// @file	ObservingState.hpp 
 /// @author Mathieu Pagé
 /// @date	Decembre 2019
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
@@ -19,8 +19,9 @@ namespace m8::engine {
 		/// Default constructor
 		ObservingState(Engine* engine,
 			           eval::PieceSqTablePtr psqt,
-			           EngineCallbacks callbacks)
-			: EngineState("ObservingState", engine, psqt, callbacks)
+			           EngineCallbacks callbacks,
+			           search::SearchObserver* observer)
+			: EngineState("ObservingState", engine, psqt, callbacks, observer)
 		{};
 
 		/// Constructor from a previous state
