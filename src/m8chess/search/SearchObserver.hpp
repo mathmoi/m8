@@ -9,6 +9,7 @@
 
 #include "../Types.hpp"
 #include "../Move.hpp"
+#include "PV.hpp"
 
 namespace m8::search {
 
@@ -20,16 +21,16 @@ namespace m8::search {
 		inline virtual void OnBeginSearch() {};
 
 		/// Method called when a new best move is found at the root.
-		inline virtual void OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
-		inline virtual void OnNewBestMove(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
+		inline virtual void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
+		inline virtual void OnNewBestMove(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
 
 		/// Method called when an iteration is completed.
-		inline virtual void OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
-		inline virtual void OnIterationCompleted(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
+		inline virtual void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
+		inline virtual void OnIterationCompleted(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
 
 		/// Method when the search is completed.
-		inline virtual void OnSearchCompleted(Move move, double time) {};
-		inline virtual void OnSearchCompleted(std::string move, double time) {};
+		inline virtual void OnSearchCompleted(const PV& pv, double time) {};
+		inline virtual void OnSearchCompleted(const std::vector<std::string>& pv, double time) {};
 	};
 }
 

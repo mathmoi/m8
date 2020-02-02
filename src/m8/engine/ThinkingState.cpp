@@ -4,6 +4,8 @@
 /// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
 ///         searching for a move to play
 
+#include <stack>
+
 #include "../../m8common/logging.hpp"
 
 #include "../../m8chess/SAN.hpp"
@@ -29,7 +31,7 @@ namespace m8::engine
 		search_.Start();
 	}
 
-	void ThinkingState::OnSearchCompleted(Move move, double time)
+	void ThinkingState::OnSearchCompleted(const search::PV& pv, double time)
 	{
 		bool was_searching = false;
 
@@ -39,9 +41,12 @@ namespace m8::engine
 			{
 				was_searching = true;
 
-				auto move_text = RenderSAN(move, board());
-				this->board().Make(move);
-				observer()->OnSearchCompleted(move_text, time);
+				auto pv_str = RenderPVMoves(pv);
+
+				this->board().Make(pv.first());
+
+				observer()->OnSearchCompleted(pv_str, time);
+
 				searching_ = false;
 			}
 		}
@@ -52,16 +57,16 @@ namespace m8::engine
 		}
 	}
 
-	void ThinkingState::OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void ThinkingState::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		auto move_text = RenderSAN(move, board());
-		observer()->OnNewBestMove(move_text, eval, depth, time, nodes);
+		auto pv_str = RenderPVMoves(pv);
+		observer()->OnNewBestMove(pv_str, eval, depth, time, nodes);
 	}
 
-	void ThinkingState::OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void ThinkingState::OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		auto move_text = RenderSAN(move, board());
-		observer()->OnIterationCompleted(move_text, eval, depth, time, nodes);
+		auto pv_str = RenderPVMoves(pv);
+		observer()->OnIterationCompleted(pv_str, eval, depth, time, nodes);
 	}
 
 	void ThinkingState::SwitchToWaitingState()
@@ -98,5 +103,27 @@ namespace m8::engine
 		}
 
 		return was_searching;
+	}
+
+	std::vector<std::string> ThinkingState::RenderPVMoves(const search::PV& pv)
+	{
+		std::vector<std::string> moves;
+		std::stack<UnmakeInfo> unmake_info_stack;
+
+		Board& boardr = board();
+
+		for (size_t x = 0; x < pv.count(); ++x)
+		{
+			moves.push_back(RenderSAN(pv[x], boardr));
+			unmake_info_stack.push(boardr.Make(pv[x]));
+		}
+
+		while (unmake_info_stack.size() > 0)
+		{
+			boardr.Unmake(pv[unmake_info_stack.size() - 1], unmake_info_stack.top());
+			unmake_info_stack.pop();
+		}
+		
+		return moves;
 	}
 }

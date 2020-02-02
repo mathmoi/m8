@@ -161,7 +161,7 @@ namespace m8
 
     void m8Intrf::HandleDisplay() const
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
         DisplayBoard();
     }
 
@@ -169,7 +169,7 @@ namespace m8
     {
         if (args_list.size() == 1)
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<<' ' << engine_.board().fen());
         }
         else
@@ -182,7 +182,7 @@ namespace m8
             }
             catch (const InvalFenError&)
             {
-                std::lock_guard<std::mutex> lock(output_mutex_);
+                std::lock_guard<std::recursive_mutex> lock(output_mutex_);
                 M8_OUT_LINE(<< "Invalid fen string.");
             }
         }
@@ -193,7 +193,7 @@ namespace m8
         // Check number of arguments
         if (args_list.size() != 2)
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : perft {Depth}");
             return;
         }
@@ -206,14 +206,14 @@ namespace m8
         }
         catch (const BadConvr&)
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : perft {Depth}");
             return;
         }
 
         if (depth < 1 || 255 < depth)
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<<"The depth must be between 1 and 255");
         }
         else
@@ -224,7 +224,7 @@ namespace m8
 
     void m8Intrf::HandleOptions() const
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
         M8_EMPTY_LINE();
 
@@ -238,7 +238,7 @@ namespace m8
 
     void m8Intrf::DisplayOption(const Option& option) const
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
         M8_EMPTY_LINE();
         M8_OUT_LINE(<<"Option name: " << option.name());
@@ -257,7 +257,7 @@ namespace m8
         }
         else
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
             M8_OUT_LINE(<< "Option \"" << option_name << "\" does not exist.");
         }
@@ -273,7 +273,7 @@ namespace m8
         }
         else
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
             M8_OUT_LINE(<< "Option \"" << option_name << "\" does not exist.");
         }
@@ -291,7 +291,7 @@ namespace m8
         }
         else
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : option {name} [value]");
         }
     }
@@ -304,7 +304,7 @@ namespace m8
 
 	void m8Intrf::HandleProtover(std::vector<std::string> args_list)
 	{
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
         M8_OUT_LINE(<< "feature done=0");
 		M8_OUT_LINE(<< "feature myname=\"m8 0.1\"");
         M8_OUT_LINE(<< "feature sigint=0");
@@ -339,7 +339,7 @@ namespace m8
 
     void m8Intrf::HandlePing(std::vector<std::string> args_list)
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
         M8_OUT_LINE(<< "pong " <<args_list[1]);
     }
 
@@ -357,7 +357,7 @@ namespace m8
         }
         else
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Usage : usermove {move}");
         }
 
@@ -369,7 +369,7 @@ namespace m8
                 
                 if (sucess && Options::get().display_auto())
                 {
-                    std::lock_guard<std::mutex> lock(output_mutex_);
+                    std::lock_guard<std::recursive_mutex> lock(output_mutex_);
                     DisplayBoard();
                 }
             }
@@ -382,7 +382,7 @@ namespace m8
 
     void m8Intrf::DisplayPerftPartialResult(std::string move, std::uint64_t count)
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
         ClearLine();
         M8_OUT_LINE(<< ' ' << move << '\t' << count);
@@ -390,7 +390,7 @@ namespace m8
 
     void m8Intrf::DisplayPerftResult(std::uint64_t count, double seconds)
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
         ClearLine();
         M8_OUT_LINE(<< std::endl
                     << " Nodes: " << count << std::endl
@@ -425,7 +425,7 @@ namespace m8
         auto after_pv = pv_width - before_pv - 2;
 
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
             ClearLine();
             M8_OUT_LINE(<< ' ' << std::string(header_width, '-') << std::endl
@@ -434,13 +434,56 @@ namespace m8
         }
     }
 
-    void m8Intrf::DisplaySearchTableLine(bool is_iteration_complete, std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes) const
+    /// Join the string from an iterator pair by separating them by a space.
+    std::vector<std::string> m8Intrf::JoinsPVMoves(std::vector<std::string>::const_iterator first,
+                                                   std::vector<std::string>::const_iterator last,
+                                                   size_t max_width) const
+    {
+        std::vector<std::string> result;
+        size_t current_width = 0;
+        std::ostringstream out;
+
+        for (auto next = first; next < last; ++next)
+        {
+            if (next != first)
+            {
+                if (current_width + 1 + next->length() > max_width)
+                {
+                    result.push_back(out.str());
+                    out.str("");
+                    current_width = 0;
+                }
+                else
+                {
+                    out << ' ';
+                    ++current_width;
+                }
+            }
+
+            out << *next;
+            current_width += next->length();
+        }
+
+        result.push_back(out.str());
+
+        return result;
+    }
+
+    void m8Intrf::DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) const
     {
         using namespace std;
 
         if (depth > 3 && time > 0.01)
         {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             std::ostringstream out;
+
+            ClearLine();
+
+            // Prepare the pv
+            auto console_width = std::max<int>(GetConsoleWidth(), 80);
+            auto pv_width = console_width - 40;
+            auto pv_str = JoinsPVMoves(pv.begin(), pv.end(), pv_width - 2);
 
             // display depth
             out << " |" << std::setw(3) << depth;
@@ -469,24 +512,28 @@ namespace m8
             out << setw(6) << AddMetricSuffix(nodes, 1) << " |";
 
             // Display pv
-            auto console_width = std::max<int>(GetConsoleWidth(), 80);
-            auto pv_width = console_width - 40;
-            out << ' ' << setw(pv_width) << left << move << " |";
+            out << ' ' << setw(pv_width) << left << pv_str[0] << " |";
 
+            M8_OUT_LINE(<< out.str());
+
+            // Display the other lines of the PV
+            for (auto next = pv_str.begin() + 1; next < pv_str.end(); ++next)
             {
-                std::lock_guard<std::mutex> lock(output_mutex_);
-
-                ClearLine();
-                M8_OUT_LINE(<< out.str());
+                M8_OUT_LINE( << " |      |          |       |        | " << setw(pv_width) << left << *next << " |");
             }
             
         }
     }
 
-    void m8Intrf::DisplaySearchOutputXboard(std::string move, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const
+    void m8Intrf::DisplaySearchOutputXboard(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const
     {
-        std::lock_guard<std::mutex> lock(output_mutex_);
-        M8_OUT_LINE(<<depth <<' ' <<eval <<' ' <<static_cast<int>(seconds * 100) <<' ' <<move);
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+
+        std::ostringstream out;
+        auto pv_str = JoinsPVMoves(pv.begin(), pv.end());
+        out << depth << ' ' << eval << ' ' << static_cast<int>(seconds * 100) << ' ' << nodes << ' ' <<pv_str[0];
+
+        M8_OUT_LINE(<< out.str());
     }
     
     void m8Intrf::DisplaySearchTableFooter() const
@@ -495,7 +542,7 @@ namespace m8
         auto footer_width = console_width - 1;
 
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') << std::endl);
         }
         
@@ -528,7 +575,7 @@ namespace m8
         {
             sucess = false;
 
-            std::lock_guard<std::mutex> lock(output_mutex_);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             M8_OUT_LINE(<< "Error (" << ex.what() << "): " <<command);
         }
 
@@ -554,44 +601,43 @@ namespace m8
         }
     }
 
-    void m8Intrf::OnNewBestMove(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+    void m8Intrf::OnNewBestMove(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
         if (xboard_)
         {
-            DisplaySearchOutputXboard(move, eval, depth, time, nodes);
+            DisplaySearchOutputXboard(pv, eval, depth, time, nodes);
         }
         else
         {
-            DisplaySearchTableLine(false, move, eval, depth, time, nodes);
+            DisplaySearchTableLine(false, pv, eval, depth, time, nodes);
         }
     }
 
-    void m8Intrf::OnIterationCompleted(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+    void m8Intrf::OnIterationCompleted(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
         if (xboard_)
         {
-            DisplaySearchOutputXboard(move, eval, depth, time, nodes);
+            DisplaySearchOutputXboard(pv, eval, depth, time, nodes);
         }
         else
         {
-            DisplaySearchTableLine(true, move, eval, depth, time, nodes);
+            DisplaySearchTableLine(true, pv, eval, depth, time, nodes);
         }
     }
 
-    void m8Intrf::OnSearchCompleted(std::string move, double time)
+    void m8Intrf::OnSearchCompleted(const std::vector<std::string>& pv, double time)
     {
-        DisplaySearchTableFooter();
-
         if (xboard_)
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
-            M8_OUT_LINE(<< "move " << move);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< "move " << *pv.begin());
         }
         else
         {
-            std::lock_guard<std::mutex> lock(output_mutex_);
-            ClearLine();
-            M8_OUT_LINE(<< " m8 plays " << move);
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+
+            DisplaySearchTableFooter();
+            M8_OUT_LINE(<< " m8 plays " << *pv.begin());
 
             if (Options::get().display_auto())
             {

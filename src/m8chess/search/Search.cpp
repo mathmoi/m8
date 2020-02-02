@@ -96,7 +96,7 @@ namespace m8 { namespace search
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
-			observer_->OnSearchCompleted(search_result.best_move_, GetSearchTime());
+			observer_->OnSearchCompleted(search_result.pv_, GetSearchTime());
 		}
 	}
 
@@ -107,13 +107,13 @@ namespace m8 { namespace search
 		return time_span.count();
 	}
 
-	void Search::OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void Search::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		observer_->OnNewBestMove(move, eval, depth, GetSearchTime(), nodes);
+		observer_->OnNewBestMove(pv, eval, depth, GetSearchTime(), nodes);
 	}
 
-	void Search::OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void Search::OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		observer_->OnIterationCompleted(move, eval, depth, GetSearchTime(), nodes);
+		observer_->OnIterationCompleted(pv, eval, depth, GetSearchTime(), nodes);
 	}
 }}

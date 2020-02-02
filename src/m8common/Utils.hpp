@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
+#include <numeric>
+#include <vector>
 
 namespace m8
 {

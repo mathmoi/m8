@@ -7,8 +7,9 @@
 #define M8_SEARCH_RESULT_HPP_
 
 #include "../eval/Eval.hpp"
-#include "../Move.hpp"
 #include "../Types.hpp"
+
+#include "PV.hpp"
 
 namespace m8::search {
 
@@ -16,18 +17,23 @@ namespace m8::search {
 	struct SearchResult
 	{
 	public:
+		/// Default constuctor
+		SearchResult()
+			: value_(0),
+			  nodes_(0)
+		{}
 
 		// Constructor.
-		SearchResult(EvalType value = 0,
-			         Move best_move = kNullMove,
-					 NodeCounterType nodes = 0)
+		SearchResult(const PV& pv,
+			         EvalType value,
+			         NodeCounterType nodes)
 			: value_(value),
-			  best_move_(best_move),
+			  pv_(pv),
 			  nodes_(nodes)
 		{}
 
 		EvalType        value_;
-		Move            best_move_;
+		PV				pv_;
 		NodeCounterType nodes_;
 
 	};

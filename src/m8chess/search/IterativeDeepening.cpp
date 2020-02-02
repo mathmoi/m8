@@ -23,10 +23,10 @@ namespace m8::search {
 		for (DepthType current_depth = 1; current_depth <= depth; ++current_depth)
 		{
 			result = alpha_beta_.Search(current_depth);
-			observer_->OnIterationCompleted(result.best_move_, result.value_, current_depth, 0, result.nodes_);
+			observer_->OnIterationCompleted(result.pv_, result.value_, current_depth, 0, result.nodes_);
 		}
 
-		observer_->OnSearchCompleted(result.best_move_, 0);
+		observer_->OnSearchCompleted(result.pv_, 0);
 
 		return result;
 	}
@@ -36,8 +36,8 @@ namespace m8::search {
 		alpha_beta_.Stop();
 	}
 
-	void IterativeDeepening::OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void IterativeDeepening::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		observer_->OnNewBestMove(move, eval, depth, time, nodes);
+		observer_->OnNewBestMove(pv, eval, depth, time, nodes);
 	}
 }

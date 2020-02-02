@@ -24,8 +24,10 @@ namespace m8::search {
 	{}
 
 	template<bool root, bool qsearch>
-	EvalType AlphaBeta::Search(EvalType alpha, EvalType beta, DepthType depth)
+	EvalType AlphaBeta::Search(EvalType alpha, EvalType beta, DepthType depth, PV& pv)
 	{
+		PV local_pv;
+
 		++nodes_counter_;
 
 		if (!root && depth <= 0)
@@ -49,7 +51,7 @@ namespace m8::search {
 			}
 			else
 			{
-				value = -Search<false, false>(-beta, -alpha, depth - 1);
+				value = -Search<false, false>(-beta, -alpha, depth - 1, local_pv);
 				value = eval::AddDepthToMate(value);
 				board_.Unmake(*next, unmake_info);
 
@@ -61,12 +63,13 @@ namespace m8::search {
 				if (value > alpha)
 				{
 					alpha = value;
+					pv.Replace(*next, local_pv);
 
 					// If it is a new best move we notify the user.
 					if (root && *next != best_move_)
 					{
 						best_move_ = *next;
-						observer_->OnNewBestMove(best_move_, alpha, depth, 0, nodes_counter_);
+						observer_->OnNewBestMove(pv, alpha, depth, 0, nodes_counter_);
 					}
 				}
 			}
@@ -77,12 +80,14 @@ namespace m8::search {
 
 	SearchResult AlphaBeta::Search(DepthType depth)
 	{
+		PV pv;
+
 		observer_->OnBeginSearch();
 
-		auto value = Search<true, false>(eval::kMinEval, eval::kMaxEval, depth);
-		auto result = SearchResult(value, best_move_, nodes_counter_);
+		auto value = Search<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
+		auto result = SearchResult(pv, value, nodes_counter_);
 
-		observer_->OnSearchCompleted(result.best_move_, 0);
+		observer_->OnSearchCompleted(pv, 0);
 
 		return result;
 	}

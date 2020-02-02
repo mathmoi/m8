@@ -29,13 +29,13 @@ namespace m8
       void OnBeginSearch();
 
       /// Method called when a new best move is found at the root.
-      void OnNewBestMove(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+      void OnNewBestMove(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
       /// Method called when an iteration is completed.
-      void OnIterationCompleted(std::string move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+      void OnIterationCompleted(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
       /// Method when the search is completed.
-      void OnSearchCompleted(std::string move, double time);
+      void OnSearchCompleted(const std::vector<std::string>& pv, double time);
 
    private:
 
@@ -45,7 +45,7 @@ namespace m8
       /// Object that implements the shell interface.
       ShellIntrf shell_intrf_;
 
-      mutable std::mutex output_mutex_;
+      mutable std::recursive_mutex output_mutex_;
 
       /// Setup the shell interface.
       void SetupShellInterf();
@@ -79,10 +79,13 @@ namespace m8
       void DisplayPerftResult(std::uint64_t count, double seconds);
       void DisplayBoard() const;
 
+      std::vector<std::string> JoinsPVMoves(std::vector<std::string>::const_iterator first,
+                                            std::vector<std::string>::const_iterator last,
+                                            size_t max_width = std::numeric_limits<size_t>::max()) const;
       void DisplaySearchTableHeader() const;
-      void DisplaySearchTableLine(bool is_iteration_complete, std::string move, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
+      void DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
       void DisplaySearchTableFooter() const;
-      void DisplaySearchOutputXboard(std::string move, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
+      void DisplaySearchOutputXboard(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
       std::string FormaterEval(int eval) const;
 
       bool CallEngineCommand(std::function<void()> call, const std::string& command);

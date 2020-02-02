@@ -31,13 +31,13 @@ namespace m8::engine {
 		virtual void Force();
 
 		/// Method called when a new best move is found at the root.
-		void OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+		void OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
 		/// Method called when an iteration is completed.
-		void OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+		void OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
 		/// Method when the search is completed.
-		void OnSearchCompleted(Move move, double time);
+		void OnSearchCompleted(const search::PV& pv, double time);
 				
 	private:
 		search::Search search_;
@@ -48,6 +48,8 @@ namespace m8::engine {
 		void SwitchToWaitingState();
 		void SwitchToObservingState();
 		bool StopSearch();
+
+		std::vector<std::string> RenderPVMoves(const search::PV& pv);
 	};
 }
 

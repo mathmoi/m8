@@ -55,10 +55,10 @@ namespace m8 { namespace search
 		void Stop();
 
 		/// Method called when a new best move is found at the root.
-		void OnNewBestMove(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+		void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
 		/// Method called when an iteration is completed.
-		void OnIterationCompleted(Move move, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+		void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
     private:
 		std::thread search_thread_;

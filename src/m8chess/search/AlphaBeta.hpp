@@ -16,6 +16,7 @@
 
 #include "SearchResult.hpp"
 #include "SearchObserver.hpp"
+#include "PV.hpp"
 
 namespace m8 {
 	namespace search
@@ -44,7 +45,7 @@ namespace m8 {
 			SearchObserver* observer_;
 
 			template<bool root, bool qsearch>
-			EvalType Search(EvalType alpha, EvalType beta, DepthType depth);
+			EvalType Search(EvalType alpha, EvalType beta, DepthType depth, PV& pv);
 		};
 
 	}
