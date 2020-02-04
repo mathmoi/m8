@@ -54,6 +54,12 @@ namespace m8::search
 			assert(0 < count_);
 			return moves_[0];
 		}
+
+		/// Remove all moves from the PV.
+		inline void Clear()
+		{
+			count_ = 0;
+		}
 		
 	private:
 		std::array<Move, MAX_PV_SIZE> moves_;

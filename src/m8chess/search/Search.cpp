@@ -91,7 +91,7 @@ namespace m8 { namespace search
 
 		observer_->OnBeginSearch();
 
-		auto search_result = ptr_iterative_deepening_->Search(8);
+		auto search_result = ptr_iterative_deepening_->Search(6);
 
 		bool was_searching = StopSearch();
 		if (was_searching)

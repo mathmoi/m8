@@ -28,38 +28,69 @@ namespace m8::search {
 	{
 		PV local_pv;
 
+		pv.Clear();
 		++nodes_counter_;
 
-		if (!root && depth <= 0)
+		// If we are in the qsearch we must evaluate the stand path option.
+		if (qsearch)
 		{
-			return eval::Evaluate(board_);
+			EvalType stand_path = eval::Evaluate(board_);
+			if (stand_path >= beta)
+			{
+				return beta;
+			}
+			if (alpha < stand_path)
+			{
+				alpha = stand_path;
+			}
 		}
 
+		// Generate all the moves
 		MoveList moves;
-		Move* last = GenerateAllMoves(board_, moves.data());
 		Move* first = moves.data();
-
+		Move* last = qsearch ? GenerateAllCaptures(board_, moves.data())
+			                 : GenerateAllMoves(board_, moves.data());
+				
+		// Evaluate all moves
 		for (Move* next = first; next < last && continue_; ++next)
 		{
 			EvalType value;
 
 			UnmakeInfo unmake_info = board_.Make(*next);
 
+			// If the position is invalid because the side to move is in check we must 
+			// undo the current move and continue with the next one.
 			if (IsInvalidCheckPosition(board_))
 			{
 				board_.Unmake(*next, unmake_info);
 			}
 			else
 			{
-				value = -Search<false, false>(-beta, -alpha, depth - 1, local_pv);
+				// If we are at depth > 1 we need to make a recursive call to the search
+				// function. If we are at depth 1 or in the qsearch we need to make a
+				// recursive call to the qsearch function.
+				if (!qsearch && depth > 1)
+				{
+					// Recursive call to the search function
+					value = -Search<false, false>(-beta, -alpha, depth - 1, local_pv);
+				}
+				else
+				{
+					// Call to the qsearch
+					value = -Search<false, true>(-beta, -alpha, 0, local_pv);
+				}
 				value = eval::AddDepthToMate(value);
 				board_.Unmake(*next, unmake_info);
 
+				// If the value of the current move is better or equal to beta we can 
+				// abort the search at this node.
 				if (value >= beta)
 				{
 					return beta;
 				}
 
+				// If value is better than alpha we possibly have a new best move at this
+				// node.
 				if (value > alpha)
 				{
 					alpha = value;

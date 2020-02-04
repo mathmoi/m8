@@ -568,6 +568,19 @@ namespace m8
         return next_move;
     }
 
+    /// Generate all captures for the current side on move.
+    ///
+    /// @param next_move Pointer into an array where we can add moves.
+    /// @return A pointer to the position afther the last move inserted into the array.
+    inline Move* GenerateAllCaptures(const Board& board, Move* next_move)
+    {
+        Color color = board.side_to_move();
+
+        next_move = GenerateCaptures(board, color, next_move);
+
+        return next_move;
+    }
+
     /// Returns a bitboard of the pinned pieces of a give color.
     inline Bb GetPinnedPieces(const Board& board, Color color)
     {
