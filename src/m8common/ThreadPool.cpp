@@ -1,5 +1,5 @@
 /// @file   ThreadPool.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2018
 /// @brief  Contains the ThreadPools definitions.
 
@@ -8,8 +8,9 @@
 namespace m8
 {
     ThreadPool::ThreadPool(size_t threads_count)
-        : stop_(false),
-          workers_(threads_count)
+        : workers_(threads_count),
+          stop_(false)
+
     {
         for (size_t x = 0; x < threads_count; ++x)
         {

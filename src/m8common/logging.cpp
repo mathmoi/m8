@@ -3,7 +3,13 @@
 /// @date   Feburary 2018
 /// @brief  Contains functionalities to log informations to a log file.
 
-#include <process.h>
+#ifdef _MSC_VER
+#   include <process.h>
+#endif // _MSC_VER
+
+#ifdef __GNUC__
+#   include <unistd.h>
+#endif //  __GNUC__
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -96,10 +102,18 @@ namespace m8
 
         logging::add_common_attributes();
 
+#ifdef _MSC_VER
+        auto pid = _getpid();
+#endif // _MSC_VER
+
+#ifdef __GNUC__
+        auto pid = getpid();
+#endif //  __GNUC__
+
         boost::shared_ptr<sinks::text_file_backend> backend =
             boost::make_shared<sinks::text_file_backend>
             (
-                keywords::file_name = std::string("m8_%Y%m%d%H%M%S.") + ToString(_getpid()) + ".log"
+                keywords::file_name = std::string("m8_%Y%m%d%H%M%S.") + ToString(pid) + ".log"
             );
 
         // Create the sink to a log file

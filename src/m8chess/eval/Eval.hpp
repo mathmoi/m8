@@ -1,5 +1,5 @@
 /// @file   Eval.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   March 2018
 /// @brief  Contains the evaluation function
 
@@ -24,12 +24,7 @@ namespace m8::eval
     /// Evaluate a position.
     inline EvalType Evaluate(const Board& board)
     {
-		if (board.material_value() != 0)
-		{
-			auto x = 0;
-		}
-
-        return (1 - 2 * static_cast<int>(board.side_to_move())) * board.material_value();
+		return (1 - 2 * static_cast<int>(board.side_to_move())) * board.material_value();
     }
 
 	/// Add a 1 depth to the score if the value is a mate score.
