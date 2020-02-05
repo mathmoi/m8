@@ -94,7 +94,10 @@ namespace m8::search {
 				if (value > alpha)
 				{
 					alpha = value;
-					pv.Replace(*next, local_pv);
+					if (!qsearch)
+					{
+						pv.Replace(*next, local_pv);
+					}
 
 					// If it is a new best move we notify the user.
 					if (root && *next != best_move_)
