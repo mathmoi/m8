@@ -12,7 +12,7 @@ endif()
 # We add boost
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)    
-set(Boost_USE_STATIC_RUNTIME     ON)
+#set(Boost_USE_STATIC_RUNTIME     ON)
 find_package(Boost REQUIRED COMPONENTS program_options
                                        filesystem
                                        log)
