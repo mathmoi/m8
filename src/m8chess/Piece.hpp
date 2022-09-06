@@ -1,11 +1,12 @@
 /// @file   Piece.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains the definition of the Piece and PieceType types.
 
 #ifndef M8_PIECE_HPP_
 #define M8_PIECE_HPP_
 
+#include <string>
 #include <cstdint>
 #include <cassert>
 #include <unordered_map>
