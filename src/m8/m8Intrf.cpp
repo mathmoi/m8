@@ -228,7 +228,7 @@ namespace m8
 
         M8_EMPTY_LINE();
 
-        for (auto& pair : Options::get().modifiable_options_map())
+        for (auto& pair : options::Options::get().modifiable_options)
         {
             M8_OUT_LINE(<<pair.second->name() <<'=' <<pair.second->ToString());
         }   
@@ -236,7 +236,7 @@ namespace m8
         M8_EMPTY_LINE();
     }
 
-    void m8Intrf::DisplayOption(const Option& option) const
+    void m8Intrf::DisplayOption(const options::ModifiableOption& option) const
     {
         std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
@@ -249,9 +249,9 @@ namespace m8
 
     void m8Intrf::DisplayOption(const std::string& option_name) const
     {
-        auto& options = Options::get();
-        auto it = options.modifiable_options_map().find(option_name);
-        if (it != options.modifiable_options_map().cend())
+        auto& modifiable_options = options::Options::get().modifiable_options;
+        auto it = modifiable_options.find(option_name);
+        if (it != modifiable_options.cend())
         {
             DisplayOption(*it->second);
         }
@@ -265,9 +265,9 @@ namespace m8
 
     void m8Intrf::EditOption(const std::string& option_name, const std::string& value) const
     {
-        auto& options = Options::get();
-        auto it = options.modifiable_options_map().find(option_name);
-        if (it != options.modifiable_options_map().end())
+        auto& modifiable_options = options::Options::get().modifiable_options;
+        auto it = modifiable_options.find(option_name);
+        if (it != modifiable_options.end())
         {
             it->second->set_value(value);
         }
@@ -367,7 +367,7 @@ namespace m8
             {
                 auto sucess = CallEngineCommand([this, move]() {engine_.UserMove(move); }, move);
                 
-                if (sucess && Options::get().display_auto())
+                if (sucess && options::Options::get().display_auto)
                 {
                     std::lock_guard<std::recursive_mutex> lock(output_mutex_);
                     DisplayBoard();
@@ -404,7 +404,7 @@ namespace m8
         M8_EMPTY_LINE();
         M8_OUT_LINE(<< engine_.board());
 
-        if (Options::get().display_eval())
+        if (options::Options::get().display_eval)
         {
             M8_OUT_LINE(<< "Current evaluation: " << engine_.current_evaluation());
         }
@@ -639,7 +639,7 @@ namespace m8
             DisplaySearchTableFooter();
             M8_OUT_LINE(<< " m8 plays " << *pv.begin());
 
-            if (Options::get().display_auto())
+            if (options::Options::get().display_auto)
             {
                 DisplayBoard();
             }

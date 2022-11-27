@@ -1,9 +1,10 @@
 /// @file   PieceSquareTable.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2018
 /// @brief  Contains functionalities about the piece-square table evaluation features.
 
 #include "PieceSqTable.hpp"
+#include "../Board.hpp"
 #include "../../m8/options/Options.hpp"
 
 namespace m8::eval {
@@ -40,17 +41,17 @@ namespace m8::eval {
     }
 
     /// Apply all the zones to the piece-square table of a piece.
-    void ApplyZonesToPsqt(PieceType piece_type, Color color, std::vector<PsqtZoneValue> zones, PieceSqTablePtr psqt)
+    void ApplyZonesToPsqt(PieceType piece_type, Color color, std::vector<options::PsqtZone> zones, PieceSqTablePtr psqt)
     {
         auto piece = NewPiece(piece_type, color);
 
         SinglePieceSqTable& single_piece_psqt = psqt->at(piece);
         int multiplier = (color == kWhite ? 1 : -1);
-        single_piece_psqt.fill(multiplier * Options::get().eval().get_value_piece_type(piece_type));
+        single_piece_psqt.fill(multiplier * options::Options::get().eval.get_value_piece_type(piece_type));
 
         for (auto zone : zones)
         {
-            ApplyZoneToPsqt(zone.zone(), zone.value() * multiplier, color, single_piece_psqt);
+            ApplyZoneToPsqt(zone.zone, zone.value * multiplier, color, single_piece_psqt);
         }
     }
 
@@ -60,7 +61,7 @@ namespace m8::eval {
 
         for (Color color = kMinColor; IsColor(color); ++color)
         {   
-            for (auto piece_zones : Options::get().psqt())
+            for (auto piece_zones : options::Options::get().eval.psqt_zones)
             {
                 ApplyZonesToPsqt(piece_zones.first, color, piece_zones.second, psqt);
             }

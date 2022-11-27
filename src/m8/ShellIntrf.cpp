@@ -1,5 +1,5 @@
 /// @file   ShellIntrf.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   May 2015
 /// @brief  Contains classes that are used to create a shell-like interface.
 
@@ -99,5 +99,6 @@ namespace m8
 	void ShellIntrf::DisplayInvit() const
 	{
 		std::cout << invit_;
+        std::cout.flush();
 	}
 }

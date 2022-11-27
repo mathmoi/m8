@@ -18,7 +18,6 @@ namespace m8
    class m8Intrf : public search::SearchObserver
    {
    public:
-
       /// Default constructor.
       m8Intrf();
 
@@ -29,18 +28,17 @@ namespace m8
       void OnBeginSearch();
 
       /// Method called when a new best move is found at the root.
-      void OnNewBestMove(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+      void OnNewBestMove(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
       /// Method called when an iteration is completed.
-      void OnIterationCompleted(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+      void OnIterationCompleted(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
       /// Method when the search is completed.
-      void OnSearchCompleted(const std::vector<std::string>& pv, double time);
+      void OnSearchCompleted(const std::vector<std::string> &pv, double time);
 
    private:
-
       engine::Engine engine_;
-	  bool xboard_;
+      bool xboard_;
 
       /// Object that implements the shell interface.
       ShellIntrf shell_intrf_;
@@ -50,8 +48,8 @@ namespace m8
       /// Setup the shell interface.
       void SetupShellInterf();
 
-	  /// Setup the xboard mode.
-	  void SetupXboardMode();
+      /// Setup the xboard mode.
+      void SetupXboardMode();
 
       engine::EngineCallbacks CreateEngineCallbacks();
 
@@ -63,17 +61,17 @@ namespace m8
       void HandlePerft(std::vector<std::string> args_list);
       void HandleOptions() const;
       void HandleOption(std::vector<std::string> args_list) const;
-	  void HandleXboard();
-	  void HandleProtover(std::vector<std::string> args_list);
-	  void HandleGo();
+      void HandleXboard();
+      void HandleProtover(std::vector<std::string> args_list);
+      void HandleGo();
       void HandleForce();
       void HandleStop();
-	  void HandleNew();
+      void HandleNew();
       void HandlePing(std::vector<std::string> args_list);
 
-      void DisplayOption(const Option& option) const;
-      void DisplayOption(const std::string& option_name) const;
-      void EditOption(const std::string& option_name, const std::string& value) const;
+      void DisplayOption(const options::ModifiableOption &option) const;
+      void DisplayOption(const std::string &option_name) const;
+      void EditOption(const std::string &option_name, const std::string &value) const;
 
       void DisplayPerftPartialResult(std::string move, std::uint64_t count);
       void DisplayPerftResult(std::uint64_t count, double seconds);
@@ -83,13 +81,13 @@ namespace m8
                                             std::vector<std::string>::const_iterator last,
                                             size_t max_width = std::numeric_limits<size_t>::max()) const;
       void DisplaySearchTableHeader() const;
-      void DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
+      void DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string> &pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
       void DisplaySearchTableFooter() const;
-      void DisplaySearchOutputXboard(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
+      void DisplaySearchOutputXboard(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
       std::string FormaterEval(int eval) const;
 
-      bool CallEngineCommand(std::function<void()> call, const std::string& command);
-	  void ClearLine() const;
+      bool CallEngineCommand(std::function<void()> call, const std::string &command);
+      void ClearLine() const;
    };
 }
 

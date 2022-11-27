@@ -1,99 +1,146 @@
 /// @file   Options.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   January 2017
-/// @brief  Contains the declarations of the Options class that handles m8 command line 
-///         parameters and m8.ini file.
+/// @brief  Contains the declarations of the classes that hold the engine options
 
-#ifndef M8_OPTIONS_HPP_
-#define M8_OPTIONS_HPP_
+#ifndef M8_OPTIONS_OPTIONS_HPP_
+#define M8_OPTIONS_OPTIONS_HPP_
 
-#include <iostream>
-#include <array>
-#include <memory>
+#include <string>
+#include <cstdint>
+#include <unordered_map>
+#include <vector>
 
-#include <boost/program_options.hpp>
-#include <boost/algorithm/string/replace.hpp>
-
-#include "OptionsDefinitions.hpp"
-#include "Option.hpp"
-#include "PsqtZoneValue.hpp"
-#include "PerftOptions.hpp"
-#include "EvalOptions.hpp"
-#include "../../m8common/logging.hpp"
-#include "../../m8chess/Sq.hpp"
 #include "../../m8chess/Piece.hpp"
+#include "../../m8common/Bb.hpp"
+#include "../../m8common/logging.hpp"
 
-namespace m8
+#include "ModifiableOption.hpp"
+
+namespace m8::options
 {
+    struct PsqtZone
+    {
+        /// Human readable name for the zone
+        std::string name;
+
+        /// Bitboard representing all the squares of the zone
+        Bb zone;
+
+        /// Value (bonus or malus) applied to the zone
+        std::int32_t value;
+    };
+
+    /// Class containing options related to the perft command
+    struct PerftOptions
+    {
+        /// Numbers of parallel threads to use for the perft command.
+        std::int32_t threads = 8;
+
+        /// Minimum number of work item the perft load is separated in.
+        std::int32_t min_works_items = 100;
+    };
+
+    /// Class containing options related to the evaluation function
+    struct EvalOptions
+    {
+        /// Value of a pawn
+        std::int32_t pawn = 100;
+
+        /// Value of a knight
+        std::int32_t knight = 320;
+
+        /// Value of a bishop
+        std::int32_t bishop = 333;
+
+        /// Value of a rook
+        std::int32_t rook = 510;
+
+        /// Value of a queen
+        std::int32_t queen = 880;
+
+        /// Zones values used to generate the piece/square table
+        std::unordered_map<PieceType, std::vector<PsqtZone>> psqt_zones;
+
+        /// Return the value of a give piece_type.
+        inline int get_value_piece_type(PieceType piece_type) const
+        {
+            assert(IsPieceType(piece_type));
+
+            int value;
+
+            switch (piece_type)
+            {
+            case kPawn:
+                value = pawn;
+                break;
+            case kKnight:
+                value = knight;
+                break;
+            case kBishop:
+                value = bishop;
+                break;
+            case kRook:
+                value = rook;
+                break;
+            case kQueen:
+                value = queen;
+                break;
+            default:
+                value = 0;
+                break;
+            }
+
+            return value;
+        }
+    };
+
+    /// Class containing all m8 options
     struct Options
     {
-        typedef std::map<std::string, std::shared_ptr<Option>> Storage;
-        typedef std::map<PieceType, std::vector<PsqtZoneValue>> PsqtType;
+    public:
+        typedef std::map<std::string, std::unique_ptr<ModifiableOption>> ModifiableOptions;
 
-        /// Get the only instance of the class (Singleton pattern)
-        inline static Options& get()
+        static Options& get()
         {
-            static Options options;
-            return options;
-        };
+            static Options instance;
+            if (instance.modifiable_options.size() == 0)
+            {
+                instance.CreateModifiableOptions();
+            }
+            return instance;
+        }
 
-        /// Options for perft calculation.
-        inline PerftOptions& perft() { return perft_; }
+        /// Options of the perft command
+        PerftOptions perft;
 
-        /// Value used to generate the piece-square table.
-        inline const PsqtType psqt() const { return psqt_; }
+        /// Max log severity
+        severity_level max_log_severity;
 
-        /// Set the values used to generate the piece-square table.
-        inline void set_psqt(PsqtType value) { psqt_ = value; }
+        /// Map of a list of ModifiableOption that allows to list or modify options at 
+        /// runtime.
+        ModifiableOptions modifiable_options;
 
-        /// Value used by the evaluation function.
-        inline const EvalOptions& eval() const { return eval_; }
+        /// Parameter indicating if the evaluation should be displayed
+        bool display_eval = true;
 
-        /// Set the value used by the evaluation function.
-        inline void set_eval(const EvalOptions& value) { eval_ = value; }
-        
-        /// Set the maximum log severity.
-        inline void set_max_log_severity(severity_level value) { max_log_severity_ = value; }
+        /// Parameter indicating if the board should be displayed automatically
+        bool display_auto = true;
 
-        /// Maximum log severity level.
-        inline severity_level max_log_severity() const { return max_log_severity_; }
-
-        /// Set a value indicating if the evaluation should be displayed with the board.
-        inline void set_display_eval(bool value) { display_eval_ = value; }
-
-        /// Return an value indicating if the evaluation should be displayed with the board.
-        inline bool display_eval() const { return display_eval_; }
-
-        /// Set the value indicating if the board should be displayed automatically
-        inline void set_display_auto(bool value) { display_auto_ = value; }
-
-        /// Get the value indicating if the board should be displayed automatically
-        inline bool display_auto() const { return display_auto_; }
-        
-        /// Give access to the options that can be modified through the user interface.
-        inline const Storage& modifiable_options_map() const { return options_; }
-
-        /// Delete the copy constructor
-        Options(Options const&) = delete;
-
-        /// Delete the copy operator
-        void operator=(Options const&) = delete;
+        /// Options related to the evaluation function
+        EvalOptions eval;        
 
     private:
-        /// Private constructor;
-        Options();
+        /// Consctructor
+        Options()
+        : max_log_severity(severity_level::none)
+        {}
 
-        template<typename T>
-        void AddOption(const std::string& name, const std::string& desc, typename TypedOption<T>::setter_type setter, typename TypedOption<T>::getter_type getter);
-
-        Storage options_;
-
-        severity_level max_log_severity_ = severity_level::trace;
-        PerftOptions perft_;
-        PsqtType psqt_;
-        EvalOptions eval_;
-        bool display_eval_;
-        bool display_auto_;
+        void CreateModifiableOptions();
+    
+    public:
+        Options(Options const&)        = delete;
+        void operator=(Options const&) = delete;
     };
 
     /// Read the properties from a configuration file.
@@ -112,4 +159,4 @@ namespace m8
     bool ReadOptionsFromCommandLine(int argc, char** argv, std::ostream& out);
 }
 
-#endif // M8_OPTIONS_HPP_
+#endif // M8_OPTIONS_OPTIONS_HPP_

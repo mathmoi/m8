@@ -1,5 +1,5 @@
 /// @file   m8.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   May 2015
 /// @brief  Contains the entry point (main) of m8.
 
@@ -19,9 +19,9 @@ namespace m8
 {
     bool ReadOptions(int argc, char* argv[])
     {
-        ReadOptionsFromFile("m8.json");
+        options::ReadOptionsFromFile("m8.json");
 
-        bool stop_execution = ReadOptionsFromCommandLine(argc, argv, std::cout);
+        bool stop_execution = options::ReadOptionsFromCommandLine(argc, argv, std::cout);
         return stop_execution;
     }
 }

@@ -69,7 +69,7 @@ namespace m8
 
     bool FilterLogRecord(logging::value_ref< severity_level, tag::severity > const& level)
     {
-        return level <= Options::get().max_log_severity();
+        return level <= options::Options::get().max_log_severity;
     }
 
     void FormatLogRecord(logging::record_view const& rec, logging::formatting_ostream& strm)

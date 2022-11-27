@@ -1,36 +1,61 @@
 /// @file   Options.cpp
-/// @author Mathieu Pag�
-/// @date   January 2017
-/// @brief  Contains the declarations of the Options class that handles m8 command line 
-///         parameters and m8.ini file.
+/// @author Mathieu Pagé
+/// @date   November 2022
+/// @brief  Contains methods related to the engine options
 
-#include <functional>
-
-#include <boost/program_options.hpp>
-#include <boost/algorithm/string/replace.hpp>
+#include <string>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
+
+#include <boost/program_options.hpp>
 
 #include "../../m8common/logging.hpp"
+#include "../../m8common/Utils.hpp"
+
 #include "Options.hpp"
 
 namespace po = boost::program_options;
 namespace pt = boost::property_tree;
 
-#define M8_DESC_OPTIONS(name, desc, type, getter, setter)       (name, po::value<type>()->notifier([&options](type v) { options.setter(v); }), desc)
-#define M8_ADD_OPTIONS(name, desc, type, getter, setter)        AddOption<type>(name, desc, [this](type v) { this->setter(v); }, [this]() { return this->getter(); });
-
-namespace m8
+namespace m8::options
 {
+    void Options::CreateModifiableOptions()
+    {
+        modifiable_options.emplace("perft-threads", 
+            std::make_unique<TypedModifiableOption<std::int32_t>>("perft-threads",
+                                                    "Numbers of parallel threads to use for the perft command.",
+                                                    this->perft.threads));
+        
+        modifiable_options.emplace("max-log-severity", 
+            std::make_unique<TypedModifiableOption<m8::severity_level>>("max-log-severity",
+                                                    "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).",
+                                                    this->max_log_severity));
+
+        modifiable_options.emplace("display-auto", 
+            std::make_unique<TypedModifiableOption<bool>>("display-auto",
+                                                    "Indicate if the board should be displayed after each moves.",
+                                                    this->display_auto));
+
+        modifiable_options.emplace("display-eval", 
+            std::make_unique<TypedModifiableOption<bool>>("display-eval",
+                                                    "Indicate if the evaluation should be displayed with the board.",
+                                                    this->display_eval));
+
+    }
+
     template<typename T>
-    void TryReadOption(pt::ptree& tree, const std::string key, std::function<void(T)> setter)
+    bool TryReadOption(pt::ptree& tree, const std::string key, T& storage)
     {
         auto optional = tree.get_optional<T>(key);
         if (optional.is_initialized())
         {
-            setter(optional.get());
+            storage = optional.get();
+            return true;
         }
+
+        return false;
     }
 
     void ReadPerftOptions(pt::ptree& tree, PerftOptions& options)
@@ -38,64 +63,39 @@ namespace m8
         auto perft_tree = tree.get_child_optional("perft");
         if (perft_tree.is_initialized())
         {
-            TryReadOption<int>(perft_tree.get(), "threads", [&options](int v) {options.set_threads(v); });
-            TryReadOption<int>(perft_tree.get(), "min-works-items", [&options](int v) {options.set_min_works_items(v); });
+            TryReadOption<int>(perft_tree.get(), "threads", options.threads);
+            TryReadOption<int>(perft_tree.get(), "min-works-items", options.min_works_items);
         }
     }
 
-    EvalOptions ReadEvalOptions(pt::ptree& tree)
+    void ReadEvalOptions(pt::ptree& tree, EvalOptions& options)
     {
-        EvalOptions options;
-
-        TryReadOption<int>(tree, "eval.pawn", [&options](int v) {options.set_pawn(v); });
-        TryReadOption<int>(tree, "eval.knight", [&options](int v) {options.set_knight(v); });
-        TryReadOption<int>(tree, "eval.bishop", [&options](int v) {options.set_bishop(v); });
-        TryReadOption<int>(tree, "eval.rook", [&options](int v) {options.set_rook(v); });
-        TryReadOption<int>(tree, "eval.queen", [&options](int v) {options.set_queen(v); });
-
-        return options;
+        TryReadOption<int>(tree, "eval.pawn",   options.pawn);
+        TryReadOption<int>(tree, "eval.knight", options.knight);
+        TryReadOption<int>(tree, "eval.bishop", options.bishop);
+        TryReadOption<int>(tree, "eval.rook",   options.rook);
+        TryReadOption<int>(tree, "eval.queen",  options.queen);
     }
 
-    template<typename T>
-    void ReadArray(pt::ptree& tree, T& an_array)
+    std::vector<PsqtZone> ReadPsqtZones(pt::ptree& tree)
     {
-        std::size_t index = 0;
-
-        for (auto& value_tree : tree)
-        {
-            if (index < an_array.size())
-            {
-                an_array[index++] = value_tree.second.get_value<typename T::value_type>();
-            }
-        }
-    }
-
-    template<typename T>
-    void ReadArray(pt::ptree& tree, const std::string& name, T& an_array)
-    {
-        auto array_tree = tree.get_child_optional(name);
-        if (array_tree.is_initialized())
-        {
-            ReadArray(array_tree.get(), an_array);
-        }
-    }
-
-    std::vector<PsqtZoneValue> ReadPsqtZones(pt::ptree& tree)
-    {
-        std::vector<PsqtZoneValue> list;
+        std::vector<PsqtZone> list;
 
         for (auto& zone_tree : tree)
         {
-            list.emplace_back(zone_tree.second);
+            PsqtZone zone;
+            zone.name = zone_tree.second.get<std::string>("name");
+            auto zone_str = zone_tree.second.get<std::string>("zone");
+            zone.zone = ConvertTo<Bb>(zone_str, true);
+            zone.value = zone_tree.second.get<std::int32_t>("value");
+            list.push_back(zone);
         }
 
         return list;
     }
 
-    std::map<PieceType, std::vector<PsqtZoneValue>> ReadPsqtOptions(pt::ptree& tree)
+    void ReadPsqtOptions(pt::ptree& tree, std::unordered_map<PieceType, std::vector<PsqtZone>>& psqt)
     {
-        std::map<PieceType, std::vector<PsqtZoneValue>> map;
-
         auto psqt_tree = tree.get_child_optional("psqt");
         if (psqt_tree.is_initialized())
         {
@@ -104,7 +104,7 @@ namespace m8
                 auto piece_type = GetPieceTypeFromName(psqt_piece_tree.first);
                 if (IsPieceType(piece_type))
                 {
-                    map.insert(std::make_pair(piece_type, ReadPsqtZones(psqt_piece_tree.second)));
+                    psqt.insert(std::make_pair(piece_type, ReadPsqtZones(psqt_piece_tree.second)));
                 }
                 else
                 {
@@ -112,26 +112,35 @@ namespace m8
                 }
             }
         }
-
-        return map;
     }
 
     void ReadOptionsFromFile(const std::string filename)
-    {
-       pt::ptree tree;
-       pt::read_json(filename, tree);
+    {   
+        pt::ptree tree;
+        pt::read_json(filename, tree);
 
-       Options& options = Options::get();
+        Options& options = Options::get();
 
-       TryReadOption<std::string>(tree, "max-log-severity", [&options](std::string v) { options.set_max_log_severity(boost::lexical_cast<severity_level>(v)); });
-       TryReadOption<std::string>(tree, "display-auto", [&options](std::string v) { options.set_display_auto(boost::lexical_cast<bool>(v)); });
-       TryReadOption<std::string>(tree, "display-eval", [&options](std::string v) { options.set_display_eval(boost::lexical_cast<bool>(v)); });
+        std::string temp;
+        if (TryReadOption<std::string>(tree, "max-log-severity", temp))
+        {
+            options.max_log_severity = boost::lexical_cast<severity_level>(temp);
+        }
 
-       ReadPerftOptions(tree, options.perft());
-       options.set_psqt(ReadPsqtOptions(tree));
-       options.set_eval(ReadEvalOptions(tree));
+        if (TryReadOption<std::string>(tree, "display-auto", temp))
+        {
+            options.display_auto = boost::lexical_cast<bool>(temp);
+        }
+
+        if (TryReadOption<std::string>(tree, "display-eval", temp))
+        {
+            options.display_eval = boost::lexical_cast<bool>(temp);
+        }
+        
+        ReadPerftOptions(tree, options.perft);
+        ReadEvalOptions(tree, options.eval);
+        ReadPsqtOptions(tree, options.eval.psqt_zones);
     }
-
 
     po::options_description GenerateOptionsDescriptions()
     {
@@ -140,7 +149,8 @@ namespace m8
         po::options_description desc("Allowed options");
         desc.add_options()
             ("help", "produce help message")
-            M8_OPTIONS_DEFINITIONS(M8_DESC_OPTIONS);
+            ("max-log-severity", po::value<m8::severity_level>(&options.max_log_severity),
+             "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).");
 
         return desc;
     }
@@ -162,15 +172,5 @@ namespace m8
         return stop_execution;
     }
 
-    template<typename T>
-    void Options::AddOption(const std::string& name, const std::string& desc, typename TypedOption<T>::setter_type setter, typename TypedOption<T>::getter_type getter)
-    {
-        options_.insert(Storage::value_type(name, std::make_shared<TypedOption<T>>(name, desc, setter, getter)));
-    }
-
-    Options::Options()
-        : options_()
-    {
-        M8_OPTIONS_DEFINITIONS(M8_ADD_OPTIONS);
-    }
-}
+    
+} // namespace m8::options
