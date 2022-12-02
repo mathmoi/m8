@@ -2,7 +2,7 @@ ucm_set_runtime(STATIC)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     FIND_PACKAGE ( Threads REQUIRED )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -Wno-unknown-pragmas -pedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -pedantic")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
