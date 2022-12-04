@@ -136,6 +136,11 @@ namespace m8::options
         {
             options.display_eval = boost::lexical_cast<bool>(temp);
         }
+
+        if (TryReadOption<std::string>(tree, "min-display-depth", temp))
+        {
+            options.min_display_depth = boost::lexical_cast<DepthType>(temp);
+        }
         
         ReadPerftOptions(tree, options.perft);
         ReadEvalOptions(tree, options.eval);

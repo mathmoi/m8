@@ -1,3 +1,4 @@
 ﻿build/
 Build/
+*.pgn
 .vscode/

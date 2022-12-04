@@ -143,10 +143,14 @@ namespace m8
             std::bind(&m8Intrf::HandleFen, this, std::placeholders::_1)));
 
         // TODO : Implement theses commands correctly
-        shell_intrf_.AddCmd(ShellCmd("random", "", "", std::bind([] {})));
-        shell_intrf_.AddCmd(ShellCmd("post", "", "", std::bind([] {})));
-        shell_intrf_.AddCmd(ShellCmd("hard", "", "", std::bind([] {})));
-        shell_intrf_.AddCmd(ShellCmd("undo", "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("random",   "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("post",     "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("hard",     "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("undo",     "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("time",     "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("otim",     "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("level",    "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("computer", "", "", std::bind([] {})));
 	}
 
     void m8Intrf::HandleExit()
@@ -345,6 +349,8 @@ namespace m8
 
     void m8Intrf::HandleUserMove(std::vector<std::string> args_list)
     {
+        M8_TRACE <<"m8Intrf::HandleUserMove(std::vector<std::string> args_list)";
+
         std::string move;
 
         if (args_list.size() == 1)
@@ -367,7 +373,7 @@ namespace m8
             {
                 auto sucess = CallEngineCommand([this, move]() {engine_.UserMove(move); }, move);
                 
-                if (sucess && options::Options::get().display_auto)
+                if (sucess && !xboard_ && options::Options::get().display_auto)
                 {
                     std::lock_guard<std::recursive_mutex> lock(output_mutex_);
                     DisplayBoard();
@@ -473,7 +479,7 @@ namespace m8
     {
         using namespace std;
 
-        if (depth > 3 && time > 0.01)
+        if (options::Options::get().min_display_depth <= depth && time > 0.01)
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             std::ostringstream out;
@@ -527,13 +533,16 @@ namespace m8
 
     void m8Intrf::DisplaySearchOutputXboard(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const
     {
-        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+        if (options::Options::get().min_display_depth <= depth && seconds > 0.01)
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
-        std::ostringstream out;
-        auto pv_str = JoinsPVMoves(pv.begin(), pv.end());
-        out << depth << ' ' << eval << ' ' << static_cast<int>(seconds * 100) << ' ' << nodes << ' ' <<pv_str[0];
+            std::ostringstream out;
+            auto pv_str = JoinsPVMoves(pv.begin(), pv.end());
+            out << depth << ' ' << eval << ' ' << static_cast<int>(seconds * 100) << ' ' << nodes << ' ' <<pv_str[0];
 
-        M8_OUT_LINE(<< out.str());
+            M8_OUT_LINE(<< out.str());
+        }
     }
     
     void m8Intrf::DisplaySearchTableFooter() const

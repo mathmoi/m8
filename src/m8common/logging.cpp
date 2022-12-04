@@ -120,6 +120,9 @@ namespace m8
         typedef sinks::synchronous_sink<sinks::text_file_backend> text_sink;
         boost::shared_ptr<text_sink> sink = boost::make_shared<text_sink>(backend);
 
+        // TODO : Remove if it does not proves necessary
+        //sink->locked_backend()->auto_flush(true);
+
         sink->set_formatter(&FormatLogRecord);
 
         namespace phoenix = boost::phoenix;

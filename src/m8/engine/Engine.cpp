@@ -39,6 +39,10 @@ namespace m8::engine
 
 			state_->BeginState();
 		}
+		else
+		{
+			M8_DEBUG << "Same state (" << state_->state_name() <<"), no need to change.";
+		}
 	}
 
 	EvalType Engine::current_evaluation() const

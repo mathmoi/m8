@@ -14,6 +14,7 @@
 #include "../../m8chess/Piece.hpp"
 #include "../../m8common/Bb.hpp"
 #include "../../m8common/logging.hpp"
+#include "../../m8chess/Types.hpp"
 
 #include "ModifiableOption.hpp"
 
@@ -126,6 +127,9 @@ namespace m8::options
 
         /// Parameter indicating if the board should be displayed automatically
         bool display_auto = true;
+
+        /// Minimum depth of the displayed engine thinking
+        DepthType min_display_depth = 4;
 
         /// Options related to the evaluation function
         EvalOptions eval;        

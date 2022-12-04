@@ -8,6 +8,7 @@
 
 namespace m8::engine {
 
+	// TODO : Is it possible to use smart pointer here?
 	void EngineState::ChangeState(EngineState* new_state)
 	{
 		engine_->ChangeState(new_state);

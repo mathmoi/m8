@@ -1,5 +1,5 @@
 /// @file   Board.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains the definition of methods of the Board class that 
 ///         represent the state of a chess board.

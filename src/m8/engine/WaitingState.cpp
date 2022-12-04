@@ -4,7 +4,10 @@
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.
 
+#include "../../m8common/logging.hpp"
+
 #include "../../m8chess/SAN.hpp"
+#include "../../m8chess/Checkmate.hpp"
 
 #include "InvalidMoveException.hpp"
 #include "ThinkingState.hpp"
@@ -20,12 +23,16 @@ namespace m8::engine
 
 	void WaitingState::UserMove(std::string str_move)
 	{	
+		M8_TRACE <<"WaitingState::UserMove(\"" <<str_move <<"\")";
+		
 		Move move = ParseMove(str_move);
 
-		this->board().Make(move);
+		board().Make(move);
 
-		auto thinking_state = new ThinkingState(this);
-		ChangeState(thinking_state);
+		EngineState* next_state = IsMat(board())
+		                        ? static_cast<EngineState*>(new ObservingState(this))
+								: static_cast<EngineState*>(new ThinkingState(this));
+		ChangeState(next_state);
 	}
 
 	Move WaitingState::ParseMove(const std::string& str_move)

@@ -6,6 +6,7 @@
   "max-log-severity": "none",
   "display-eval": 1,
   "display-auto": 1,
+  "min-display-depth": 1,
   "eval" : {
       "pawn" : 100,
       "knight" : 320,
