@@ -8,7 +8,6 @@
 #include <thread>
 
 #include "Search.hpp"
-#include "Minimax.hpp"
 #include "../eval/Eval.hpp"
 #include "../../m8common/logging.hpp"
 
