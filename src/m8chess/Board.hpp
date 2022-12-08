@@ -121,11 +121,9 @@ namespace m8
 
         /// Accesor for the castling columns.
         ///
-        /// @param indx Index of the column to get, must be 0 or 1 for the queen 
-        ///             side castling column and the king side castling columns 
-        ///             respectively.
+        /// @param castle_type Index of the column to get, must be kQueendSide or kKingSide.
         /// @returns A column.
-        inline Colmn casle_colmn(std::size_t indx) const;
+        inline Colmn casle_colmn(CastleType castle_type) const;
 
         /// Accessor for the column of the pawn that can be captured en passant.
         ///
@@ -445,12 +443,12 @@ namespace m8
         casle_flag_ ^= (-static_cast<std::uint8_t>(value) ^ casle_flag_) & mask;
     }
 
-    inline Colmn Board::casle_colmn(std::size_t indx) const
+    inline Colmn Board::casle_colmn(CastleType castle_type) const
     {
         // A : The index is 0 or 1.
-        assert(indx == 1 || indx == 2);
+        assert(castle_type == kKingSideCastle || castle_type == kQueenSideCastle);
 
-        return casle_colmn_[indx - 1];
+        return casle_colmn_[castle_type - 1];
     }
 
     inline void Board::AddPiece(Sq sq, Piece piece)

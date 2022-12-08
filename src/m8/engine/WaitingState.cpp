@@ -43,7 +43,7 @@ namespace m8::engine
 		{
 			move = ParseSAN(str_move, this->board());
 		}
-		catch (const InvalidSANMoveException&)
+		catch (const InvalidMoveNotationException&)
 		{
 			throw InvalidMoveException("Invalid Move : " + str_move);
 		}

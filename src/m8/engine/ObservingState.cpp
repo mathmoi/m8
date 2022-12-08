@@ -1,5 +1,5 @@
 /// @file	ObservingState.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	Decembre 2019
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for commands.
@@ -35,7 +35,7 @@ namespace m8::engine {
 		{
 			move = ParseSAN(str_move, this->board());
 		}
-		catch (const InvalidSANMoveException&)
+		catch (const InvalidMoveNotationException&)
 		{
 			throw InvalidMoveException("Invalid Move : " + str_move);
 		}

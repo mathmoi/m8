@@ -1,5 +1,5 @@
 /// @file   SAN.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Novembre 2017
 /// @brief  Contains methods to parse or generate moves in Standard Algebraic Notation.
 
@@ -8,22 +8,10 @@
 
 #include "Move.hpp"
 #include "Board.hpp"
+#include "InvalidMoveNotationException.hpp"
 
 namespace m8
 {
-    /// Exception used when a string can't be parsed as a SAN move.
-    class InvalidSANMoveException : public std::runtime_error
-    {
-    public:
-        InvalidSANMoveException()
-            : runtime_error("Invalid move")
-        {};
-
-        InvalidSANMoveException(std::string message)
-            : runtime_error(message)
-        {};
-    };
-
     /// Parse a SAN string into a move.
     ///
     /// @param input  SAN move to parse.
