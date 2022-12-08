@@ -349,7 +349,7 @@ namespace m8
     void OutputPromotion(std::ostream& out, Move move)
     {
         Piece promote_to = GetPromoteTo(move);
-        if (IsPiece(GetPromoteTo(move)))
+        if (IsPiece(promote_to))
         {
             PieceType piece_type = GetPieceType(promote_to);
             out << '=' << GetCharFromPieceType(piece_type);
