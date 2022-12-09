@@ -50,7 +50,7 @@ namespace m8
         { 'K', kKing },
         { 'Q', kQueen },
         { 'B', kBishop },
-        { 'R', kRook },
+        { 'R', kRook }
     };
 
     /// Map that can be used to translate from character to piece type.

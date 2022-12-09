@@ -6,6 +6,8 @@
 
 #include "../../m8common/logging.hpp"
 
+#include "../options/Options.hpp"
+#include "../../m8chess/CoordinateNotation.hpp"
 #include "../../m8chess/SAN.hpp"
 #include "../../m8chess/Checkmate.hpp"
 
@@ -41,9 +43,9 @@ namespace m8::engine
 
 		try
 		{
-			move = ParseSAN(str_move, this->board());
+			move = options::Options::get().use_san ? ParseSAN(str_move, this->board()) : ParseCoordinateNotation(str_move, this->board());
 		}
-		catch (const InvalidSANMoveException&)
+		catch (const InvalidMoveNotationException&)
 		{
 			throw InvalidMoveException("Invalid Move : " + str_move);
 		}

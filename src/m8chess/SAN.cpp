@@ -1,5 +1,5 @@
 /// @file   SAN.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Novembre 2017
 /// @brief  Contains the definitions of method needed to parse and render moves in the
 ///         SAN notation.
@@ -60,6 +60,7 @@ namespace m8
     void PrepareCastlingMove(const m8::Board & board, m8::ParseInfo & info, CastleType castling)
     {
         Color side_to_move = board.side_to_move();
+        // TODO : Is this compatible with chess360?
         Colmn colmn = castling == kQueenSideCastle ? kColmnC : kColmnG;
 
         info.piece = NewPiece(kKing, side_to_move);
@@ -90,12 +91,12 @@ namespace m8
     {
         if (info.IsConsumed())
         {
-            throw InvalidSANMoveException("Unexpected end of string in SAN move.");
+            throw InvalidMoveNotationException("Unexpected end of string in SAN move.");
         }
 
         if (info.last() < '1' || info.last() > '8')
         {
-            throw InvalidSANMoveException("Unexpected character in SAN move.");
+            throw InvalidMoveNotationException("Unexpected character in SAN move.");
         }
 
         Row row = NewRow(info.last());
@@ -108,12 +109,12 @@ namespace m8
     {
         if (info.IsConsumed())
         {
-            throw InvalidSANMoveException("Unexpected end of string in SAN move.");
+            throw InvalidMoveNotationException("Unexpected end of string in SAN move.");
         }
 
         if (info.last() < 'a' || info.last() > 'h')
         {
-            throw InvalidSANMoveException("Unexpected character in SAN move.");
+            throw InvalidMoveNotationException("Unexpected character in SAN move.");
         }
 
         Colmn colmn =  NewColmn(info.last());
@@ -206,7 +207,7 @@ namespace m8
 
         if (GetPopct(candidates) != 1)
         {
-            throw InvalidSANMoveException();
+            throw InvalidMoveNotationException();
         }
 
         info.from = GetLsb(candidates);
@@ -348,7 +349,7 @@ namespace m8
     void OutputPromotion(std::ostream& out, Move move)
     {
         Piece promote_to = GetPromoteTo(move);
-        if (IsPiece(GetPromoteTo(move)))
+        if (IsPiece(promote_to))
         {
             PieceType piece_type = GetPieceType(promote_to);
             out << '=' << GetCharFromPieceType(piece_type);

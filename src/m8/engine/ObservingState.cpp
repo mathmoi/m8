@@ -1,10 +1,13 @@
 /// @file	ObservingState.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	Decembre 2019
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for commands.
 
 #include <memory>
+
+#include "../options/Options.hpp"
+#include "../../m8chess/CoordinateNotation.hpp"
 
 #include "ObservingState.hpp"
 #include "WaitingState.hpp"
@@ -33,9 +36,9 @@ namespace m8::engine {
 
 		try
 		{
-			move = ParseSAN(str_move, this->board());
+			move = options::Options::get().use_san ? ParseSAN(str_move, this->board()) : ParseCoordinateNotation(str_move, this->board());
 		}
-		catch (const InvalidSANMoveException&)
+		catch (const InvalidMoveNotationException&)
 		{
 			throw InvalidMoveException("Invalid Move : " + str_move);
 		}
