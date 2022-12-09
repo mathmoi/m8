@@ -1,5 +1,5 @@
 /// @file	ThinkingState.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	January 2020
 /// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
 ///         searching for a move to play
@@ -7,8 +7,9 @@
 #include <stack>
 
 #include "../../m8common/logging.hpp"
-
+#include "../options/Options.hpp"
 #include "../../m8chess/SAN.hpp"
+#include "../../m8chess/CoordinateNotation.hpp"
 
 #include "WaitingState.hpp"
 #include "ThinkingState.hpp"
@@ -114,7 +115,8 @@ namespace m8::engine
 
 		for (size_t x = 0; x < pv.count(); ++x)
 		{
-			moves.push_back(RenderSAN(pv[x], boardr));
+			std::string str_move = options::Options::get().use_san ? RenderSAN(pv[x], boardr) : RenderCoordinateNotation(pv[x]);
+			moves.push_back(str_move);
 			unmake_info_stack.push(boardr.Make(pv[x]));
 		}
 

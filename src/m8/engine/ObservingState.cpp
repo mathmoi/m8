@@ -6,6 +6,9 @@
 
 #include <memory>
 
+#include "../options/Options.hpp"
+#include "../../m8chess/CoordinateNotation.hpp"
+
 #include "ObservingState.hpp"
 #include "WaitingState.hpp"
 #include "PerftState.hpp"
@@ -33,7 +36,7 @@ namespace m8::engine {
 
 		try
 		{
-			move = ParseSAN(str_move, this->board());
+			move = options::Options::get().use_san ? ParseSAN(str_move, this->board()) : ParseCoordinateNotation(str_move, this->board());
 		}
 		catch (const InvalidMoveNotationException&)
 		{

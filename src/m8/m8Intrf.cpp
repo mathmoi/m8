@@ -129,8 +129,13 @@ namespace m8
 
 		shell_intrf_.AddCmd(ShellCmd("accepted",
 			"Indicate to the engine that a feature was accepted",
-			"protover {Feature name}",
+			"accepted {Feature name}",
             std::bind([] {})));
+
+        shell_intrf_.AddCmd(ShellCmd("rejected",
+			"Indicate to the engine that a feature was rejected",
+			"rejected {Feature name}",
+            std::bind(&m8Intrf::HandleRejected, this, std::placeholders::_1)));
 
         shell_intrf_.AddCmd(ShellCmd("ping",
             "Ask the engine if it's ready to handle more commands",
@@ -320,6 +325,14 @@ namespace m8
         M8_OUT_LINE(<< "feature san=1");
 		M8_OUT_LINE(<< "feature done=1");
 	}
+
+    void m8Intrf::HandleRejected(std::vector<std::string> args_list)
+	{
+        if (args_list[1] == "san")
+        {
+            options::Options::get().use_san = false;
+        }
+    }
 
 	void m8Intrf::HandleGo()
 	{

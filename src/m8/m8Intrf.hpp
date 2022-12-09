@@ -67,6 +67,7 @@ namespace m8
       void HandleForce();
       void HandleStop();
       void HandleNew();
+      void HandleRejected(std::vector<std::string> args_list);
       void HandlePing(std::vector<std::string> args_list);
 
       void DisplayOption(const options::ModifiableOption &option) const;

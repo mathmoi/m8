@@ -43,6 +43,10 @@ namespace m8::options
                                                     "Indicate if the evaluation should be displayed with the board.",
                                                     this->display_eval));
 
+        modifiable_options.emplace("use-san", 
+            std::make_unique<TypedModifiableOption<bool>>("use-san",
+                                                    "Indicate if the engine should use the Standard Algebraic Notation.",
+                                                    this->use_san));
     }
 
     template<typename T>
@@ -140,6 +144,11 @@ namespace m8::options
         if (TryReadOption<std::string>(tree, "min-display-depth", temp))
         {
             options.min_display_depth = boost::lexical_cast<DepthType>(temp);
+        }
+
+        if (TryReadOption<std::string>(tree, "use-san", temp))
+        {
+            options.use_san = boost::lexical_cast<bool>(temp);
         }
         
         ReadPerftOptions(tree, options.perft);

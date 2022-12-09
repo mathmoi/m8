@@ -131,6 +131,10 @@ namespace m8::options
         /// Minimum depth of the displayed engine thinking
         DepthType min_display_depth = 4;
 
+        /// Indicate if the engine should use the Standatd Algebraic Notation. If it is
+        /// false, the Coordinate Algebraic Notation is used instead.
+        bool use_san;
+
         /// Options related to the evaluation function
         EvalOptions eval;        
 
