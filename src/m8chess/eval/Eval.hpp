@@ -38,7 +38,7 @@ namespace m8::eval
 		{
 			return value + 1;
 		}
-		else
+		else // TODO : If we do this first (most common case) it might be a bit faster. Or maybe not. Test it.
 		{
 			return value;
 		}

@@ -1,5 +1,5 @@
 /// @file   Checkmate.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains a method used to verify that a player is in check or mate.
 
@@ -13,7 +13,7 @@ namespace m8
 	/// Verify if a given color is in check.
     ///
     /// @param color Color of the side to for which to verify if the king is in check.
-    inline bool IsInCheck(Color color, const Board& board)
+    inline bool IsInCheck(Color color, const Board& board) // TODO Maybe we could do a Position Class that would use a Board to compute things like attacks, IsCheck, etc.
     {
         Piece king = NewPiece(kKing, color);
         Bb bb_king = board.bb_piece(king);
