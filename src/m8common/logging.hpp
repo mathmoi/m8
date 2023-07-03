@@ -1,5 +1,5 @@
 /// @file   logging.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2018
 /// @brief  Contains functionalities to log informations to a log file.
 

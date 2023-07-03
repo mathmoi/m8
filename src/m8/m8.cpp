@@ -1,5 +1,5 @@
 /// @file   m8.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   May 2015
 /// @brief  Contains the entry point (main) of m8.
 

@@ -1,5 +1,5 @@
 /// @file   ShellIntrf.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   May 2015
 /// @brief  Contains classes that are used to create a shell-like interface.
 

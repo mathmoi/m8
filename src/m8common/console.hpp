@@ -1,5 +1,5 @@
 /// @file   console.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Novembre 2019
 /// @brief  Contains functionalities about the console window.
 

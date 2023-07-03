@@ -1,5 +1,5 @@
 /// @file   SAN.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Novembre 2017
 /// @brief  Contains methods to parse or generate moves in Standard Algebraic Notation.
 

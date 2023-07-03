@@ -1,5 +1,5 @@
 /// @file	ThinkingState.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	January 2020
 /// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
 ///         searching for a move to play

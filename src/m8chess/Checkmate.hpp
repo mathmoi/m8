@@ -1,5 +1,5 @@
 /// @file   Checkmate.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Janurary 2018
 /// @brief  Contains a method used to verify that a player is in check or mate.
 

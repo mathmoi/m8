@@ -1,5 +1,5 @@
 /// @file   Board_tests.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains tests of the Board type and functionalities.
 

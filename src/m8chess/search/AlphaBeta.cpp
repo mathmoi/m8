@@ -1,5 +1,5 @@
 /// @file   AlphaBeta.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu PagÃ©
 /// @date   Decembre 2018
 /// @brief  Contains the AlphaBeta class. This class is responsible for the search
 ///         algorithm of the chess engine.
@@ -46,7 +46,7 @@ namespace m8::search {
 		}
 
 		// Generate all the moves
-		MoveList moves;
+		MoveList moves; // TODO : MoveList should be a class. Test for performance.
 		Move* first = moves.data();
 		Move* last = qsearch ? GenerateAllCaptures(board_, moves.data())
 			                 : GenerateAllMoves(board_, moves.data());

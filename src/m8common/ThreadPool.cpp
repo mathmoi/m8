@@ -1,5 +1,5 @@
 /// @file   ThreadPool.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2018
 /// @brief  Contains the ThreadPools definitions.
 

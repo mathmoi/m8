@@ -1,5 +1,5 @@
 /// @file   SearchResult.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu PagÃ©
 /// @date   Novembre 2019
 /// @brief  Contains the SearchResult class.
 

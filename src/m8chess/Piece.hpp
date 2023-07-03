@@ -1,5 +1,5 @@
 /// @file   Piece.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains the definition of the Piece and PieceType types.
 

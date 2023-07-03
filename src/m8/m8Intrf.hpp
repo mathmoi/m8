@@ -1,5 +1,5 @@
 /// @file   m8Intrf.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   May 2015
 /// @brief  Contains the class m8Intrf that implements m8's shell like interface.
 

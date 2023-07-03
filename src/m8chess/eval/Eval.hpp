@@ -1,5 +1,5 @@
 /// @file   Eval.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   March 2018
 /// @brief  Contains the evaluation function
 

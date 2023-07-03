@@ -1,5 +1,5 @@
 /// @file	EngineState.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	Decembre 2019
 /// @brief	Contains the EngineState class. This is an abstract class that represent the
 ///         state of the engine at a given time.

@@ -1,5 +1,5 @@
 /// @file   SAN_tests.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains tests of methods contained in SAN.hpp.
 

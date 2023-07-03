@@ -1,5 +1,5 @@
 /// @file   MoveGen.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities to generate moves
 

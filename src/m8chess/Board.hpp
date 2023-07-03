@@ -1,5 +1,5 @@
 /// @file   Board.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains the definition of the Board type that represent the state 
 ///         of a chess board.

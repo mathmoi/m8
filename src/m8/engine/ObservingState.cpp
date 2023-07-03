@@ -1,5 +1,5 @@
 /// @file	ObservingState.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	Decembre 2019
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for commands.

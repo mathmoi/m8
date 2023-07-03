@@ -1,5 +1,5 @@
 /// @file   SAN.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Novembre 2017
 /// @brief  Contains the definitions of method needed to parse and render moves in the
 ///         SAN notation.

@@ -1,5 +1,5 @@
 /// @file   Perft.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Janurary 2018
 /// @brief  Contains functionalities of the perft command.
 

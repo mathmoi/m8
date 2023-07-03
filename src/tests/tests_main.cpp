@@ -1,5 +1,5 @@
 /// @file   tests_main.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains the Catch framework main function.
 
