@@ -1,5 +1,5 @@
 /// @file	ThinkingState.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu PagÃ©
 /// @date	January 2020
 /// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
 ///         searching for a move to play
@@ -16,8 +16,8 @@
 
 namespace m8::engine {
 
-	/// Class controlling the engine behavior in the waiting state.
-	class ThinkingState : public EngineState, public search::SearchObserver
+	/// Class controlling the engine behavior in the thinking state.
+	class ThinkingState : public EngineState, public search::SearchObserver // TODO : This state should be named SearchingState/PonderingState
 	{
 	public:
 

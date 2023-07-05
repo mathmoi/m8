@@ -115,6 +115,10 @@ namespace m8
             "Set the engine to play neither color",
             "force",
             std::bind(&m8Intrf::HandleForce, this)));
+        shell_intrf_.AddCmd(ShellCmd("st",
+            "Set the exact number of seconds to use for each move",
+            "st {seconds}",
+            std::bind(&m8Intrf::HandleSt, this, std::placeholders::_1)));
     }
 
 	void m8Intrf::SetupXboardMode()
@@ -208,26 +212,18 @@ namespace m8
         }
 
         // Convert argument to integer
-        int depth;
-        try
+        auto depth = ConvertArgument<int>(args_list[1], "Usage : perft {Depth}");
+        if (depth.has_value())
         {
-            depth = ConvertTo<int>(args_list[1]);
-        }
-        catch (const BadConvr&)
-        {
-            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-            M8_OUT_LINE(<< "Usage : perft {Depth}");
-            return;
-        }
-
-        if (depth < 1 || 255 < depth)
-        {
-            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-            M8_OUT_LINE(<<"The depth must be between 1 and 255");
-        }
-        else
-        {
-            CallEngineCommand([this, depth]() { engine_.Perft(depth); }, "perft");
+            if (depth.value() < 1 || 255 < depth.value())
+            {
+                std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+                M8_OUT_LINE(<<"The depth must be between 1 and 255");
+            }
+            else
+            {
+                CallEngineCommand([this, depth]() { engine_.Perft(depth.value()); }, "perft");
+            }
         }
     }
 
@@ -342,6 +338,24 @@ namespace m8
     void m8Intrf::HandleForce()
     {
         CallEngineCommand([this]() {engine_.Force(); }, "force");
+    }
+
+    void m8Intrf::HandleSt(std::vector<std::string> args_list)
+    {
+        // Check number of arguments
+        if (args_list.size() != 2)
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< "Usage : st {seconds}");
+            return;
+        }
+
+        // Convert argument to float
+        auto seconds = ConvertArgument<float>(args_list[1], "Usage : st {seconds}");
+        if (seconds.has_value())
+        {
+            CallEngineCommand([this, seconds]() {engine_.SetTimeControl(seconds.value()); }, "st");
+        }
     }
 
     void m8Intrf::HandleStop()
@@ -602,6 +616,21 @@ namespace m8
         }
 
         return sucess;
+    }
+
+    template<typename T>
+    std::optional<T> m8Intrf::ConvertArgument(const std::string& arg, const std::string& usage)
+    {
+        try
+        {
+            return ConvertTo<T>(arg);
+        }
+        catch (const BadConvr&)
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< usage);
+            return std::nullopt;
+        }
     }
 
 	void m8Intrf::ClearLine() const

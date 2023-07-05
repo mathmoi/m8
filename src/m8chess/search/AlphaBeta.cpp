@@ -15,11 +15,14 @@
 namespace m8::search {
 
 	AlphaBeta::AlphaBeta(const Board& board,
+						 const time::TimeManager& time_manager,
 		                 SearchObserver* observer)
 		: board_(board),
 		  continue_(true),
 		  best_move_(kNullMove),
 		  nodes_counter_(0),
+		  nodes_count_next_time_check_(kNodesBeforeFirstCheck),
+		  time_manager_(time_manager),
 		  observer_(observer)
 	{}
 
@@ -30,6 +33,17 @@ namespace m8::search {
 
 		pv.Clear();
 		++nodes_counter_;
+
+		// We check if we need to abort the search because of time constraint
+		if (!qsearch && nodes_count_next_time_check_ <= nodes_counter_) // TODO We need not interupt search if min iteration is not searched
+		{
+			continue_ = time_manager_.can_continue();
+			if (!continue_)
+			{
+				return 0;
+			}
+			nodes_count_next_time_check_ = nodes_counter_ + time_manager_.CalculateNodesBeforeNextCheck(nodes_counter_);
+		}
 
 		// If we are in the qsearch we must evaluate the stand path option.
 		if (qsearch)
@@ -82,6 +96,12 @@ namespace m8::search {
 				value = eval::AddDepthToMate(value);
 				board_.Unmake(*next, unmake_info);
 
+				// If we are aborting the search we need to leave immediately.
+				if (!continue_)
+				{
+					return 0;
+				}
+
 				// If the value of the current move is better or equal to beta we can 
 				// abort the search at this node.
 				if (value >= beta)
@@ -112,13 +132,21 @@ namespace m8::search {
 		return alpha;
 	}
 
-	SearchResult AlphaBeta::Search(DepthType depth)
+	std::optional<SearchResult> AlphaBeta::Search(DepthType depth)
 	{
 		PV pv;
 
 		observer_->OnBeginSearch();
 
 		auto value = Search<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
+		
+		// If we are aborting the search we need to leave immediately.
+		if (!continue_) // TODO : Find a way to return the nodes_count separately from the pv/value
+		{
+			// TODO : If we make sure that we always search the previous best move first, we could still use the result of a partial search.
+			return std::nullopt;
+		}
+
 		auto result = SearchResult(pv, value, nodes_counter_);
 
 		observer_->OnSearchCompleted(pv, 0);

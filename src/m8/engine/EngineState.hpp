@@ -16,6 +16,10 @@
 #include "../../m8chess/Board.hpp"
 #include "../../m8chess/search/SearchObserver.hpp"
 
+#include "../../m8chess/time/ChessClock.hpp"
+#include "../../m8chess/time/TimeControl.hpp"
+#include "../../m8chess/time/TimePerMoveTimeControl.hpp"
+
 #include "EngineCallbacks.hpp"
 #include "InvalidEngineCommandException.hpp"
 
@@ -41,6 +45,8 @@ namespace m8::engine {
               psqt_(psqt),
               board_(kStartingPositionFEN, psqt),
               engine_color_(kBlack),
+              time_control_(std::make_shared<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
+              clock_(time::ChessClock::CreateChessClock(*time_control_)),
               observer_(observer)
         {}
 
@@ -53,6 +59,8 @@ namespace m8::engine {
               psqt_(source->psqt_),
               board_(source->board_),
               engine_color_(source->engine_color_),
+              time_control_(source->time_control_),
+              clock_(std::move(source->clock_)),
               observer_(source->observer_)
         {}
 
@@ -67,10 +75,23 @@ namespace m8::engine {
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        virtual inline void set_fen(std::string fen) { board_ = Board(fen, psqt_); };
+        inline void set_fen(std::string fen) { board_ = Board(fen, psqt_); };
 
         /// Return the name of the state
         inline const std::string& state_name() const { return state_name_; }
+
+        /// Return the current time control
+        inline std::shared_ptr<time::TimeControl> time_control() const { return time_control_; }
+
+        /// Return engine's chess clock
+        inline time::ChessClock& clock() const { return *clock_; }
+
+        /// Set the current time control
+        inline void set_time_control(std::shared_ptr<time::TimeControl> value)
+        {
+            time_control_ = value;
+            clock_ = time::ChessClock::CreateChessClock(*time_control_);
+        }
 
         /// Method that is run before a state is replaced by a new state
         virtual inline void BeginState() {};
@@ -97,6 +118,11 @@ namespace m8::engine {
 
         /// Accept a move to play on the current board.
         virtual inline void UserMove(std::string move) { throw InvalidEngineCommandException("UserMove"); }
+
+        /// Set the time control to a fixed number of seconds per move
+        /// 
+        /// @param seconds_per_move Number of seconds to use per move
+        virtual inline void SetTimeControl(float seconds_per_move) { throw InvalidEngineCommandException("SetTimeControl"); };
 
     protected:
 
@@ -125,6 +151,8 @@ namespace m8::engine {
         eval::PieceSqTablePtr psqt_;
         Board board_;
         Color engine_color_;
+        std::shared_ptr<time::TimeControl> time_control_; // TODO : Could this be a unique_ptr
+        std::unique_ptr<time::ChessClock> clock_;
 
         search::SearchObserver* observer_;
     };

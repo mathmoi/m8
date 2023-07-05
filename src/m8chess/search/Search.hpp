@@ -1,5 +1,5 @@
 /// @file   Search.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   March 2018
 /// @brief  Contains the Search class. This class is responsible to manage the engine's 
 ///         search. The search algorithm itself is contained elswhere, but is access by
@@ -16,6 +16,7 @@
 #include <chrono>
 
 #include "../Board.hpp"
+#include "../time/TimeManager.hpp"
 #include "SearchResult.hpp"
 #include "SearchObserver.hpp"
 #include "IterativeDeepening.hpp"
@@ -37,6 +38,7 @@ namespace m8 { namespace search
 		
         /// Constructor
         Search(const Board& board,
+			   std::shared_ptr<time::TimeManager> time_manager,
 			   SearchObserver* observer);
 
 		/// Destructor
@@ -67,6 +69,7 @@ namespace m8 { namespace search
 		Board board_;
 		SearchState state_;
 		std::unique_ptr<IterativeDeepening> ptr_iterative_deepening_;
+		std::shared_ptr<time::TimeManager> time_manager_;
 
 		SearchObserver* observer_;
 

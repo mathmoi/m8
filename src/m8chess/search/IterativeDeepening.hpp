@@ -1,13 +1,14 @@
 /// @file   IterativeDeepening.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu PagÃ©
 /// @date   Janvier 2020
 /// @brief  Contains the Iterative Deepening algorithm.
 
-#ifndef M8_SEARCH_ITERATIVE_DEEPENING_HPP_
-#define M8_SEARCH_ITERATIVE_DEEPENING_HPP_
+#ifndef M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_
+#define M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_
 
 #include "../Board.hpp"
 #include "../Types.hpp"
+#include "../time/TimeManager.hpp"
 #include "SearchResult.hpp"
 #include "SearchObserver.hpp"
 #include "AlphaBeta.hpp"
@@ -19,6 +20,7 @@ namespace m8::search {
 	public:
 		/// Constructor.
 		IterativeDeepening(const Board& board,
+		                   std::shared_ptr<time::TimeManager> time_manager,
 			               SearchObserver* observer);
 
 		// TODO : Remove depth from the Search method and replace by proper time management
@@ -32,10 +34,13 @@ namespace m8::search {
 		void Stop();
 
 	private:
-		AlphaBeta alpha_beta_;
+		const DepthType kMinimumSearchDepth = 3;
 
-		SearchObserver* observer_;
+		AlphaBeta                          alpha_beta_;
+		std::shared_ptr<time::TimeManager> time_manager_;
+
+		SearchObserver*                    observer_;
 	};
 }
 
-#endif // M8_SEARCH_ITERATIVE_DEEPENING_HPP_
+#endif // M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_

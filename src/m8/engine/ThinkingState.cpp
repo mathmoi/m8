@@ -10,6 +10,7 @@
 #include "../options/Options.hpp"
 #include "../../m8chess/SAN.hpp"
 #include "../../m8chess/CoordinateNotation.hpp"
+#include "../../m8chess/time/TimeManager.hpp"
 
 #include "WaitingState.hpp"
 #include "ThinkingState.hpp"
@@ -19,13 +20,15 @@ namespace m8::engine
 {
 	ThinkingState::ThinkingState(EngineState* source)
 		: EngineState("ThinkingState", source),
-		search_(source->board(), this),
+		search_(source->board(), time::TimeManager::CreateTimeManager(*(this->time_control()), this->clock()), this),
 		searching_(true)
 	{}
 
 	void ThinkingState::BeginState()
 	{
 		M8_DEBUG << this->board().fen();
+
+		clock().Start();
 
 		observer()->OnBeginSearch();
 
@@ -47,6 +50,8 @@ namespace m8::engine
 				this->board().Make(pv.first());
 
 				observer()->OnSearchCompleted(pv_str, time);
+
+				clock().Stop();
 
 				searching_ = false;
 			}

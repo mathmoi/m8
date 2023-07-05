@@ -14,9 +14,11 @@
 namespace m8 { namespace search
 {
     Search::Search(const Board& board,
-	               SearchObserver* observer)
+			       std::shared_ptr<time::TimeManager> time_manager,
+			       SearchObserver* observer)
 		: board_(board),
 		  state_(SearchState::Ready),
+		  time_manager_(time_manager),
 		  observer_(observer)
     {}
 
@@ -55,7 +57,7 @@ namespace m8 { namespace search
 			search_thread_.join();
 		}
 
-		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, this);
+		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, time_manager_, this);
 		search_thread_ = std::thread(&Search::RunSearchThread, this);
 	}
 
@@ -90,7 +92,7 @@ namespace m8 { namespace search
 
 		observer_->OnBeginSearch();
 
-		auto search_result = ptr_iterative_deepening_->Search(6);
+		auto search_result = ptr_iterative_deepening_->Search(60); // TODO : Change depth here
 
 		bool was_searching = StopSearch();
 		if (was_searching)

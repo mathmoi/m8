@@ -69,6 +69,7 @@ namespace m8
       void HandleNew();
       void HandleRejected(std::vector<std::string> args_list);
       void HandlePing(std::vector<std::string> args_list);
+      void HandleSt(std::vector<std::string> args_list);
 
       void DisplayOption(const options::ModifiableOption &option) const;
       void DisplayOption(const std::string &option_name) const;
@@ -88,6 +89,8 @@ namespace m8
       std::string FormaterEval(int eval) const;
 
       bool CallEngineCommand(std::function<void()> call, const std::string &command);
+      template<typename T>
+      std::optional<T> ConvertArgument(const std::string& arg, const std::string& usage);
       void ClearLine() const;
    };
 }

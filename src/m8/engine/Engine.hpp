@@ -1,5 +1,5 @@
 /// @file	Engine.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu PagÃ©
 /// @date	November 2017
 /// @brief	Contains the Engine class that encapsulate all m8 functionalities.
 
@@ -41,25 +41,30 @@ namespace m8::engine
         /// @param fen XFen string representing the new position.
         inline void set_fen(std::string fen) { state_->set_fen(fen); };
 
+        /// Set the time control to a fixed number of seconds per move
+        /// 
+        /// @param seconds_per_move Number of seconds to use per move
+        inline void SetTimeControl(float seconds_per_move) { state_->SetTimeControl(seconds_per_move); };
+
         /// Run a perft tests.
         ///
         /// @param depth                   Depth of the test to run.
         inline void Perft(int depth) { return state_->Perft(depth); };
 
         /// Set the engine to play the current side and start playing.
-        void Go() { state_->Go(); };
+        inline void Go() { state_->Go(); };
 
         /// Set the engine to play neither color.
-        void Force() { state_->Force(); }
+        inline void Force() { state_->Force(); }
 
         /// Stop the current operation
-        void Stop() { state_->Stop(); };
+        inline void Stop() { state_->Stop(); };
 
         /// Terminate the current game and prepare the engine to play a new game.
-        void New() { state_->New(); };
+        inline void New() { state_->New(); };
 
         /// Accept a move to play on the current board.
-        void UserMove(std::string move) { state_->UserMove(move); };
+        inline void UserMove(std::string move) { state_->UserMove(move); };
 
         /// Returns the current evaluation;
         EvalType current_evaluation() const;

@@ -1,5 +1,5 @@
 /// @file   IterativeDeepening.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janvier 2020
 /// @brief  Contains the Iterative Deepening algorithm.
 
@@ -8,27 +8,45 @@
 namespace m8::search {
 
 	IterativeDeepening::IterativeDeepening(const Board& board,
+										   std::shared_ptr<time::TimeManager> time_manager,
 		                                   SearchObserver* observer)
 		: alpha_beta_(board,
+					  *time_manager,
 			          this),
+		  time_manager_(time_manager),
 		  observer_(observer)
 	{}
 
 	SearchResult IterativeDeepening::Search(DepthType depth)
 	{
-		SearchResult result;
+		std::optional<SearchResult> result;
+		std::optional<SearchResult> last_result;
 
 		observer_->OnBeginSearch();
 
-		for (DepthType current_depth = 1; current_depth <= depth; ++current_depth)
+		DepthType current_depth = 1;
+		while(current_depth <= kMinimumSearchDepth ||
+			  	(current_depth <= depth &&
+		         time_manager_->can_start_new_iteration()))
 		{
 			result = alpha_beta_.Search(current_depth);
-			observer_->OnIterationCompleted(result.pv_, result.value_, current_depth, 0, result.nodes_);
+			if (result.has_value())
+			{
+				observer_->OnIterationCompleted(result.value().pv_,
+				                                result.value().value_,
+												current_depth,
+												0,
+												result.value().nodes_);
+
+				last_result = result;
+			}
+
+			++current_depth;
 		}
 
-		observer_->OnSearchCompleted(result.pv_, 0);
+		observer_->OnSearchCompleted(last_result.value().pv_, 0);
 
-		return result;
+		return last_result.value();
 	}
 
 	void IterativeDeepening::Stop()
