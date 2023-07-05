@@ -11,10 +11,6 @@
 #include "../../m8common/chronoHelpers.hpp"
 #include "TimeManager.hpp"
 
-
-// TODO : remove
-#include <iostream>
-
 namespace m8::time
 {
     class TimePerMoveTimeManager : public TimeManager
@@ -31,10 +27,10 @@ namespace m8::time
         /// Indicate if the search can continue. The search needs to call this regularly
         /// after searching a number of nodes defined by the method
         ///  CalculateNodesBeforeNextCheck.
-        virtual bool can_continue() const { return kSafetyBuffer < clock().time_on_clock(); } // TODO : Use this
+        virtual bool can_continue() const { return kSafetyBuffer < clock().time_on_clock(); }
 
         /// Indicate if the search can start a new iteration.
-        virtual bool can_start_new_iteration() const { return can_continue(); }; // TODO : Il semble que "st 0.25" agis toujours comme "st 1"
+        virtual bool can_start_new_iteration() const { return can_continue(); };
 
         /// Returns the number of nodes can be searched before we need to make another 
         /// call to can_continue.
@@ -43,7 +39,7 @@ namespace m8::time
         ///                         current search.
         /// @return NodeCounterType Number of nodes to search before the next call to
         ///                         can_continue.
-        virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const // TODO : Use this
+        virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const
         {
             auto time_searched = ToFSec(clock().elapsed());
             NodeCounterType nps = nodes_searched / time_searched.count();

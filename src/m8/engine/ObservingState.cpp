@@ -68,6 +68,6 @@ namespace m8::engine {
 		std::chrono::duration<float> fseconds(seconds_per_move);
 		auto duration = std::chrono::duration_cast<time::TimePerMoveTimeControl::Duration>(fseconds);
 
-		set_time_control(std::make_shared<time::TimePerMoveTimeControl>(duration));
+		set_time_control(std::make_unique<time::TimePerMoveTimeControl>(duration));
 	}
 }

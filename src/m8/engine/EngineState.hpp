@@ -45,7 +45,7 @@ namespace m8::engine {
               psqt_(psqt),
               board_(kStartingPositionFEN, psqt),
               engine_color_(kBlack),
-              time_control_(std::make_shared<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
+              time_control_(std::make_unique<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
               clock_(time::ChessClock::CreateChessClock(*time_control_)),
               observer_(observer)
         {}
@@ -59,7 +59,7 @@ namespace m8::engine {
               psqt_(source->psqt_),
               board_(source->board_),
               engine_color_(source->engine_color_),
-              time_control_(source->time_control_),
+              time_control_(std::move(source->time_control_)),
               clock_(std::move(source->clock_)),
               observer_(source->observer_)
         {}
@@ -81,15 +81,15 @@ namespace m8::engine {
         inline const std::string& state_name() const { return state_name_; }
 
         /// Return the current time control
-        inline std::shared_ptr<time::TimeControl> time_control() const { return time_control_; }
+        inline const time::TimeControl& time_control() const { return *time_control_; }
 
         /// Return engine's chess clock
         inline time::ChessClock& clock() const { return *clock_; }
 
         /// Set the current time control
-        inline void set_time_control(std::shared_ptr<time::TimeControl> value)
+        inline void set_time_control(std::unique_ptr<time::TimeControl> value)
         {
-            time_control_ = value;
+            time_control_ = std::move(value);
             clock_ = time::ChessClock::CreateChessClock(*time_control_);
         }
 
@@ -151,7 +151,7 @@ namespace m8::engine {
         eval::PieceSqTablePtr psqt_;
         Board board_;
         Color engine_color_;
-        std::shared_ptr<time::TimeControl> time_control_; // TODO : Could this be a unique_ptr
+        std::unique_ptr<time::TimeControl> time_control_;
         std::unique_ptr<time::ChessClock> clock_;
 
         search::SearchObserver* observer_;

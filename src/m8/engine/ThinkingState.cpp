@@ -20,7 +20,7 @@ namespace m8::engine
 {
 	ThinkingState::ThinkingState(EngineState* source)
 		: EngineState("ThinkingState", source),
-		search_(source->board(), time::TimeManager::CreateTimeManager(*(this->time_control()), this->clock()), this),
+		search_(source->board(), time::TimeManager::CreateTimeManager(this->time_control(), this->clock()), this),
 		searching_(true)
 	{}
 
