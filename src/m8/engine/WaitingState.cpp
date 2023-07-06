@@ -72,5 +72,13 @@ namespace m8::engine
 		auto observing_state = new ObservingState(this);
 		ChangeState(observing_state);
 	}
+
+	void WaitingState::SetTimeControl(float seconds_per_move)
+	{
+		std::chrono::duration<float> fseconds(seconds_per_move);
+		auto duration = std::chrono::duration_cast<time::TimePerMoveTimeControl::Duration>(fseconds);
+
+		set_time_control(std::make_unique<time::TimePerMoveTimeControl>(duration));
+	}
 }
 

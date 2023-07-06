@@ -1,5 +1,5 @@
 /// @file	WaitingState.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	January 2020
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.
@@ -30,6 +30,11 @@ namespace m8::engine {
 
 		/// Set the engine to play neither color.
 		virtual void Force();
+
+		/// Set the time control to a fixed number of seconds per move
+        /// 
+        /// @param seconds_per_move Number of seconds to use per move
+		virtual void SetTimeControl(float seconds_per_move);
 
 	private:
 		Move ParseMove(const std::string& str_move);
