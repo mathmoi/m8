@@ -8,45 +8,67 @@
 #include "../../m8common/logging.hpp"
 
 #include "Engine.hpp"
+#include "EngineState.hpp"
 #include "ObservingState.hpp"
 
 #include "../../m8chess/SAN.hpp"
 
 namespace m8::engine
 {
-	Engine::Engine(eval::PieceSqTablePtr psqt,
-		           EngineCallbacks callbacks,
-		           search::SearchObserver* observer)
-	{
-		state_ = new ObservingState(this, psqt, callbacks, observer);
-	}
+    Engine::Engine(eval::PieceSqTablePtr psqt,
+                   EngineCallbacks callbacks)
+    : callbacks_(callbacks),
+      psqt_(psqt),
+      board_(kStartingPositionFEN, psqt),
+      engine_color_(kBlack),
+      time_control_(std::make_unique<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
+      clock_(time::ChessClock::CreateChessClock(*time_control_))
+    {
+        state_ = new ObservingState(this);
+    }
 
-	Engine::~Engine()
-	{
-		delete state_;
-	}
+    Engine::~Engine()
+    {
+        delete state_;
+    }
 
-	void Engine::ChangeState(EngineState* new_state)
-	{
-		if (new_state != state_)
-		{
-			M8_DEBUG << "ChangeState from " << state_->state_name() << " to " << new_state->state_name();
+    void Engine::ChangeState(EngineState* new_state)
+    {
+        if (new_state != state_)
+        {
+            M8_DEBUG << "ChangeState from " << state_->state_name() << " to " << new_state->state_name();
 
-			state_->EndState();
+            state_->EndState();
 
-			delete state_;
-			state_ = new_state;
+            delete state_; // TODO : Smart Pointer
+            state_ = new_state;
 
-			state_->BeginState();
-		}
-		else
-		{
-			M8_DEBUG << "Same state (" << state_->state_name() <<"), no need to change.";
-		}
-	}
+            state_->BeginState();
+        }
+        else
+        {
+            M8_DEBUG << "Same state (" << state_->state_name() <<"), no need to change.";
+        }
+    }
 
-	EvalType Engine::current_evaluation() const
-	{
-		return eval::Evaluate(state_->board());
-	}
+    EvalType Engine::current_evaluation() const
+    {
+        return eval::Evaluate(board_);
+    }
+
+    void Engine::set_fen(std::string fen) { state_->set_fen(fen); }
+
+    void Engine::SetTimeControl(float seconds_per_move) { state_->SetTimeControl(seconds_per_move); }
+
+    void Engine::Perft(int depth) { return state_->Perft(depth); }
+
+    void Engine::Go() { state_->Go(); }
+
+    void Engine::Force() { state_->Force(); }
+
+    void Engine::Stop() { state_->Stop(); }
+
+    void Engine::New() { state_->New(); }
+
+    void Engine::UserMove(std::string move) { state_->UserMove(move); }
 }

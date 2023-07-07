@@ -1,5 +1,5 @@
 /// @file	EngineCallbacks.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	January 2020
 /// @brief	Contains the EngineCallbacks struct, that contains a list of callbacks 
 ///         function used by the Engine class to notify it's creator of events.
@@ -7,11 +7,13 @@
 #ifndef M8_ENGINE_ENGINE_CALLBACKS_HPP_
 #define M8_ENGINE_ENGINE_CALLBACKS_HPP_
 
+#include <functional>
+
 #include "../../m8chess/Types.hpp"
 
 namespace m8::engine {
 
-	// TODO : Could we replace this or part of this witha SearchObserver base class (interface) that could be passed around?
+	// TODO : Could we replace this or part of this witha ISearchObserver base class (interface) that could be passed around?
 
 	/// Contains a list of callbacks used by the engine class and the different
 	/// engine states classes.

@@ -17,17 +17,17 @@ namespace m8::engine {
 	{
 	public:
 		/// Default constructor
-		ObservingState(Engine* engine,
-			           eval::PieceSqTablePtr psqt,
-			           EngineCallbacks callbacks,
-			           search::SearchObserver* observer)
-			: EngineState("ObservingState", engine, psqt, callbacks, observer)
+		ObservingState(Engine* engine)
+			: EngineState(engine)
 		{};
 
-		/// Constructor from a previous state
-		ObservingState(EngineState* source)
-			: EngineState("ObservingState", source)
-		{}
+		/// Return the name of the state
+        inline virtual const std::string state_name() const { return "ObservingState"; }
+
+		/// Set the board position using a fen string.
+        ///
+        /// @param fen XFen string representing the new position.
+        inline void set_fen(std::string fen) { engine_->board_ = Board(fen, engine_->psqt_); };
 
 		/// Run a perft tests.
 		///

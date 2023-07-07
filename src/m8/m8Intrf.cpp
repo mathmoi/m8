@@ -11,6 +11,7 @@
 #include "m8Intrf.hpp"
 #include "options/Options.hpp"
 #include "engine/InvalidMoveException.hpp"
+#include "engine/InvalidEngineCommandException.hpp"
 #include "../m8chess/SAN.hpp"
 #include "../m8common/stringHelpers.hpp"
 #include "../m8common/Utils.hpp"
@@ -19,17 +20,17 @@
 
 // This macro can be used in the m8Intrf class to output both to std::cout and to the log system.
 #define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
-#define M8_EMPTY_LINE()  std::cout <<std::endl;
+#define M8_EMPTY_LINE()  std::cout   <<std::endl;
 
 namespace m8
 {
     m8Intrf::m8Intrf()
         : engine_(eval::GeneratePieceSqTable(),
-                  CreateEngineCallbacks(),
-                  this),
+                  CreateEngineCallbacks()),
 		  xboard_(false),
           shell_intrf_()
     {
+        engine_.Attach(this);
         SetupShellInterf();
     }
 
@@ -646,7 +647,7 @@ namespace m8
 		std::cout << '\r';
 	}
 
-    void m8Intrf::OnBeginSearch()
+    void m8Intrf::OnSearchStarted()
     {
         if (!xboard_)
         {

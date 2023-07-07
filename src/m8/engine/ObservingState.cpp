@@ -19,15 +19,15 @@ namespace m8::engine {
 
 	void ObservingState::Perft(int depth)
 	{
-		auto perft_state = new PerftState(this, depth);
-		ChangeState(perft_state);
+		auto perft_state = new PerftState(this->engine_, depth);
+		engine_->ChangeState(perft_state);
 	}
 
 	void ObservingState::UserMove(std::string str_move)
 	{
 		Move move = ParseMove(str_move);
 
-		this->board().Make(move);
+		engine_->board_.Make(move);
 	}
 
 	Move ObservingState::ParseMove(const std::string& str_move)
@@ -36,7 +36,7 @@ namespace m8::engine {
 
 		try
 		{
-			move = options::Options::get().use_san ? ParseSAN(str_move, this->board()) : ParseCoordinateNotation(str_move, this->board());
+			move = options::Options::get().use_san ? ParseSAN(str_move, engine_->board_) : ParseCoordinateNotation(str_move, engine_->board_);
 		}
 		catch (const InvalidMoveNotationException&)
 		{
@@ -48,19 +48,19 @@ namespace m8::engine {
 
 	void ObservingState::New()
 	{
-		set_fen(kStartingPositionFEN);
-		set_engine_color(kBlack);
+		engine_->set_fen(kStartingPositionFEN);
+		engine_->engine_color_ = kBlack;
 
-		auto waiting_state = new WaitingState(this);
-		ChangeState(waiting_state);
+		auto waiting_state = new WaitingState(engine_);
+		engine_->ChangeState(waiting_state);
 	}
 
 	void ObservingState::Go()
 	{
-		set_engine_color(board().side_to_move());
+		engine_->engine_color_ = engine_->board_.side_to_move();
 
-		auto thinking_state = new ThinkingState(this);
-		ChangeState(thinking_state);
+		auto thinking_state = new ThinkingState(engine_);
+		engine_->ChangeState(thinking_state);
 	}
 
 	void ObservingState::SetTimeControl(float seconds_per_move)
@@ -68,6 +68,6 @@ namespace m8::engine {
 		std::chrono::duration<float> fseconds(seconds_per_move);
 		auto duration = std::chrono::duration_cast<time::TimePerMoveTimeControl::Duration>(fseconds);
 
-		set_time_control(std::make_unique<time::TimePerMoveTimeControl>(duration));
+		engine_->time_control_ = std::make_unique<time::TimePerMoveTimeControl>(duration);
 	}
 }

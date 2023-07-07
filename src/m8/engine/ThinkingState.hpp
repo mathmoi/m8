@@ -17,12 +17,15 @@
 namespace m8::engine {
 
 	/// Class controlling the engine behavior in the thinking state.
-	class ThinkingState : public EngineState, public search::SearchObserver // TODO : This state should be named SearchingState/PonderingState
+	class ThinkingState : public EngineState, public search::ISearchObserver<search::PV> // TODO : This state should be named SearchingState/PonderingState
 	{
 	public:
 
 		/// Constructor from a previous state
-		ThinkingState(EngineState* source);
+		ThinkingState(Engine* engine);
+
+		/// Return the name of the state
+        inline virtual const std::string state_name() const { return "ThinkingState"; }
 
 		/// Method that is run when this state becomes the new current state
 		virtual void BeginState();

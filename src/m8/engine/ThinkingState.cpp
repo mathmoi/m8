@@ -18,19 +18,21 @@
 
 namespace m8::engine
 {
-	ThinkingState::ThinkingState(EngineState* source)
-		: EngineState("ThinkingState", source),
-		search_(source->board(), time::TimeManager::CreateTimeManager(this->time_control(), this->clock()), this),
+	ThinkingState::ThinkingState(Engine* engine)
+		: EngineState(engine),
+		search_(engine->board_, time::TimeManager::CreateTimeManager(*(engine->time_control_), *(engine->clock_))),
 		searching_(true)
-	{}
+	{
+		search_.Attach(this);
+	}
 
 	void ThinkingState::BeginState()
 	{
-		M8_DEBUG << this->board().fen();
+		M8_DEBUG << engine_->board_.fen();
 
-		clock().Start();
+		engine_->clock_->Start();
 
-		observer()->OnBeginSearch();
+		engine_->NotifySearchStarted();
 
 		search_.Start();
 	}
@@ -47,11 +49,11 @@ namespace m8::engine
 
 				auto pv_str = RenderPVMoves(pv);
 
-				this->board().Make(pv.first());
+				engine_->board_.Make(pv.first());
 
-				observer()->OnSearchCompleted(pv_str, time);
+				engine_->NotifySearchCompleted(pv_str, time);
 
-				clock().Stop();
+				engine_->clock_->Stop();
 
 				searching_ = false;
 			}
@@ -66,19 +68,19 @@ namespace m8::engine
 	void ThinkingState::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		auto pv_str = RenderPVMoves(pv);
-		observer()->OnNewBestMove(pv_str, eval, depth, time, nodes);
+		engine_->NotifyNewBestMove(pv_str, eval, depth, time, nodes);
 	}
 
 	void ThinkingState::OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		auto pv_str = RenderPVMoves(pv);
-		observer()->OnIterationCompleted(pv_str, eval, depth, time, nodes);
+		engine_->NotifyIterationCompleted(pv_str, eval, depth, time, nodes);
 	}
 
 	void ThinkingState::SwitchToWaitingState()
 	{
-		auto waiting_state = new WaitingState(this);
-		ChangeState(waiting_state);
+		auto waiting_state = new WaitingState(engine_);
+		engine_->ChangeState(waiting_state);
 	}
 
 	void ThinkingState::Force()
@@ -92,8 +94,8 @@ namespace m8::engine
 
 	void ThinkingState::SwitchToObservingState()
 	{
-		auto observing_state = new ObservingState(this);
-		ChangeState(observing_state);
+		auto observing_state = new ObservingState(engine_);
+		engine_->ChangeState(observing_state);
 	}
 
 	bool ThinkingState::StopSearch()
@@ -116,18 +118,16 @@ namespace m8::engine
 		std::vector<std::string> moves;
 		std::stack<UnmakeInfo> unmake_info_stack;
 
-		Board& boardr = board();
-
 		for (size_t x = 0; x < pv.count(); ++x)
 		{
-			std::string str_move = options::Options::get().use_san ? RenderSAN(pv[x], boardr) : RenderCoordinateNotation(pv[x]);
+			std::string str_move = options::Options::get().use_san ? RenderSAN(pv[x], engine_->board_) : RenderCoordinateNotation(pv[x]);
 			moves.push_back(str_move);
-			unmake_info_stack.push(boardr.Make(pv[x]));
+			unmake_info_stack.push(engine_->board_.Make(pv[x]));
 		}
 
 		while (unmake_info_stack.size() > 0)
 		{
-			boardr.Unmake(pv[unmake_info_stack.size() - 1], unmake_info_stack.top());
+			engine_->board_.Unmake(pv[unmake_info_stack.size() - 1], unmake_info_stack.top());
 			unmake_info_stack.pop();
 		}
 		

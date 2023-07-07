@@ -5,12 +5,16 @@
 ///         state of the engine at a given time.
 
 #include "Engine.hpp"
+#include "EngineState.hpp"
 
 namespace m8::engine {
 
+	// TODO : Remove if not usefull
+	/*
 	// TODO : Is it possible to use smart pointer here?
 	void EngineState::ChangeState(EngineState* new_state)
 	{
 		engine_->ChangeState(new_state);
 	}
+	*/
 }

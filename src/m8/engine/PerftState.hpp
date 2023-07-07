@@ -1,5 +1,5 @@
 /// @file	PerftState.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date	Decembre 2019
 /// @brief	Contains the PerftState class. Controlling the engine behavior when it's 
 ///         executing a perft test.
@@ -22,14 +22,17 @@ namespace m8::engine {
 	public:
 
 		/// Constructor from a previous state
-		PerftState(EngineState* source,
+		PerftState(Engine* engine,
 			       int depth)
-			: EngineState("PerftState", source),
+			: EngineState(engine),
 			  perft_(depth,
-				     source->board(),
-				     [this](Move move, std::uint64_t count) { callbacks().partial_perft_result_callback(m8::RenderSAN(move, this->board()), count); },
+				     engine->board_,
+				     [this](Move move, std::uint64_t count) { this->engine_->callbacks_.partial_perft_result_callback(m8::RenderSAN(move, this->engine_->board_), count); },
 				     std::bind(&PerftState::HandleResult, this, std::placeholders::_1, std::placeholders::_2))
 		{}
+
+		/// Return the name of the state
+        inline virtual const std::string state_name() const { return "PerftState"; }
 
 		/// Method that is run before a state is replaced by a new state
 		virtual void BeginState();

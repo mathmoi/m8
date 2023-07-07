@@ -15,7 +15,7 @@
 namespace m8
 {
    /// Class that implements m8's shell-like interface.
-   class m8Intrf : public search::SearchObserver
+   class m8Intrf : public search::ISearchObserver<std::vector<std::string>>
    {
    public:
       /// Default constructor.
@@ -25,7 +25,7 @@ namespace m8
       void Execute();
 
       /// Method called when the search starts.
-      void OnBeginSearch();
+      void OnSearchStarted();
 
       /// Method called when a new best move is found at the root.
       void OnNewBestMove(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);

@@ -40,4 +40,4 @@ configure_file(../../resources/m8.json
 target_link_libraries(m8 ${Boost_LIBRARIES}
                          ${CMAKE_THREAD_LIBS_INIT})
 
-set_property(TARGET m8 PROPERTY CXX_STANDARD 17)
+set_property(TARGET m8 PROPERTY CXX_STANDARD 20)

@@ -14,12 +14,10 @@
 namespace m8 { namespace search
 {
     Search::Search(const Board& board,
-			       std::shared_ptr<time::TimeManager> time_manager,
-			       SearchObserver* observer)
+			       std::shared_ptr<time::TimeManager> time_manager)
 		: board_(board),
 		  state_(SearchState::Ready),
-		  time_manager_(time_manager),
-		  observer_(observer)
+		  time_manager_(time_manager)
     {}
 
 	Search::~Search()
@@ -57,7 +55,8 @@ namespace m8 { namespace search
 			search_thread_.join();
 		}
 
-		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, time_manager_, this);
+		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, time_manager_);
+		ptr_iterative_deepening_->Attach(this);
 		search_thread_ = std::thread(&Search::RunSearchThread, this);
 	}
 
@@ -90,14 +89,14 @@ namespace m8 { namespace search
  	{
 		M8_LOG_SCOPE_THREAD();
 
-		observer_->OnBeginSearch();
+		NotifySearchStarted();
 
 		auto search_result = ptr_iterative_deepening_->Search(60); // TODO : Change depth here
 
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
-			observer_->OnSearchCompleted(search_result.pv_, GetSearchTime());
+			NotifySearchCompleted(search_result.pv_, GetSearchTime());
 		}
 	}
 
@@ -110,11 +109,11 @@ namespace m8 { namespace search
 
 	void Search::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		observer_->OnNewBestMove(pv, eval, depth, GetSearchTime(), nodes);
+		NotifyNewBestMove(pv, eval, depth, GetSearchTime(), nodes);
 	}
 
 	void Search::OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
-		observer_->OnIterationCompleted(pv, eval, depth, GetSearchTime(), nodes);
+		NotifyIterationCompleted(pv, eval, depth, GetSearchTime(), nodes);
 	}
 }}

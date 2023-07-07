@@ -19,8 +19,8 @@
 
 namespace m8::engine
 {
-	WaitingState::WaitingState(EngineState* source)
-		: EngineState("WaitingState", source)
+	WaitingState::WaitingState(Engine* engine)
+		: EngineState(engine)
 	{}
 
 	void WaitingState::UserMove(std::string str_move)
@@ -29,12 +29,12 @@ namespace m8::engine
 		
 		Move move = ParseMove(str_move);
 
-		board().Make(move);
+		engine_->board_.Make(move);
 
-		EngineState* next_state = IsMat(board())
-		                        ? static_cast<EngineState*>(new ObservingState(this))
-								: static_cast<EngineState*>(new ThinkingState(this));
-		ChangeState(next_state);
+		EngineState* next_state = IsMat(engine_->board_)
+		                        ? static_cast<EngineState*>(new ObservingState(engine_))
+								: static_cast<EngineState*>(new ThinkingState(engine_));
+		engine_->ChangeState(next_state);
 	}
 
 	Move WaitingState::ParseMove(const std::string& str_move)
@@ -43,7 +43,7 @@ namespace m8::engine
 
 		try
 		{
-			move = options::Options::get().use_san ? ParseSAN(str_move, this->board()) : ParseCoordinateNotation(str_move, this->board());
+			move = options::Options::get().use_san ? ParseSAN(str_move, engine_->board_) : ParseCoordinateNotation(str_move, engine_->board_);
 		}
 		catch (const InvalidMoveNotationException&)
 		{
@@ -56,21 +56,21 @@ namespace m8::engine
 	void WaitingState::New()
 	{
 		set_fen(kStartingPositionFEN);
-		set_engine_color(kBlack);
+		engine_->engine_color_ = kBlack;
 	}
 
 	void WaitingState::Go()
 	{
-		set_engine_color(board().side_to_move());
+		engine_->engine_color_ = engine_->board_.side_to_move();
 
-		auto thinking_state = new ThinkingState(this);
-		ChangeState(thinking_state);
+		auto thinking_state = new ThinkingState(engine_);
+		engine_->ChangeState(thinking_state);
 	}
 
 	void WaitingState::Force()
 	{
-		auto observing_state = new ObservingState(this);
-		ChangeState(observing_state);
+		auto observing_state = new ObservingState(engine_);
+		engine_->ChangeState(observing_state);
 	}
 
 	void WaitingState::SetTimeControl(float seconds_per_move)
@@ -78,7 +78,7 @@ namespace m8::engine
 		std::chrono::duration<float> fseconds(seconds_per_move);
 		auto duration = std::chrono::duration_cast<time::TimePerMoveTimeControl::Duration>(fseconds);
 
-		set_time_control(std::make_unique<time::TimePerMoveTimeControl>(duration));
+		engine_->time_control_ = std::make_unique<time::TimePerMoveTimeControl>(duration);
 	}
 }
 

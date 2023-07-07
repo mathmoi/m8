@@ -17,7 +17,10 @@ namespace m8::engine {
 	public:
 
 		/// Constructor from a previous state
-		WaitingState(EngineState* source);
+		WaitingState(Engine* engine);
+
+		/// Return the name of the state
+        inline virtual const std::string state_name() const { return "WaitingState"; }
 
 		/// Accept a move to play on the current board.
 		virtual void UserMove(std::string move);

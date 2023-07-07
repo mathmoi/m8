@@ -18,7 +18,7 @@
 #include "../Board.hpp"
 #include "../time/TimeManager.hpp"
 #include "SearchResult.hpp"
-#include "SearchObserver.hpp"
+#include "SearchSubject.hpp"
 #include "IterativeDeepening.hpp"
 
 namespace m8 { namespace search
@@ -32,14 +32,13 @@ namespace m8 { namespace search
 	};
 
     /// Manage the seach for the engine.
-    class Search : public SearchObserver
+    class Search : public SearchSubject<PV>, public ISearchObserver<PV>
     {
     public:
 		
         /// Constructor
         Search(const Board& board,
-			   std::shared_ptr<time::TimeManager> time_manager,
-			   SearchObserver* observer);
+			   std::shared_ptr<time::TimeManager> time_manager);
 
 		/// Destructor
 		~Search();
@@ -70,8 +69,6 @@ namespace m8 { namespace search
 		SearchState state_;
 		std::unique_ptr<IterativeDeepening> ptr_iterative_deepening_;
 		std::shared_ptr<time::TimeManager> time_manager_;
-
-		SearchObserver* observer_;
 
 		std::chrono::steady_clock::time_point start_time_;
 

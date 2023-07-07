@@ -15,15 +15,13 @@
 namespace m8::search {
 
 	AlphaBeta::AlphaBeta(const Board& board,
-						 const time::TimeManager& time_manager,
-		                 SearchObserver* observer)
+						 const time::TimeManager& time_manager)
 		: board_(board),
 		  continue_(true),
 		  best_move_(kNullMove),
 		  nodes_counter_(0),
 		  nodes_count_next_time_check_(kNodesBeforeFirstCheck),
-		  time_manager_(time_manager),
-		  observer_(observer)
+		  time_manager_(time_manager)
 	{}
 
 	template<bool root, bool qsearch>
@@ -123,7 +121,7 @@ namespace m8::search {
 					if (root && *next != best_move_)
 					{
 						best_move_ = *next;
-						observer_->OnNewBestMove(pv, alpha, depth, 0, nodes_counter_);
+						NotifyNewBestMove(pv, alpha, depth, 0, nodes_counter_);
 					}
 				}
 			}
@@ -136,7 +134,7 @@ namespace m8::search {
 	{
 		PV pv;
 
-		observer_->OnBeginSearch();
+		NotifySearchStarted();
 
 		auto value = Search<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
 		
@@ -149,7 +147,7 @@ namespace m8::search {
 
 		auto result = SearchResult(pv, value, nodes_counter_);
 
-		observer_->OnSearchCompleted(pv, 0);
+		NotifySearchCompleted(pv, 0);
 
 		return result;
 	}

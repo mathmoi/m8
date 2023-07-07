@@ -9,15 +9,22 @@
 #include <memory>
 #include <string>
 
-#include "EngineState.hpp"
 #include "EngineCallbacks.hpp"
-#include "../../m8chess/search/SearchObserver.hpp"
+#include "../../m8chess/search/SearchSubject.hpp"
 #include "../../m8chess/eval/Eval.hpp"
+#include "../../m8chess/time/ChessClock.hpp"
+#include "../../m8chess/time/TimeControl.hpp"
 
 namespace m8::engine
 {
+    class EngineState;
+    class ObservingState;
+    class PerftState;
+    class ThinkingState;
+    class WaitingState;
+
     /// Encapsulate all m8 functionalities
-    class Engine
+    class Engine : public search::SearchSubject<std::vector<std::string>>
     {
         // Allows the EngineState class to change the current state of the engine
         friend class EngineState;
@@ -25,8 +32,7 @@ namespace m8::engine
     public:
         /// Constructor
         Engine(eval::PieceSqTablePtr psqt,
-               EngineCallbacks callbacks,
-               search::SearchObserver* observer);
+               EngineCallbacks callbacks);
 
         /// Destructor
         ~Engine();
@@ -34,46 +40,68 @@ namespace m8::engine
         /// Accessor for the board
         ///
         /// @returns The board
-        inline const Board& board() const { return state_->board(); };
+        inline const Board& board() const { return board_; };
 
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        inline void set_fen(std::string fen) { state_->set_fen(fen); };
+        void set_fen(std::string fen);
+
+        /// Return engine's chess clock
+        inline const time::ChessClock& clock() const { return *clock_; }
+
+        /// Return the current time control
+        inline const time::TimeControl& time_control() const { return *time_control_; }
 
         /// Set the time control to a fixed number of seconds per move
         /// 
         /// @param seconds_per_move Number of seconds to use per move
-        inline void SetTimeControl(float seconds_per_move) { state_->SetTimeControl(seconds_per_move); };
+        void SetTimeControl(float seconds_per_move);
 
         /// Run a perft tests.
         ///
-        /// @param depth                   Depth of the test to run.
-        inline void Perft(int depth) { return state_->Perft(depth); };
+        /// @param depth  epth of the test to run.
+        void Perft(int depth);
 
         /// Set the engine to play the current side and start playing.
-        inline void Go() { state_->Go(); };
+        void Go();
 
         /// Set the engine to play neither color.
-        inline void Force() { state_->Force(); }
+        void Force();
 
         /// Stop the current operation
-        inline void Stop() { state_->Stop(); };
+        void Stop();
 
         /// Terminate the current game and prepare the engine to play a new game.
-        inline void New() { state_->New(); };
+        void New();
 
         /// Accept a move to play on the current board.
-        inline void UserMove(std::string move) { state_->UserMove(move); };
+        void UserMove(std::string move);
 
         /// Returns the current evaluation;
         EvalType current_evaluation() const;
 
+        // TODO : Separate all other methods into sections
+
     private:
+        friend EngineState;
+        friend ObservingState;
+        friend PerftState;
+        friend ThinkingState;
+        friend WaitingState;
+
         EngineState* state_;
 
+        EngineCallbacks callbacks_; // TODO : Is this still needed now that we use the ObserverPattern?
+
+        eval::PieceSqTablePtr psqt_;
+        Board board_;
+        Color engine_color_;
+        std::unique_ptr<time::TimeControl> time_control_;
+        std::unique_ptr<time::ChessClock> clock_;
+
         /// Change the state of the engine
-        void ChangeState(EngineState* new_state);
+        void ChangeState(EngineState* new_state); // TODO : Is this used?
     };
 }
 

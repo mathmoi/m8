@@ -7,55 +7,54 @@
 
 namespace m8::search {
 
-	IterativeDeepening::IterativeDeepening(const Board& board,
-										   std::shared_ptr<time::TimeManager> time_manager,
-		                                   SearchObserver* observer)
-		: alpha_beta_(board,
-					  *time_manager,
-			          this),
-		  time_manager_(time_manager),
-		  observer_(observer)
-	{}
+    IterativeDeepening::IterativeDeepening(const Board& board,
+                                           std::shared_ptr<time::TimeManager> time_manager)
+        : alpha_beta_(board,
+                      *time_manager),
+          time_manager_(time_manager)
+    {
+        alpha_beta_.Attach(this);
+    }
 
-	SearchResult IterativeDeepening::Search(DepthType depth)
-	{
-		std::optional<SearchResult> result;
-		std::optional<SearchResult> last_result;
+    SearchResult IterativeDeepening::Search(DepthType depth)
+    {
+        std::optional<SearchResult> result;
+        std::optional<SearchResult> last_result;
 
-		observer_->OnBeginSearch();
+        NotifySearchStarted();
 
-		DepthType current_depth = 1;
-		while(current_depth <= kMinimumSearchDepth ||
-			  	(current_depth <= depth &&
-		         time_manager_->can_start_new_iteration()))
-		{
-			result = alpha_beta_.Search(current_depth);
-			if (result.has_value())
-			{
-				observer_->OnIterationCompleted(result.value().pv_,
-				                                result.value().value_,
-												current_depth,
-												0,
-												result.value().nodes_);
+        DepthType current_depth = 1;
+        while(current_depth <= kMinimumSearchDepth ||
+                  (current_depth <= depth &&
+                 time_manager_->can_start_new_iteration()))
+        {
+            result = alpha_beta_.Search(current_depth);
+            if (result.has_value())
+            {
+                NotifyIterationCompleted(result.value().pv_,
+                                         result.value().value_,
+                                         current_depth,
+                                         0,
+                                         result.value().nodes_);
 
-				last_result = result;
-			}
+                last_result = result;
+            }
 
-			++current_depth;
-		}
+            ++current_depth;
+        }
 
-		observer_->OnSearchCompleted(last_result.value().pv_, 0);
+        NotifySearchCompleted(last_result.value().pv_, 0);
 
-		return last_result.value();
-	}
+        return last_result.value();
+    }
 
-	void IterativeDeepening::Stop()
-	{
-		alpha_beta_.Stop();
-	}
+    void IterativeDeepening::Stop()
+    {
+        alpha_beta_.Stop();
+    }
 
-	void IterativeDeepening::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
-	{
-		observer_->OnNewBestMove(pv, eval, depth, time, nodes);
-	}
+    void IterativeDeepening::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+    {
+        NotifyNewBestMove(pv, eval, depth, time, nodes);
+    }
 }
