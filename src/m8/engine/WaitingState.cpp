@@ -10,6 +10,11 @@
 #include "../../m8chess/CoordinateNotation.hpp"
 #include "../../m8chess/SAN.hpp"
 #include "../../m8chess/Checkmate.hpp"
+#include "../../m8chess/time/ConventionalTimeControl.hpp"
+#include "../../m8chess/time/IncrementalTimeControl.hpp"
+#include "../../m8chess/time/TimePerMoveChessClock.hpp"
+#include "../../m8chess/time/ConventionalChessClock.hpp"
+#include "../../m8chess/time/IncrementalChessClock.hpp"
 
 #include "InvalidMoveException.hpp"
 #include "ThinkingState.hpp"
@@ -73,12 +78,22 @@ namespace m8::engine
 		engine_->ChangeState(observing_state);
 	}
 
-	void WaitingState::SetTimeControl(float seconds_per_move)
+	void WaitingState::SetTimeControl(time::ChessClock::Duration time_per_move)
 	{
-		std::chrono::duration<float> fseconds(seconds_per_move);
-		auto duration = std::chrono::duration_cast<time::TimePerMoveTimeControl::Duration>(fseconds);
+		engine_->time_control_ = std::make_unique<time::TimePerMoveTimeControl>(time_per_move);
+		engine_->clock_ = std::make_unique<time::TimePerMoveChessClock>(static_cast<time::TimePerMoveTimeControl&>(*engine_->time_control_));
+	}
 
-		engine_->time_control_ = std::make_unique<time::TimePerMoveTimeControl>(duration);
+	void WaitingState::SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time)
+	{
+		engine_->time_control_ = std::make_unique<time::ConventionalTimeControl>(moves, time);
+		engine_->clock_ = std::make_unique<time::ConventionalChessClock>(static_cast<time::ConventionalTimeControl&>(*engine_->time_control_));
+	}
+
+	void WaitingState::SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment)
+	{
+		engine_->time_control_ = std::make_unique<time::IncrementalTimeControl>(base, increment);
+		engine_->clock_ = std::make_unique<time::IncrementalChessClock>(static_cast<time::IncrementalTimeControl&>(*engine_->time_control_));
 	}
 }
 

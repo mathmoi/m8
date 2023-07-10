@@ -53,11 +53,11 @@ namespace m8::engine
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        inline void set_fen(std::string fen) { throw InvalidEngineCommandException("set_fen"); }
+        virtual inline void set_fen(std::string fen) { throw InvalidEngineCommandException("set_fen"); }
 
         /// Run a perft tests.
         ///
-        /// @param depth                   Depth of the test to run.
+        /// @param depth Depth of the test to run.
         virtual inline void Perft(int depth) { throw InvalidEngineCommandException("Perft"); }
 
         /// Set the engine to play the current side and start playing.
