@@ -10,6 +10,7 @@
 #include <string>
 
 #include "EngineCallbacks.hpp"
+#include "../../m8chess/search/Search.hpp"
 #include "../../m8chess/search/SearchSubject.hpp"
 #include "../../m8chess/eval/Eval.hpp"
 #include "../../m8chess/time/ChessClock.hpp"
@@ -56,7 +57,19 @@ namespace m8::engine
         /// Set the time control to a fixed number of seconds per move
         /// 
         /// @param seconds_per_move Number of seconds to use per move
-        void SetTimeControl(float seconds_per_move);
+        void SetTimeControl(time::ChessClock::Duration time_per_move);
+
+        /// Set the time control to a conventional one.
+        /// 
+        /// @param moves Number of moves for each control
+        /// @param time  Time added for each control
+        void SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time);
+
+        /// Set the time control to an incremental one.
+        /// 
+        /// @param base      Base time
+        /// @param increment Incremental time added after each move
+        void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment);
 
         /// Run a perft tests.
         ///
@@ -99,6 +112,14 @@ namespace m8::engine
         Color engine_color_;
         std::unique_ptr<time::TimeControl> time_control_;
         std::unique_ptr<time::ChessClock> clock_;
+
+        //////////////////////////////////////////////////////////////////////////////////
+        // Searching variables
+        ////////////////////////////////////////////////////////////////////////////////// 
+        // TODO : The search should become a permanent/reusable object
+        std::unique_ptr<search::Search> search_;
+		bool searching_;
+		std::mutex search_mutex_; // TODO : This mutex should probable become more global to make the Engine class completely thread safe.
 
         /// Change the state of the engine
         void ChangeState(EngineState* new_state); // TODO : Is this used?

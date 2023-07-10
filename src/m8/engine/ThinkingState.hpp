@@ -43,11 +43,6 @@ namespace m8::engine {
 		void OnSearchCompleted(const search::PV& pv, double time);
 				
 	private:
-		search::Search search_;
-		bool searching_;
-
-		std::mutex state_mutex_;
-
 		void SwitchToWaitingState();
 		void SwitchToObservingState();
 		bool StopSearch();

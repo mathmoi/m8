@@ -53,7 +53,7 @@ namespace m8::engine
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        inline void set_fen(std::string fen) { throw InvalidEngineCommandException("set_fen"); };
+        inline void set_fen(std::string fen) { throw InvalidEngineCommandException("set_fen"); }
 
         /// Run a perft tests.
         ///
@@ -78,7 +78,19 @@ namespace m8::engine
         /// Set the time control to a fixed number of seconds per move
         /// 
         /// @param seconds_per_move Number of seconds to use per move
-        virtual inline void SetTimeControl(float seconds_per_move) { throw InvalidEngineCommandException("SetTimeControl"); };
+        virtual inline void SetTimeControl(time::ChessClock::Duration time_per_move) { throw InvalidEngineCommandException("SetTimeControl"); }
+
+        /// Set the time control to a conventional one.
+        /// 
+        /// @param moves Number of moves for each control
+        /// @param time  Time added for each control
+        virtual inline void SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time) { throw InvalidEngineCommandException("SetTimeControl"); }
+
+        /// Set the time control to an incremental one.
+        /// 
+        /// @param base      Base time
+        /// @param increment Incremental time added after each move
+        virtual inline void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment) { throw InvalidEngineCommandException("SetTimeControl"); }
 
     protected:
 

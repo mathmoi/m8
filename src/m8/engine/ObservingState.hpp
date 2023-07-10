@@ -31,8 +31,8 @@ namespace m8::engine {
 
 		/// Run a perft tests.
 		///
-		/// @param depth                   Depth of the test to run.
-		virtual void Perft(int depth);
+		/// @param depth Depth of the test to run.
+		virtual void Perft(int depth); // TODO : In the concrete state the methods should no longer be virtual
 
 		/// Accept a move to play on the current board.
 		virtual void UserMove(std::string move);
@@ -49,7 +49,19 @@ namespace m8::engine {
 		/// Set the time control to a fixed number of seconds per move
         /// 
         /// @param seconds_per_move Number of seconds to use per move
-        virtual void SetTimeControl(float seconds_per_move);
+        virtual void SetTimeControl(time::ChessClock::Duration time_per_move);
+
+		/// Set the time control to a conventional one.
+        /// 
+        /// @param moves Number of moves for each control
+        /// @param time  Time added for each control
+        virtual void SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time);
+
+        /// Set the time control to an incremental one.
+        /// 
+        /// @param base      Base time
+        /// @param increment Incremental time added after each move
+        virtual void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment);
 
 	private:
 		Move ParseMove(const std::string& str_move);

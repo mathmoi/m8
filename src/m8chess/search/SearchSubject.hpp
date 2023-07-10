@@ -61,6 +61,12 @@ namespace m8::search
             Notify( [pv, eval, depth, time, nodes](ISearchObserver<TPV>* observer){ observer->OnNewBestMove(pv, eval, depth, time, nodes); } );
         }
 
+        /// Method called when the an iteration is started.
+		inline void NotifyIterationStarted()
+        {
+            Notify( [](ISearchObserver<TPV>* observer){ observer->OnIterationStarted(); } );
+        }
+
 		/// Method called when an iteration is completed.
 		inline void NotifyIterationCompleted(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
         {

@@ -55,11 +55,18 @@ namespace m8 { namespace search
 		/// Stop the search
 		void Stop();
 
+		////////////////////////////////////////////////////////////////////////////////// 
+		/// Implementation of ISearchObserver
+		//////////////////////////////////////////////////////////////////////////////////
+
 		/// Method called when a new best move is found at the root.
-		void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+		inline void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+
+		/// Method called when an iteration is started.
+		inline void OnIterationStarted();
 
 		/// Method called when an iteration is completed.
-		void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+		inline void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
     private:
 		std::thread search_thread_;
@@ -68,7 +75,7 @@ namespace m8 { namespace search
 		Board board_;
 		SearchState state_;
 		std::unique_ptr<IterativeDeepening> ptr_iterative_deepening_;
-		std::shared_ptr<time::TimeManager> time_manager_;
+		std::shared_ptr<time::TimeManager> time_manager_; // TODO : Could this pointer be unique? Do we really share the ownership?
 
 		std::chrono::steady_clock::time_point start_time_;
 

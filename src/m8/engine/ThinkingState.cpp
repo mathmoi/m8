@@ -19,11 +19,13 @@
 namespace m8::engine
 {
 	ThinkingState::ThinkingState(Engine* engine)
-		: EngineState(engine),
-		search_(engine->board_, time::TimeManager::CreateTimeManager(*(engine->time_control_), *(engine->clock_))),
-		searching_(true)
+		: EngineState(engine)
 	{
-		search_.Attach(this);
+		engine->search_ = std::make_unique<search::Search>(engine->board_,
+		                                                   time::TimeManager::CreateTimeManager(*(engine->time_control_),
+														                                        *(engine->clock_)));
+		engine->searching_ = true;
+		engine->search_->Attach(this);
 	}
 
 	void ThinkingState::BeginState()
@@ -34,7 +36,7 @@ namespace m8::engine
 
 		engine_->NotifySearchStarted();
 
-		search_.Start();
+		engine_->search_->Start();
 	}
 
 	void ThinkingState::OnSearchCompleted(const search::PV& pv, double time)
@@ -42,8 +44,8 @@ namespace m8::engine
 		bool was_searching = false;
 
 		{
-			auto lock = std::lock_guard(state_mutex_);
-			if (searching_)
+			auto lock = std::lock_guard(engine_->search_mutex_);
+			if (engine_->searching_)
 			{
 				was_searching = true;
 
@@ -55,7 +57,7 @@ namespace m8::engine
 
 				engine_->clock_->Stop();
 
-				searching_ = false;
+				engine_->searching_ = false;
 			}
 		}
 
@@ -100,14 +102,14 @@ namespace m8::engine
 
 	bool ThinkingState::StopSearch()
 	{
-		auto lock = std::lock_guard(state_mutex_);
+		auto lock = std::lock_guard(engine_->search_mutex_);
 		
-		bool was_searching = searching_;
+		bool was_searching = engine_->searching_;
 
-		if (searching_)
+		if (engine_->searching_)
 		{
-			search_.Stop();
-			searching_ = false;
+			engine_->search_->Stop();
+			engine_->searching_ = false;
 		}
 
 		return was_searching;

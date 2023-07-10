@@ -7,6 +7,9 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <chrono>
+
+#include <boost/algorithm/string.hpp>
 
 #include "m8Intrf.hpp"
 #include "options/Options.hpp"
@@ -14,6 +17,7 @@
 #include "engine/InvalidEngineCommandException.hpp"
 #include "../m8chess/SAN.hpp"
 #include "../m8common/stringHelpers.hpp"
+#include "../m8common/chronoHelpers.hpp"
 #include "../m8common/Utils.hpp"
 #include "../m8common/logging.hpp"
 #include "../m8common/console.hpp"
@@ -120,6 +124,10 @@ namespace m8
             "Set the exact number of seconds to use for each move",
             "st {seconds}",
             std::bind(&m8Intrf::HandleSt, this, std::placeholders::_1)));
+        shell_intrf_.AddCmd(ShellCmd("level",
+            "Set the time control in conventional or incremental mode",
+            "level {moves} {base} {increment}",
+            std::bind(&m8Intrf::HandleLevel, this, std::placeholders::_1)));
     }
 
 	void m8Intrf::SetupXboardMode()
@@ -357,7 +365,83 @@ namespace m8
         auto seconds = ConvertArgument<float>(args_list[1], "Usage : st {seconds}");
         if (seconds.has_value())
         {
-            CallEngineCommand([this, seconds]() {engine_.SetTimeControl(seconds.value()); }, "st");
+            time::ChessClock::Duration time_per_move = FloatToNanoseconds(seconds.value());
+            CallEngineCommand([this, time_per_move]() {engine_.SetTimeControl(time_per_move); }, "st");
+        }
+    }
+
+    void m8Intrf::HandleLevel(std::vector<std::string> args_list)
+    {
+        const std::string kUsage = "Usage : level {moves} {base} {increment}";
+
+        // Check number of arguments
+        if (args_list.size() != 4)
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< kUsage);
+            return;
+        }
+
+        // The first arguments is the number of move in a control
+        auto moves = ConvertArgument<std::uint32_t>(args_list[1], kUsage);
+        if (!moves.has_value())
+        {
+            return;
+        }
+        
+        // The base argument is either an integer representing the number of
+        // minutes or two integers separated by a colon representing minutes and
+        // seconds.
+        std::vector<std::string> base_tokens;
+        boost::split(base_tokens, args_list[2], boost::is_any_of(":"), boost::token_compress_on);
+
+        if (2 < base_tokens.size())
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< kUsage);
+        }
+
+        auto base_minutes = ConvertArgument<std::uint32_t>(base_tokens[0], kUsage);
+        if (!base_minutes.has_value())
+        {
+            return;
+        }
+        std::chrono::seconds base = std::chrono::minutes(base_minutes.value());
+
+        if (base_tokens.size() == 2)
+        {
+            auto base_seconds = ConvertArgument<std::uint32_t>(base_tokens[1], kUsage);
+            if (!base_seconds.has_value())
+            {
+                return;
+            }
+
+            base += std::chrono::seconds(base_seconds.value());
+        }
+
+        // The last argument is the increment in seconds
+        auto increment_seconds = ConvertArgument<float>(args_list[3], kUsage);
+        if (!increment_seconds.has_value())
+        {
+            return;
+        }
+        auto increment = FloatToNanoseconds(increment_seconds.value());
+
+        // We cannot have both a number of moves and an increment
+        if (increment.count() > 0 && moves > 0)
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< kUsage <<" (moves and increment can not both be greater than zero)");
+            return;
+        }
+
+        if (moves.value() == 0)
+        {
+            CallEngineCommand([this, base, increment]() {engine_.SetTimeControl(base, increment); }, "level");
+        }
+        else
+        {
+            CallEngineCommand([this, moves, base]() {engine_.SetTimeControl(moves.value(), base); }, "st");
         }
     }
 

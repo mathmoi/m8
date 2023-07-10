@@ -58,7 +58,11 @@ namespace m8::engine
 
     void Engine::set_fen(std::string fen) { state_->set_fen(fen); }
 
-    void Engine::SetTimeControl(float seconds_per_move) { state_->SetTimeControl(seconds_per_move); }
+    void Engine::SetTimeControl(time::ChessClock::Duration time_per_move) { state_->SetTimeControl(time_per_move); }
+
+    void Engine::SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time) { state_->SetTimeControl(moves, time); }
+
+    void Engine::SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment) { state_->SetTimeControl(base, increment); }
 
     void Engine::Perft(int depth) { return state_->Perft(depth); }
 

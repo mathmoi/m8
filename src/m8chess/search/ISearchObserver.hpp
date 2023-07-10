@@ -7,10 +7,6 @@
 #ifndef M8_SEARCH_SEARCH_OBSERVER_HPP_
 #define M8_SEARCH_SEARCH_OBSERVER_HPP_
 
-#include "../Types.hpp"
-#include "../Move.hpp"
-#include "PV.hpp"
-
 namespace m8::search {
 
 	/// Interface for classes that can observe the search
@@ -27,6 +23,9 @@ namespace m8::search {
 
 		/// Method called when a new best move is found at the root.
 		inline virtual void OnNewBestMove(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
+
+		/// Method called when an iteration is started.
+		inline virtual void OnIterationStarted() {};
 
 		/// Method called when an iteration is completed.
 		inline virtual void OnIterationCompleted(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};

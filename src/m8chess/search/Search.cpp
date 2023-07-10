@@ -14,11 +14,13 @@
 namespace m8 { namespace search
 {
     Search::Search(const Board& board,
-			       std::shared_ptr<time::TimeManager> time_manager)
+			       std::shared_ptr<time::TimeManager> time_manager) // TODO : Shouldn't that be a std::unique_ptr?
 		: board_(board),
 		  state_(SearchState::Ready),
 		  time_manager_(time_manager)
-    {}
+    {
+		Attach(time_manager_.get());
+	}
 
 	Search::~Search()
 	{
@@ -110,6 +112,11 @@ namespace m8 { namespace search
 	void Search::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		NotifyNewBestMove(pv, eval, depth, GetSearchTime(), nodes);
+	}
+
+	void Search::OnIterationStarted()
+	{
+		NotifyIterationStarted();
 	}
 
 	void Search::OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)

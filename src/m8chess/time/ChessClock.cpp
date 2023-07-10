@@ -25,7 +25,7 @@ namespace m8::time
         
         default:
             assert(!"This code should never be reached.");
-            break;
+            return std::unique_ptr<ChessClock>(); // To silence warning about reaching the end of the method.
         }
     }
 }

@@ -37,6 +37,9 @@ namespace m8::time
             }
         }
 
+        /// Returns the number of moves before the next control.
+        inline ConventionalTimeControl::NumberOfMoves moves_before_control() const { return moves_before_control_; }
+
     private:
         ConventionalTimeControl time_control_;
         ConventionalTimeControl::NumberOfMoves moves_before_control_;

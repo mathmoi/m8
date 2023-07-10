@@ -9,13 +9,15 @@
 #include <memory>
 
 #include "../Types.hpp"
+#include "../search/PV.hpp"
+#include "../search/ISearchObserver.hpp"
 #include "ChessClock.hpp"
 
 namespace m8::time
 {
     /// Base class for all time managers. Time manager are responsible for the engine's
     /// time management. They tell it when to stop searching.
-    class TimeManager
+    class TimeManager : public search::ISearchObserver<search::PV>
     {
     public:
 
@@ -32,6 +34,10 @@ namespace m8::time
         /// @param clock        Clock used to keep the engine's time
         static std::shared_ptr<TimeManager> CreateTimeManager(const TimeControl& time_control,
                                                               ChessClock& clock);
+
+        /// Initialise the time manager for a search. This should be called before the
+        /// begining of each search.
+        virtual void InitSearch() {}
 
         /// Indicate if the search can continue. The search needs to call this regularly
         /// after searching a number of nodes defined by the method.

@@ -28,6 +28,7 @@ namespace m8::search {
                   (current_depth <= depth &&
                  time_manager_->can_start_new_iteration()))
         {
+            NotifyIterationStarted();
             result = alpha_beta_.Search(current_depth);
             if (result.has_value())
             {

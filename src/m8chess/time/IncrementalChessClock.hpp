@@ -17,7 +17,7 @@ namespace m8::time
     {
     public:
         IncrementalChessClock(IncrementalTimeControl time_control)
-        : ChessClock(time_control.base()),
+        : ChessClock(time_control.base() + time_control.increment()),
           time_control_(time_control)
         {}
 

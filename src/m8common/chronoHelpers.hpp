@@ -18,6 +18,10 @@ namespace m8
     {
         return std::chrono::duration_cast<FSec>(duration);
     }
-}
 
+    inline std::chrono::nanoseconds FloatToNanoseconds(float seconds)
+    {
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<float>(seconds));
+    }
+}
 #endif // M8_COMMON_CHRONO_HELPERS_HPP_
