@@ -24,15 +24,12 @@ namespace m8::engine
       time_control_(std::make_unique<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
       clock_(time::ChessClock::CreateChessClock(*time_control_))
     {
-        state_ = new ObservingState(this);
+        state_ = std::make_unique<ObservingState>(this);
     }
 
-    Engine::~Engine()
-    {
-        delete state_;
-    }
+    Engine::~Engine() = default;
 
-    void Engine::ChangeState(EngineState* new_state)
+    void Engine::ChangeState(std::unique_ptr<EngineState> new_state)
     {
         if (new_state != state_)
         {
@@ -40,8 +37,7 @@ namespace m8::engine
 
             state_->EndState();
 
-            delete state_; // TODO : Smart Pointer
-            state_ = new_state;
+            state_ = std::move(new_state);
 
             state_->BeginState();
         }

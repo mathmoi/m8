@@ -103,7 +103,7 @@ namespace m8::engine
         friend ThinkingState;
         friend WaitingState;
 
-        EngineState* state_;
+        std::unique_ptr<EngineState> state_;
 
         EngineCallbacks callbacks_; // TODO : Is this still needed now that we use the ObserverPattern?
 
@@ -122,7 +122,7 @@ namespace m8::engine
 		std::mutex search_mutex_; // TODO : This mutex should probable become more global to make the Engine class completely thread safe.
 
         /// Change the state of the engine
-        void ChangeState(EngineState* new_state); // TODO : Is this used?
+        void ChangeState(std::unique_ptr<EngineState> new_state);
     };
 }
 

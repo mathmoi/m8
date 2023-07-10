@@ -18,16 +18,16 @@ namespace m8::engine {
 	{
 		engine_->callbacks_.perft_result_callback(count, seconds);
 		
-		auto waiting_state = new ObservingState(this->engine_);
-		engine_->ChangeState(waiting_state);
+		auto waiting_state = std::make_unique<ObservingState>(this->engine_);
+		engine_->ChangeState(std::move(waiting_state));
 	}
 
 	void PerftState::Stop()
 	{
 		perft_.Abort();
 
-		auto waiting_state = new ObservingState(this->engine_);
-		engine_->ChangeState(waiting_state);
+		auto waiting_state = std::make_unique<ObservingState>(this->engine_);
+		engine_->ChangeState(std::move(waiting_state));
 	}
 
 }

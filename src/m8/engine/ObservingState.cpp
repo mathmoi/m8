@@ -24,8 +24,8 @@ namespace m8::engine {
 
 	void ObservingState::Perft(int depth)
 	{
-		auto perft_state = new PerftState(this->engine_, depth);
-		engine_->ChangeState(perft_state);
+		auto perft_state = std::make_unique<PerftState>(this->engine_, depth);
+		engine_->ChangeState(std::move(perft_state));
 	}
 
 	void ObservingState::UserMove(std::string str_move)
@@ -56,16 +56,16 @@ namespace m8::engine {
 		engine_->set_fen(kStartingPositionFEN);
 		engine_->engine_color_ = kBlack;
 
-		auto waiting_state = new WaitingState(engine_);
-		engine_->ChangeState(waiting_state);
+		auto waiting_state = std::make_unique<WaitingState>(engine_);
+		engine_->ChangeState(std::move(waiting_state));
 	}
 
 	void ObservingState::Go()
 	{
 		engine_->engine_color_ = engine_->board_.side_to_move();
 
-		auto thinking_state = new ThinkingState(engine_);
-		engine_->ChangeState(thinking_state);
+		auto thinking_state = std::make_unique<ThinkingState>(engine_);
+		engine_->ChangeState(std::move(thinking_state));
 	}
 
 	void ObservingState::SetTimeControl(time::ChessClock::Duration time_per_move)

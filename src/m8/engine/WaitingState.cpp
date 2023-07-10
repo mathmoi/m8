@@ -24,76 +24,76 @@
 
 namespace m8::engine
 {
-	WaitingState::WaitingState(Engine* engine)
-		: EngineState(engine)
-	{}
+    WaitingState::WaitingState(Engine* engine)
+        : EngineState(engine)
+    {}
 
-	void WaitingState::UserMove(std::string str_move)
-	{	
-		M8_TRACE <<"WaitingState::UserMove(\"" <<str_move <<"\")";
-		
-		Move move = ParseMove(str_move);
+    void WaitingState::UserMove(std::string str_move)
+    {	
+        M8_TRACE <<"WaitingState::UserMove(\"" <<str_move <<"\")";
+        
+        Move move = ParseMove(str_move);
 
-		engine_->board_.Make(move);
+        engine_->board_.Make(move);
 
-		EngineState* next_state = IsMat(engine_->board_)
-		                        ? static_cast<EngineState*>(new ObservingState(engine_))
-								: static_cast<EngineState*>(new ThinkingState(engine_));
-		engine_->ChangeState(next_state);
-	}
+        std::unique_ptr<EngineState> next_state = IsMat(engine_->board_)
+                                                ? static_cast<std::unique_ptr<EngineState>>(std::make_unique<ObservingState>(engine_))
+                                                : static_cast<std::unique_ptr<EngineState>>(std::make_unique<ThinkingState>(engine_));
+        engine_->ChangeState(std::move(next_state));
+    }
 
-	Move WaitingState::ParseMove(const std::string& str_move)
-	{
-		Move move = kNullMove;
+    Move WaitingState::ParseMove(const std::string& str_move)
+    {
+        Move move = kNullMove;
 
-		try
-		{
-			move = options::Options::get().use_san ? ParseSAN(str_move, engine_->board_) : ParseCoordinateNotation(str_move, engine_->board_);
-		}
-		catch (const InvalidMoveNotationException&)
-		{
-			throw InvalidMoveException("Invalid Move : " + str_move);
-		}
+        try
+        {
+            move = options::Options::get().use_san ? ParseSAN(str_move, engine_->board_) : ParseCoordinateNotation(str_move, engine_->board_);
+        }
+        catch (const InvalidMoveNotationException&)
+        {
+            throw InvalidMoveException("Invalid Move : " + str_move);
+        }
 
-		return move;
-	}
+        return move;
+    }
 
-	void WaitingState::New()
-	{
-		set_fen(kStartingPositionFEN);
-		engine_->engine_color_ = kBlack;
-	}
+    void WaitingState::New()
+    {
+        set_fen(kStartingPositionFEN);
+        engine_->engine_color_ = kBlack;
+    }
 
-	void WaitingState::Go()
-	{
-		engine_->engine_color_ = engine_->board_.side_to_move();
+    void WaitingState::Go()
+    {
+        engine_->engine_color_ = engine_->board_.side_to_move();
 
-		auto thinking_state = new ThinkingState(engine_);
-		engine_->ChangeState(thinking_state);
-	}
+        auto thinking_state = std::make_unique<ThinkingState>(engine_);
+        engine_->ChangeState(std::move(thinking_state));
+    }
 
-	void WaitingState::Force()
-	{
-		auto observing_state = new ObservingState(engine_);
-		engine_->ChangeState(observing_state);
-	}
+    void WaitingState::Force()
+    {
+        auto observing_state = std::make_unique<ObservingState>(engine_);
+        engine_->ChangeState(std::move(observing_state));
+    }
 
-	void WaitingState::SetTimeControl(time::ChessClock::Duration time_per_move)
-	{
-		engine_->time_control_ = std::make_unique<time::TimePerMoveTimeControl>(time_per_move);
-		engine_->clock_ = std::make_unique<time::TimePerMoveChessClock>(static_cast<time::TimePerMoveTimeControl&>(*engine_->time_control_));
-	}
+    void WaitingState::SetTimeControl(time::ChessClock::Duration time_per_move)
+    {
+        engine_->time_control_ = std::make_unique<time::TimePerMoveTimeControl>(time_per_move);
+        engine_->clock_ = std::make_unique<time::TimePerMoveChessClock>(static_cast<time::TimePerMoveTimeControl&>(*engine_->time_control_));
+    }
 
-	void WaitingState::SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time)
-	{
-		engine_->time_control_ = std::make_unique<time::ConventionalTimeControl>(moves, time);
-		engine_->clock_ = std::make_unique<time::ConventionalChessClock>(static_cast<time::ConventionalTimeControl&>(*engine_->time_control_));
-	}
+    void WaitingState::SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time)
+    {
+        engine_->time_control_ = std::make_unique<time::ConventionalTimeControl>(moves, time);
+        engine_->clock_ = std::make_unique<time::ConventionalChessClock>(static_cast<time::ConventionalTimeControl&>(*engine_->time_control_));
+    }
 
-	void WaitingState::SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment)
-	{
-		engine_->time_control_ = std::make_unique<time::IncrementalTimeControl>(base, increment);
-		engine_->clock_ = std::make_unique<time::IncrementalChessClock>(static_cast<time::IncrementalTimeControl&>(*engine_->time_control_));
-	}
+    void WaitingState::SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment)
+    {
+        engine_->time_control_ = std::make_unique<time::IncrementalTimeControl>(base, increment);
+        engine_->clock_ = std::make_unique<time::IncrementalChessClock>(static_cast<time::IncrementalTimeControl&>(*engine_->time_control_));
+    }
 }
 

@@ -81,8 +81,8 @@ namespace m8::engine
 
 	void ThinkingState::SwitchToWaitingState()
 	{
-		auto waiting_state = new WaitingState(engine_);
-		engine_->ChangeState(waiting_state);
+		auto waiting_state = std::make_unique<WaitingState>(engine_);
+		engine_->ChangeState(std::move(waiting_state));
 	}
 
 	void ThinkingState::Force()
@@ -96,8 +96,8 @@ namespace m8::engine
 
 	void ThinkingState::SwitchToObservingState()
 	{
-		auto observing_state = new ObservingState(engine_);
-		engine_->ChangeState(observing_state);
+		auto observing_state = std::make_unique<ObservingState>(engine_);
+		engine_->ChangeState(std::move(observing_state));
 	}
 
 	bool ThinkingState::StopSearch()
