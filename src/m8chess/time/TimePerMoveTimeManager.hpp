@@ -27,10 +27,18 @@ namespace m8::time
         /// Indicate if the search can continue. The search needs to call this regularly
         /// after searching a number of nodes defined by the method
         ///  CalculateNodesBeforeNextCheck.
-        virtual bool can_continue() const { return kSafetyBuffer < clock().time_on_clock(); }
+        bool can_continue() const
+        {
+            if (need_to_continue())
+            {
+                return true;
+            }
+            
+            return kSafetyBuffer < clock().time_on_clock();
+        }
 
         /// Indicate if the search can start a new iteration.
-        virtual bool can_start_new_iteration() const { return can_continue(); };
+        bool can_start_new_iteration() const { return can_continue(); };
 
         /// Returns the number of nodes can be searched before we need to make another 
         /// call to can_continue.
@@ -39,7 +47,7 @@ namespace m8::time
         ///                         current search.
         /// @return NodeCounterType Number of nodes to search before the next call to
         ///                         can_continue.
-        virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const
+        NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const
         {
             auto time_searched = ToFSec(clock().elapsed());
             NodeCounterType nps = nodes_searched / time_searched.count();

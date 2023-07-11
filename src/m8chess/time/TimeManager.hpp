@@ -25,7 +25,10 @@ namespace m8::time
         /// 
         /// @param clock Pointer to the engine's chess clock
         TimeManager(ChessClock& clock)
-        : clock_(clock)
+        : clock_(clock),
+          last_iteration_duration(std::chrono::seconds(0)),
+          second_last_iteration_duration(std::chrono::seconds(0)),
+          iterations_completed_(0)
         {}
 
         /// Create a TimeManager object
@@ -47,6 +50,26 @@ namespace m8::time
         /// Indicate if the search can start a new iteration.
         virtual bool can_start_new_iteration() const = 0;
 
+        /// Method called when an iteration is started.
+        inline virtual void OnIterationStarted()
+        {
+            iteration_start = std::chrono::steady_clock::now();
+        }
+
+        /// Method called when an iteration is completed.
+		inline virtual void OnIterationCompleted(const search::PV& pv,
+                                                EvalType eval,
+                                                DepthType depth,
+                                                double time,
+                                                NodeCounterType nodes)
+        {
+            auto iteration_end = std::chrono::steady_clock::now();
+            second_last_iteration_duration = last_iteration_duration;
+            last_iteration_duration = iteration_end - iteration_start;
+
+            ++iterations_completed_;
+        }
+
         /// Returns the number of nodes can be searched before we need to make another 
         /// call to can_continue.
         /// 
@@ -57,14 +80,30 @@ namespace m8::time
         virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const = 0;
 
     protected:
+        const DepthType            kMinDepth                 = 5;
         const ChessClock::Duration kSafetyBuffer             = std::chrono::milliseconds(  50);
         const ChessClock::Duration kMinDurationBetweenChecks = std::chrono::milliseconds(  10);
         const ChessClock::Duration kMaxDurationBetweenChecks = std::chrono::milliseconds(2000);
         
         inline const ChessClock& clock() const { return clock_; }
 
+        /// Indicate if the search need to continue because the minimum depth is not 
+        /// searched yet.
+        inline bool need_to_continue() const { return iterations_completed_ < kMinDepth; }
+
+        inline ChessClock::Duration next_iteration_estimated_time() const
+        {
+            return last_iteration_duration * (last_iteration_duration / second_last_iteration_duration);
+        }
+
     private:
         ChessClock& clock_;
+
+        std::chrono::steady_clock::time_point iteration_start;
+        ChessClock::Duration last_iteration_duration,
+                                second_last_iteration_duration;
+
+        DepthType iterations_completed_;
     };
 }
 

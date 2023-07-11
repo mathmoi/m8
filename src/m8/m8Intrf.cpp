@@ -84,7 +84,6 @@ namespace m8
 			"Force the engine to play the side to move and to start playing",
 			"go",
 			std::bind(&m8Intrf::HandleGo, this)));
-        // TODO : Est-ce que cette commande est obsolete, puisqu'on utilise "force"
         shell_intrf_.AddCmd(ShellCmd("stop",
             "Stops the current operation",
             "stop",
@@ -148,8 +147,6 @@ namespace m8
             "Set the position of the board as a XFen string",
             "setboard [XFenString]",
             std::bind(&m8Intrf::HandleFen, this, std::placeholders::_1)));
-
-        // TODO : Implement de st command.
 
         // TODO : Implement theses commands correctly
         shell_intrf_.AddCmd(ShellCmd("random",   "", "", std::bind([] {})));

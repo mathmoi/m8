@@ -93,22 +93,6 @@ namespace m8::engine
         virtual inline void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment) { throw InvalidEngineCommandException("SetTimeControl"); }
 
     protected:
-
-        // TODO : Remove if not used
-        /*
-        /// Change the state of the engine
-        void ChangeState(EngineState* new_state);
-
-        /// Get the color played by the engine.
-        inline Color engine_color() const { return engine_->engine_color_; };
-
-        /// Set the color played by the engine
-        inline void set_engine_color(Color new_engine_color) { engine_->engine_color_ = new_engine_color; };
-
-        /// Accessor for the callbacks
-        inline const EngineCallbacks callbacks() const { return engine_->callbacks_; }
-        */
-
         Engine* engine_;
     };
 }

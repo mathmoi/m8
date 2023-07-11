@@ -29,14 +29,11 @@ namespace m8::time
         IncrementalTimeManager(ChessClock& clock,
                                IncrementalTimeControl time_control)
         : TimeManager(clock),
-          time_control_(time_control),
-          last_iteration_duration(std::chrono::seconds(0)),
-          second_last_iteration_duration(std::chrono::seconds(0)),
-          iterations_completed_(0)
+          time_control_(time_control)
         {}
 
         /// Method called when the search starts.
-		inline virtual void OnSearchStarted()
+		inline void OnSearchStarted()
         {
             auto time_on_clock = clock().time_on_clock();
             target_time_ = time_on_clock / kMovesRemainingsEstimate + time_control_.increment();
@@ -45,48 +42,28 @@ namespace m8::time
             maximum_time_ = std::min(maximum_time_, clock().time_on_clock() - kSafetyBuffer);
         }
 
-        /// Method called when an iteration is started.
-        inline virtual void OnIterationStarted()
-        {
-            iteration_start = std::chrono::steady_clock::now();
-        }
-
-        /// Method called when an iteration is completed.
-		inline virtual void OnIterationCompleted(const search::PV& pv,
-                                                EvalType eval,
-                                                DepthType depth,
-                                                double time,
-                                                NodeCounterType nodes)
-        {
-            auto iteration_end = std::chrono::steady_clock::now();
-            second_last_iteration_duration = last_iteration_duration;
-            last_iteration_duration = iteration_end - iteration_start;
-
-            ++iterations_completed_;
-        }
-
         /// Indicate if the search can continue. The search needs to call this regularly
         /// after searching a number of nodes defined by the method
         ///  CalculateNodesBeforeNextCheck.
-        virtual bool can_continue() const {
+        bool can_continue() const {
+            if (need_to_continue())
+            {
+                return true;
+            }
+            
             return clock().elapsed() < maximum_time_; }
 
         /// Indicate if the search can start a new iteration.
-        virtual bool can_start_new_iteration() const {
-            // If two iterations have not been completed we can't estimate the time for 
-            // the next iteration. In this condition we continue another iteration.
-            if (iterations_completed_ < 2)
+        bool can_start_new_iteration() const {
+            if (need_to_continue())
             {
                 return true;
             }
 
-            // Estimate the time of the next iteration
-            auto next_iteration_estimated_time = last_iteration_duration * (last_iteration_duration / second_last_iteration_duration);
-            auto time_before_target = target_time_ - clock().elapsed();
-            
             // return true if we can complete at least half the next iteration before the
             // target time.
-            return next_iteration_estimated_time / 2 < time_before_target;
+            auto time_before_target = target_time_ - clock().elapsed();
+            return next_iteration_estimated_time() / 2 < time_before_target;
         };
 
         /// Returns the number of nodes can be searched before we need to make another 
@@ -96,7 +73,7 @@ namespace m8::time
         ///                         current search.
         /// @return NodeCounterType Number of nodes to search before the next call to
         ///                         can_continue.
-        virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const
+        NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const
         {
             auto elapsed = clock().elapsed();
             auto time_searched = ToFSec(elapsed);
@@ -112,12 +89,6 @@ namespace m8::time
 
         private:
             IncrementalTimeControl time_control_;
-
-            std::chrono::steady_clock::time_point iteration_start;
-            ChessClock::Duration last_iteration_duration,
-                                 second_last_iteration_duration;
-
-            DepthType iterations_completed_;
 
             ChessClock::Duration target_time_;
             ChessClock::Duration maximum_time_;

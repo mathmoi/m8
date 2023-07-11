@@ -33,7 +33,7 @@ namespace m8::search {
 		++nodes_counter_;
 
 		// We check if we need to abort the search because of time constraint
-		if (!qsearch && nodes_count_next_time_check_ <= nodes_counter_) // TODO We need not interupt search if min iteration is not searched
+		if (!qsearch && nodes_count_next_time_check_ <= nodes_counter_)
 		{
 			continue_ = time_manager_.can_continue();
 			if (!continue_)
