@@ -521,7 +521,7 @@ namespace m8
 
     void m8Intrf::DisplaySearchTableHeader() const
     {
-        const std::string fixed_column_names(" | depth |   time   | score |   n   |");
+        const std::string fixed_column_names(" | dpth |   time   | score | nodes  |");
 
         auto console_width = std::max<int>(GetConsoleWidth(), 80);
         auto fixed_columns_width = fixed_column_names.size();
@@ -536,7 +536,7 @@ namespace m8
 
             ClearLine();
             M8_OUT_LINE(<< ' ' << std::string(header_width, '-') << std::endl
-                << " | pro  |  temps   | score | nodes  |" << std::string(before_pv, ' ') << "pv" << std::string(after_pv, ' ') << "|" << std::endl
+                << fixed_column_names << std::string(before_pv, ' ') << "pv" << std::string(after_pv, ' ') << "|" << std::endl
                 << ' ' << std::string(header_width, '-'));
         }
     }
