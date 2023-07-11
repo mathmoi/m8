@@ -64,7 +64,7 @@ namespace m8::engine {
 	{
 		engine_->engine_color_ = engine_->board_.side_to_move();
 
-		auto thinking_state = std::make_unique<ThinkingState>(engine_);
+		auto thinking_state = std::make_unique<SearchState>(engine_);
 		engine_->ChangeState(std::move(thinking_state));
 	}
 

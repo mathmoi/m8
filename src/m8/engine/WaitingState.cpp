@@ -38,7 +38,7 @@ namespace m8::engine
 
         std::unique_ptr<EngineState> next_state = IsMat(engine_->board_)
                                                 ? static_cast<std::unique_ptr<EngineState>>(std::make_unique<ObservingState>(engine_))
-                                                : static_cast<std::unique_ptr<EngineState>>(std::make_unique<ThinkingState>(engine_));
+                                                : static_cast<std::unique_ptr<EngineState>>(std::make_unique<SearchState>(engine_));
         engine_->ChangeState(std::move(next_state));
     }
 
@@ -68,7 +68,7 @@ namespace m8::engine
     {
         engine_->engine_color_ = engine_->board_.side_to_move();
 
-        auto thinking_state = std::make_unique<ThinkingState>(engine_);
+        auto thinking_state = std::make_unique<SearchState>(engine_);
         engine_->ChangeState(std::move(thinking_state));
     }
 

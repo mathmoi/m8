@@ -21,7 +21,7 @@ namespace m8::engine
     class EngineState;
     class ObservingState;
     class PerftState;
-    class ThinkingState;
+    class SearchState;
     class WaitingState;
 
     /// Encapsulate all m8 functionalities
@@ -97,7 +97,7 @@ namespace m8::engine
         friend EngineState;
         friend ObservingState;
         friend PerftState;
-        friend ThinkingState;
+        friend SearchState;
         friend WaitingState;
 
         std::unique_ptr<EngineState> state_;

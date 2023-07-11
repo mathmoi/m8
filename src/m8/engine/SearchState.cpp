@@ -1,7 +1,7 @@
-/// @file	ThinkingState.cpp
+/// @file	SearchState.cpp
 /// @author Mathieu Pagé
 /// @date	January 2020
-/// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
+/// @brief	Contains the SearchState class. Controlling the engine behavior when it's 
 ///         searching for a move to play
 
 #include <stack>
@@ -18,7 +18,7 @@
 
 namespace m8::engine
 {
-	ThinkingState::ThinkingState(Engine* engine)
+	SearchState::SearchState(Engine* engine)
 		: EngineState(engine)
 	{
 		engine->search_ = std::make_unique<search::Search>(engine->board_,
@@ -28,7 +28,7 @@ namespace m8::engine
 		engine->search_->Attach(this);
 	}
 
-	void ThinkingState::BeginState()
+	void SearchState::BeginState()
 	{
 		M8_DEBUG << engine_->board_.fen();
 
@@ -39,7 +39,7 @@ namespace m8::engine
 		engine_->search_->Start();
 	}
 
-	void ThinkingState::OnSearchCompleted(const search::PV& pv, double time)
+	void SearchState::OnSearchCompleted(const search::PV& pv, double time)
 	{
 		bool was_searching = false;
 
@@ -67,25 +67,25 @@ namespace m8::engine
 		}
 	}
 
-	void ThinkingState::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void SearchState::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		auto pv_str = RenderPVMoves(pv);
 		engine_->NotifyNewBestMove(pv_str, eval, depth, time, nodes);
 	}
 
-	void ThinkingState::OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void SearchState::OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		auto pv_str = RenderPVMoves(pv);
 		engine_->NotifyIterationCompleted(pv_str, eval, depth, time, nodes);
 	}
 
-	void ThinkingState::SwitchToWaitingState()
+	void SearchState::SwitchToWaitingState()
 	{
 		auto waiting_state = std::make_unique<WaitingState>(engine_);
 		engine_->ChangeState(std::move(waiting_state));
 	}
 
-	void ThinkingState::Force()
+	void SearchState::Force()
 	{
 		auto was_searching = StopSearch();
 		if (was_searching)
@@ -94,13 +94,13 @@ namespace m8::engine
 		}
 	}
 
-	void ThinkingState::SwitchToObservingState()
+	void SearchState::SwitchToObservingState()
 	{
 		auto observing_state = std::make_unique<ObservingState>(engine_);
 		engine_->ChangeState(std::move(observing_state));
 	}
 
-	bool ThinkingState::StopSearch()
+	bool SearchState::StopSearch()
 	{
 		auto lock = std::lock_guard(engine_->search_mutex_);
 		
@@ -115,7 +115,7 @@ namespace m8::engine
 		return was_searching;
 	}
 
-	std::vector<std::string> ThinkingState::RenderPVMoves(const search::PV& pv)
+	std::vector<std::string> SearchState::RenderPVMoves(const search::PV& pv)
 	{
 		std::vector<std::string> moves;
 		std::stack<UnmakeInfo> unmake_info_stack;

@@ -1,7 +1,7 @@
-/// @file	ThinkingState.hpp
+/// @file	SearchState.hpp
 /// @author Mathieu Pagé
 /// @date	January 2020
-/// @brief	Contains the ThinkingState class. Controlling the engine behavior when it's 
+/// @brief	Contains the SearchState class. Controlling the engine behavior when it's 
 ///         searching for a move to play
 
 #ifndef M8_ENGINE_THINKING_STATE_HPP_
@@ -17,15 +17,15 @@
 namespace m8::engine {
 
 	/// Class controlling the engine behavior in the thinking state.
-	class ThinkingState : public EngineState, public search::ISearchObserver<search::PV> // TODO : This state should be named SearchingState/PonderingState
+	class SearchState : public EngineState, public search::ISearchObserver<search::PV> // TODO : This state should be named SearchingState/PonderingState
 	{
 	public:
 
 		/// Constructor from a previous state
-		ThinkingState(Engine* engine);
+		SearchState(Engine* engine);
 
 		/// Return the name of the state
-        inline virtual const std::string state_name() const { return "ThinkingState"; }
+        inline virtual const std::string state_name() const { return "SearchState"; }
 
 		/// Method that is run when this state becomes the new current state
 		virtual void BeginState();
