@@ -39,7 +39,7 @@ namespace m8::engine
 		engine_->search_->Start();
 	}
 
-	void SearchState::OnSearchCompleted(const search::PV& pv, double time)
+	void SearchState::OnSearchCompleted(const search::PV& pv, double time, const search::SearchStats& stats)
 	{
 		bool was_searching = false;
 
@@ -53,7 +53,7 @@ namespace m8::engine
 
 				engine_->board_.Make(pv.first());
 
-				engine_->NotifySearchCompleted(pv_str, time);
+				engine_->NotifySearchCompleted(pv_str, time, stats);
 
 				engine_->clock_->Stop();
 

@@ -7,6 +7,8 @@
 #ifndef M8_SEARCH_SEARCH_OBSERVER_HPP_
 #define M8_SEARCH_SEARCH_OBSERVER_HPP_
 
+#include "SearchStats.hpp"
+
 namespace m8::search {
 
 	/// Interface for classes that can observe the search
@@ -31,7 +33,7 @@ namespace m8::search {
 		inline virtual void OnIterationCompleted(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};
 
 		/// Method when the search is completed.
-		inline virtual void OnSearchCompleted(const TPV& pv, double time) {};
+		inline virtual void OnSearchCompleted(const TPV& pv, double time, const SearchStats& stats) {};
 	};
 }
 

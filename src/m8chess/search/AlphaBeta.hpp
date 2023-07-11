@@ -16,6 +16,7 @@
 #include "../../m8chess/time/TimeManager.hpp"
 
 #include "SearchResult.hpp"
+#include "SearchStats.hpp"
 #include "SearchSubject.hpp"
 #include "PV.hpp"
 
@@ -43,7 +44,7 @@ namespace m8 {
 			Board board_;
 			bool continue_;
 			Move best_move_; // TODO : Remove this hack by returning a proper PV.
-			NodeCounterType nodes_counter_; // TODO : Replace this with a proper stats counter struct.
+			SearchStats stats_;
 			NodeCounterType nodes_count_next_time_check_;
 
 			const time::TimeManager& time_manager_;

@@ -43,7 +43,7 @@ namespace m8::engine {
 		void OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
 		/// Method when the search is completed.
-		void OnSearchCompleted(const search::PV& pv, double time);
+		void OnSearchCompleted(const search::PV& pv, double time, const search::SearchStats& stats);
 				
 	private:
 		void SwitchToWaitingState();

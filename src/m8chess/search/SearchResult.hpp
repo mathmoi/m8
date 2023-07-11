@@ -10,31 +10,31 @@
 #include "../Types.hpp"
 
 #include "PV.hpp"
+#include "SearchStats.hpp"
 
 namespace m8::search {
 
-	/// Implements the minimax search algorithm
+	/// Result of a search
 	struct SearchResult
 	{
 	public:
 		/// Default constuctor
-		SearchResult()
-			: value_(0),
-			  nodes_(0)
+		inline SearchResult()
+			: value_(0)
 		{}
 
 		// Constructor.
-		SearchResult(const PV& pv,
+		inline SearchResult(const PV& pv,
 			         EvalType value,
-			         NodeCounterType nodes)
+			         const SearchStats& stats)
 			: value_(value),
 			  pv_(pv),
-			  nodes_(nodes)
+			  stats_(stats)
 		{}
 
 		EvalType        value_;
 		PV				pv_;
-		NodeCounterType nodes_;
+		SearchStats		stats_;
 
 	};
 }

@@ -10,6 +10,7 @@
 #include <functional>
 
 #include "ISearchObserver.hpp"
+#include "SearchStats.hpp"
 
 namespace m8::search
 {
@@ -74,9 +75,9 @@ namespace m8::search
         }
 
 		/// Method when the search is completed.
-		inline void NotifySearchCompleted(const TPV& pv, double time)
+		inline void NotifySearchCompleted(const TPV& pv, double time, const SearchStats& stats)
         {
-            Notify( [pv, time](ISearchObserver<TPV>* observer){ observer->OnSearchCompleted(pv, time); } );
+            Notify( [pv, time, stats](ISearchObserver<TPV>* observer){ observer->OnSearchCompleted(pv, time, stats); } );
         }
         
     private:

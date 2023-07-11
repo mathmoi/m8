@@ -98,7 +98,7 @@ namespace m8 { namespace search
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
-			NotifySearchCompleted(search_result.pv_, GetSearchTime());
+			NotifySearchCompleted(search_result.pv_, GetSearchTime(), search_result.stats_);
 		}
 	}
 

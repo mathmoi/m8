@@ -19,7 +19,6 @@ namespace m8::search {
 		: board_(board),
 		  continue_(true),
 		  best_move_(kNullMove),
-		  nodes_counter_(0),
 		  nodes_count_next_time_check_(kNodesBeforeFirstCheck),
 		  time_manager_(time_manager)
 	{}
@@ -30,17 +29,18 @@ namespace m8::search {
 		PV local_pv;
 
 		pv.Clear();
-		++nodes_counter_;
+
+		qsearch ? stats_.qnodes++ : stats_.nodes++;
 
 		// We check if we need to abort the search because of time constraint
-		if (!qsearch && nodes_count_next_time_check_ <= nodes_counter_)
+		if (!qsearch && nodes_count_next_time_check_ <= stats_.nodes)
 		{
 			continue_ = time_manager_.can_continue();
 			if (!continue_)
 			{
 				return 0;
 			}
-			nodes_count_next_time_check_ = nodes_counter_ + time_manager_.CalculateNodesBeforeNextCheck(nodes_counter_);
+			nodes_count_next_time_check_ = stats_.nodes + time_manager_.CalculateNodesBeforeNextCheck(stats_.nodes);
 		}
 
 		// If we are in the qsearch we must evaluate the stand path option.
@@ -121,7 +121,7 @@ namespace m8::search {
 					if (root && *next != best_move_)
 					{
 						best_move_ = *next;
-						NotifyNewBestMove(pv, alpha, depth, 0, nodes_counter_);
+						NotifyNewBestMove(pv, alpha, depth, 0, stats_.nodes);
 					}
 				}
 			}
@@ -145,9 +145,9 @@ namespace m8::search {
 			return std::nullopt;
 		}
 
-		auto result = SearchResult(pv, value, nodes_counter_);
+		auto result = SearchResult(pv, value, stats_);
 
-		NotifySearchCompleted(pv, 0);
+		NotifySearchCompleted(pv, 0, stats_);
 
 		return result;
 	}

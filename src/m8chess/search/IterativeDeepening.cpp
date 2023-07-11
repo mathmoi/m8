@@ -36,7 +36,7 @@ namespace m8::search {
                                          result.value().value_,
                                          current_depth,
                                          0,
-                                         result.value().nodes_);
+                                         result.value().stats_.nodes);
 
                 last_result = result;
             }
@@ -44,7 +44,7 @@ namespace m8::search {
             ++current_depth;
         }
 
-        NotifySearchCompleted(last_result.value().pv_, 0);
+        NotifySearchCompleted(last_result.value().pv_, 0, last_result.value().stats_);
 
         return last_result.value();
     }
