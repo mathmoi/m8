@@ -13,7 +13,7 @@
 #include "../../m8chess/time/TimeManager.hpp"
 
 #include "WaitingState.hpp"
-#include "ThinkingState.hpp"
+#include "SearchState.hpp"
 #include "ObservingState.hpp"
 
 namespace m8::engine
@@ -92,6 +92,11 @@ namespace m8::engine
 		{
 			SwitchToObservingState();
 		}
+	}
+
+	void SearchState::Stop()
+	{
+		Force();
 	}
 
 	void SearchState::SwitchToObservingState()

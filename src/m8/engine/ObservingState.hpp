@@ -45,6 +45,9 @@ namespace m8::engine {
 		/// Set the engine to play neither color.
 		inline void Force() { /* do nothing */ }
 
+		/// Stops the current operation.
+        inline void Stop() { /* do nothing */ }
+
 		/// Set the time control to a fixed number of seconds per move
         /// 
         /// @param seconds_per_move Number of seconds to use per move

@@ -164,6 +164,7 @@ namespace m8
 
     void m8Intrf::HandleExit()
     {
+        engine_.Stop();
         shell_intrf_.set_abort(true);
     }
 

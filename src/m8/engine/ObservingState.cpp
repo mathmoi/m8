@@ -17,7 +17,7 @@
 #include "ObservingState.hpp"
 #include "WaitingState.hpp"
 #include "PerftState.hpp"
-#include "ThinkingState.hpp"
+#include "SearchState.hpp"
 #include "InvalidMoveException.hpp"
 
 namespace m8::engine {

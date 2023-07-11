@@ -17,7 +17,7 @@
 namespace m8::engine {
 
 	/// Class controlling the engine behavior in the thinking state.
-	class SearchState : public EngineState, public search::ISearchObserver<search::PV> // TODO : This state should be named SearchingState/PonderingState
+	class SearchState : public EngineState, public search::ISearchObserver<search::PV>
 	{
 	public:
 
@@ -25,13 +25,16 @@ namespace m8::engine {
 		SearchState(Engine* engine);
 
 		/// Return the name of the state
-        inline virtual const std::string state_name() const { return "SearchState"; }
+        inline const std::string state_name() const { return "SearchState"; }
 
 		/// Method that is run when this state becomes the new current state
-		virtual void BeginState();
+		void BeginState();
 
 		/// Set the engine to play neither color.
-		virtual void Force();
+		void Force();
+
+		/// Stops the current operation.
+        void Stop();
 
 		/// Method called when a new best move is found at the root.
 		void OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
