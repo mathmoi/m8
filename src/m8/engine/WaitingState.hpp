@@ -20,36 +20,36 @@ namespace m8::engine {
 		WaitingState(Engine* engine);
 
 		/// Return the name of the state
-        inline virtual const std::string state_name() const { return "WaitingState"; }
+        inline const std::string state_name() const { return "WaitingState"; }
 
 		/// Accept a move to play on the current board.
-		virtual void UserMove(std::string move);
+		void UserMove(std::string move);
 
 		/// Terminate the current game and prepare the engine to play a new game.
-		virtual void New();
+		void New();
 
 		/// Set the engine to play the current side and start playing.
-		virtual void Go();
+		void Go();
 
 		/// Set the engine to play neither color.
-		virtual void Force();
+		void Force();
 
 		/// Set the time control to a fixed number of seconds per move
         /// 
         /// @param seconds_per_move Number of seconds to use per move
-        virtual void SetTimeControl(time::ChessClock::Duration time_per_move);
+        void SetTimeControl(time::ChessClock::Duration time_per_move);
 
 		/// Set the time control to a conventional one.
         /// 
         /// @param moves Number of moves for each control
         /// @param time  Time added for each control
-        virtual void SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time);
+        void SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time);
 
         /// Set the time control to an incremental one.
         /// 
         /// @param base      Base time
         /// @param increment Incremental time added after each move
-        virtual void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment);
+        void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment);
 
 	private:
 		Move ParseMove(const std::string& str_move);

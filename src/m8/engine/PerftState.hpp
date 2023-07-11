@@ -36,13 +36,13 @@ namespace m8::engine {
 		{}
 
 		/// Return the name of the state
-        inline virtual const std::string state_name() const { return "PerftState"; }
+        inline const std::string state_name() const { return "PerftState"; }
 
 		/// Method that is run before a state is replaced by a new state
-		virtual void BeginState();
+		void BeginState();
 
 		/// Stops the current operation.
-		virtual void Stop();
+		void Stop();
 
 		/// Method called everytime a partial perf result is ready
 		/// 
