@@ -10,12 +10,14 @@
 
 #include "ShellIntrf.hpp"
 #include "engine/Engine.hpp"
+#include "engine/IPerftObserver.hpp"
 #include "options/Options.hpp"
 
 namespace m8
 {
    /// Class that implements m8's shell-like interface.
-   class m8Intrf : public search::ISearchObserver<std::vector<std::string>>
+   class m8Intrf : public search::ISearchObserver<std::vector<std::string>>,
+                   public engine::IPerftObserver
    {
    public:
       /// Default constructor.
@@ -36,6 +38,18 @@ namespace m8
       /// Method when the search is completed.
       void OnSearchCompleted(const std::vector<std::string> &pv, double time);
 
+      /// Method called everytime a partial perf result is ready
+		/// 
+		/// @param move  The move for which the result is available 
+		/// @param count The number of nodes
+      void OnPartialPerftResult(const std::string& move, std::uint64_t count);
+
+      /// Method called at the end of the perft test
+		/// 
+		/// @param count The number of nodes
+		/// @param time  The time used to complete the test
+      void OnPerftCompleted(std::uint64_t count, double time);
+
    private:
       engine::Engine engine_;
       bool xboard_;
@@ -50,8 +64,6 @@ namespace m8
 
       /// Setup the xboard mode.
       void SetupXboardMode();
-
-      engine::EngineCallbacks CreateEngineCallbacks();
 
       void HandleExit();
       void HandleUserMove(std::vector<std::string> args_list);
@@ -76,8 +88,6 @@ namespace m8
       void DisplayOption(const std::string &option_name) const;
       void EditOption(const std::string &option_name, const std::string &value) const;
 
-      void DisplayPerftPartialResult(std::string move, std::uint64_t count);
-      void DisplayPerftResult(std::uint64_t count, double seconds);
       void DisplayBoard() const;
 
       std::vector<std::string> JoinsPVMoves(std::vector<std::string>::const_iterator first,

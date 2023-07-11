@@ -14,9 +14,14 @@ namespace m8::engine {
 		perft_.RunParallel();
 	}
 
-	void PerftState::HandleResult(std::uint64_t count, double seconds)
+	void PerftState::OnPartialPerftResult(const std::string& move, std::uint64_t count)
 	{
-		engine_->callbacks_.perft_result_callback(count, seconds);
+		observer_->OnPartialPerftResult(move, count);
+	}
+
+	void PerftState::OnPerftCompleted(std::uint64_t count, double time)
+	{
+		observer_->OnPerftCompleted(count, time);
 		
 		auto waiting_state = std::make_unique<ObservingState>(this->engine_);
 		engine_->ChangeState(std::move(waiting_state));

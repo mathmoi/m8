@@ -12,6 +12,7 @@
 #include <string>
 
 #include "../../m8/engine/Engine.hpp"
+#include "../../m8/engine/IPerftObserver.hpp"
 
 #include "../../m8chess/Perft.hpp"
 #include "../../m8chess/Color.hpp"	
@@ -22,7 +23,6 @@
 #include "../../m8chess/time/TimeControl.hpp"
 #include "../../m8chess/time/TimePerMoveTimeControl.hpp"
 
-#include "EngineCallbacks.hpp"
 #include "InvalidEngineCommandException.hpp"
 
 namespace m8::engine
@@ -58,7 +58,7 @@ namespace m8::engine
         /// Run a perft tests.
         ///
         /// @param depth Depth of the test to run.
-        virtual inline void Perft(int depth) { throw InvalidEngineCommandException("Perft"); }
+        virtual inline void Perft(int depth, IPerftObserver* observer) { throw InvalidEngineCommandException("Perft"); }
 
         /// Set the engine to play the current side and start playing.
         virtual inline void Go() { throw InvalidEngineCommandException("Go"); }

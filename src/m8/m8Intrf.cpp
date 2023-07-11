@@ -29,23 +29,12 @@
 namespace m8
 {
     m8Intrf::m8Intrf()
-        : engine_(eval::GeneratePieceSqTable(),
-                  CreateEngineCallbacks()),
+        : engine_(eval::GeneratePieceSqTable()),
 		  xboard_(false),
           shell_intrf_()
     {
         engine_.Attach(this);
         SetupShellInterf();
-    }
-
-    engine::EngineCallbacks m8Intrf::CreateEngineCallbacks()
-    {
-        engine::EngineCallbacks callbacks;
-
-        callbacks.partial_perft_result_callback = std::bind(&m8Intrf::DisplayPerftPartialResult, this, std::placeholders::_1, std::placeholders::_2);
-        callbacks.perft_result_callback = std::bind(&m8Intrf::DisplayPerftResult, this, std::placeholders::_1, std::placeholders::_2);
-
-        return callbacks;
     }
 
     void m8Intrf::Execute()
@@ -233,7 +222,7 @@ namespace m8
             }
             else
             {
-                CallEngineCommand([this, depth]() { engine_.Perft(depth.value()); }, "perft");
+                CallEngineCommand([this, depth]() { engine_.Perft(depth.value(), this); }, "perft");
             }
         }
     }
@@ -500,7 +489,7 @@ namespace m8
         }
     }
 
-    void m8Intrf::DisplayPerftPartialResult(std::string move, std::uint64_t count)
+    void m8Intrf::OnPartialPerftResult(const std::string& move, std::uint64_t count)
     {
         std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
@@ -508,14 +497,14 @@ namespace m8
         M8_OUT_LINE(<< ' ' << move << '\t' << count);
     }
 
-    void m8Intrf::DisplayPerftResult(std::uint64_t count, double seconds)
+    void m8Intrf::OnPerftCompleted(std::uint64_t count, double time)
     {
         std::lock_guard<std::recursive_mutex> lock(output_mutex_);
         ClearLine();
         M8_OUT_LINE(<< std::endl
                     << " Nodes: " << count << std::endl
-                    << " Time : " << seconds << std::endl
-                    << " Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(count / seconds), 3) << std::endl);
+                    << " Time : " << time << std::endl
+                    << " Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(count / time), 3) << std::endl);
         shell_intrf_.DisplayInvit();
     }
 

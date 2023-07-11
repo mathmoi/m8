@@ -13,22 +13,26 @@
 #include "../../m8chess/SAN.hpp"
 
 #include "EngineState.hpp"
+#include "IPerftObserver.hpp"
 
 namespace m8::engine {
 
 	/// Class controlling the engine behavior in the waiting state.
-	class PerftState : public EngineState
+	class PerftState : public EngineState,
+	                   public IPerftObserver
 	{
 	public:
 
 		/// Constructor from a previous state
 		PerftState(Engine* engine,
-			       int depth)
+			       int depth,
+				   IPerftObserver* observer)
 			: EngineState(engine),
 			  perft_(depth,
 				     engine->board_,
-				     [this](Move move, std::uint64_t count) { this->engine_->callbacks_.partial_perft_result_callback(m8::RenderSAN(move, this->engine_->board_), count); },
-				     std::bind(&PerftState::HandleResult, this, std::placeholders::_1, std::placeholders::_2))
+					 this),
+			  observer_(observer)
+
 		{}
 
 		/// Return the name of the state
@@ -40,8 +44,22 @@ namespace m8::engine {
 		/// Stops the current operation.
 		virtual void Stop();
 
+		/// Method called everytime a partial perf result is ready
+		/// 
+		/// @param move  The move for which the result is available 
+		/// @param count The number of nodes
+		void OnPartialPerftResult(const std::string& move, std::uint64_t count);
+
+		/// Method called at the end of the perft test
+		/// 
+		/// @param count The number of nodes
+		/// @param time  The time used to complete the test
+		void OnPerftCompleted(std::uint64_t count, double time);
+
 	private:
 		m8::Perft perft_;
+
+		IPerftObserver* observer_;
 
 		inline void partial_result_handler(Move move, std::uint64_t count) {};
 

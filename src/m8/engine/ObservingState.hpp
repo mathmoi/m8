@@ -8,7 +8,6 @@
 #define M8_ENGINE_OBSERVING_STATE_HPP_
 
 #include "EngineState.hpp"
-#include "EngineCallbacks.hpp"
 
 namespace m8::engine {
 
@@ -32,7 +31,7 @@ namespace m8::engine {
 		/// Run a perft tests.
 		///
 		/// @param depth Depth of the test to run.
-		virtual void Perft(int depth); // TODO : In the concrete state the methods should no longer be virtual
+		virtual void Perft(int depth, IPerftObserver* observer); // TODO : In the concrete state the methods should no longer be virtual
 
 		/// Accept a move to play on the current board.
 		virtual void UserMove(std::string move);

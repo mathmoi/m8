@@ -19,6 +19,7 @@
 #include "Move.hpp"
 #include "MoveGen.hpp"
 #include "Board.hpp"
+#include "../m8/engine/IPerftObserver.hpp"
 
 namespace m8
 {
@@ -85,12 +86,14 @@ namespace m8
     class Perft
     {
     public:
-        typedef std::function<void(Move, std::uint64_t)> PartialResultCallback;
-        typedef std::function<void(std::uint64_t, double)> ResultCallback;
 
         /// Constructor
-        inline Perft(int depth, const Board& board, PartialResultCallback partial_result_callback, ResultCallback result_callback)
-            : depth_(depth), abort_(false), board_(board), partial_result_callback_(partial_result_callback), result_callback_(result_callback), running_threads_(0)
+        inline Perft(int depth, const Board& board, engine::IPerftObserver* observer)
+            : depth_(depth),
+              abort_(false),
+              board_(board),
+              observer_(observer),
+              running_threads_(0)
         {}
 
         /// Destructor.
@@ -106,8 +109,8 @@ namespace m8
         int depth_;
         bool abort_;
         Board board_;
-        PartialResultCallback partial_result_callback_;
-        ResultCallback result_callback_;
+        engine::IPerftObserver* observer_;
+        
         std::mutex perft_mutex_;
         int running_threads_;
         std::chrono::high_resolution_clock::time_point start_;

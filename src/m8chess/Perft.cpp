@@ -11,6 +11,7 @@
 #include "MoveGen.hpp"
 #include "Checkmate.hpp"
 #include "../m8common/logging.hpp"
+#include "SAN.hpp"
 
 namespace m8
 {
@@ -177,7 +178,8 @@ namespace m8
 
         if (node->parent() == root_ && !abort_)
         {
-            partial_result_callback_(node->move(), sum);
+            auto san_move = RenderSAN(node->move(), board_);
+            observer_->OnPartialPerftResult(san_move, sum);
         }
     }
 
@@ -226,7 +228,7 @@ namespace m8
         auto end = high_resolution_clock::now();
         duration<double> time_span = duration_cast<duration<double>>(end - start_);
 
-        result_callback_(root_->count().get(), time_span.count());
+        observer_->OnPerftCompleted(root_->count().get(), time_span.count());
     }
 
     void Perft::RunWorkerThread()
@@ -242,7 +244,7 @@ namespace m8
             ComputeNode(node);
             if (node->parent() == root_ && !abort_)
             {
-                partial_result_callback_(node->move(), node->count().get());
+                observer_->OnPerftCompleted(node->move(), node->count().get());
             }
             
             node = PickNode(root_);

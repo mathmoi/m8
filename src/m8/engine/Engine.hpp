@@ -9,12 +9,12 @@
 #include <memory>
 #include <string>
 
-#include "EngineCallbacks.hpp"
 #include "../../m8chess/search/Search.hpp"
 #include "../../m8chess/search/SearchSubject.hpp"
 #include "../../m8chess/eval/Eval.hpp"
 #include "../../m8chess/time/ChessClock.hpp"
 #include "../../m8chess/time/TimeControl.hpp"
+#include "IPerftObserver.hpp"
 
 namespace m8::engine
 {
@@ -32,8 +32,7 @@ namespace m8::engine
 
     public:
         /// Constructor
-        Engine(eval::PieceSqTablePtr psqt,
-               EngineCallbacks callbacks);
+        Engine(eval::PieceSqTablePtr psqt);
 
         /// Destructor
         ~Engine();
@@ -74,7 +73,7 @@ namespace m8::engine
         /// Run a perft tests.
         ///
         /// @param depth  epth of the test to run.
-        void Perft(int depth);
+        void Perft(int depth, IPerftObserver* observer);
 
         /// Set the engine to play the current side and start playing.
         void Go();
@@ -94,8 +93,6 @@ namespace m8::engine
         /// Returns the current evaluation;
         EvalType current_evaluation() const;
 
-        // TODO : Separate all other methods into sections
-
     private:
         friend EngineState;
         friend ObservingState;
@@ -104,8 +101,6 @@ namespace m8::engine
         friend WaitingState;
 
         std::unique_ptr<EngineState> state_;
-
-        EngineCallbacks callbacks_; // TODO : Is this still needed now that we use the ObserverPattern?
 
         eval::PieceSqTablePtr psqt_;
         Board board_;

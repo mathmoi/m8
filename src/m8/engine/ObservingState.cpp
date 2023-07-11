@@ -22,9 +22,9 @@
 
 namespace m8::engine {
 
-	void ObservingState::Perft(int depth)
+	void ObservingState::Perft(int depth, IPerftObserver* observer)
 	{
-		auto perft_state = std::make_unique<PerftState>(this->engine_, depth);
+		auto perft_state = std::make_unique<PerftState>(this->engine_, depth, observer);
 		engine_->ChangeState(std::move(perft_state));
 	}
 

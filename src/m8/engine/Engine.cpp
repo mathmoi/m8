@@ -15,10 +15,8 @@
 
 namespace m8::engine
 {
-    Engine::Engine(eval::PieceSqTablePtr psqt,
-                   EngineCallbacks callbacks)
-    : callbacks_(callbacks),
-      psqt_(psqt),
+    Engine::Engine(eval::PieceSqTablePtr psqt)
+    : psqt_(psqt),
       board_(kStartingPositionFEN, psqt),
       engine_color_(kBlack),
       time_control_(std::make_unique<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
@@ -60,7 +58,7 @@ namespace m8::engine
 
     void Engine::SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment) { state_->SetTimeControl(base, increment); }
 
-    void Engine::Perft(int depth) { return state_->Perft(depth); }
+    void Engine::Perft(int depth, IPerftObserver* observer) { return state_->Perft(depth, observer); }
 
     void Engine::Go() { state_->Go(); }
 
