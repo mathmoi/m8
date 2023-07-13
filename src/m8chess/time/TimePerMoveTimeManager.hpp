@@ -56,7 +56,7 @@ namespace m8::time
             duration_before_check = std::clamp(duration_before_check,
                                                kMinDurationBetweenChecks,
                                                kMaxDurationBetweenChecks);
-
+            
             return nps * ToFSec(duration_before_check).count();
         }
     };

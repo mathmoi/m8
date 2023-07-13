@@ -39,7 +39,7 @@ namespace m8 {
 			void Stop();
 
 		private:
-			const NodeCounterType kNodesBeforeFirstCheck = 100000;
+			const NodeCounterType kNodesBeforeFirstCheck = 20000;
 
 			Board board_;
 			bool continue_;

@@ -51,13 +51,13 @@ namespace m8::time
         virtual bool can_start_new_iteration() const = 0;
 
         /// Method called when an iteration is started.
-        inline virtual void OnIterationStarted()
+        inline void OnIterationStarted()
         {
             iteration_start = std::chrono::steady_clock::now();
         }
 
         /// Method called when an iteration is completed.
-		inline virtual void OnIterationCompleted(const search::PV& pv,
+		inline void OnIterationCompleted(const search::PV& pv,
                                                 EvalType eval,
                                                 DepthType depth,
                                                 double time,
@@ -89,7 +89,10 @@ namespace m8::time
 
         /// Indicate if the search need to continue because the minimum depth is not 
         /// searched yet.
-        inline bool need_to_continue() const { return iterations_completed_ < kMinDepth; }
+        inline bool need_to_continue() const
+        {
+            return iterations_completed_ < kMinDepth;
+        }
 
         inline ChessClock::Duration next_iteration_estimated_time() const
         {

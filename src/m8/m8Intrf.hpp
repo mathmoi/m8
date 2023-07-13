@@ -36,7 +36,7 @@ namespace m8
       void OnIterationCompleted(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
       /// Method when the search is completed.
-      void OnSearchCompleted(const std::vector<std::string> &pv, double time);
+      void OnSearchCompleted(const std::vector<std::string> &pv, double time, const search::SearchStats& stats);
 
       /// Method called everytime a partial perf result is ready
 		/// 

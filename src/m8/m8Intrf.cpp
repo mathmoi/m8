@@ -750,7 +750,7 @@ namespace m8
         }
     }
 
-    void m8Intrf::OnSearchCompleted(const std::vector<std::string>& pv, double time)
+    void m8Intrf::OnSearchCompleted(const std::vector<std::string> &pv, double time, const search::SearchStats& stats)
     {
         if (xboard_)
         {
