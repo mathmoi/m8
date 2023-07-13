@@ -1,5 +1,5 @@
 /// @file	PerftState.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	Decembre 2019
 /// @brief	Contains the PerftState class. Controlling the engine behavior when it's 
 ///         executing a perft test.

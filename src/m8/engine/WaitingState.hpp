@@ -1,5 +1,5 @@
 /// @file	WaitingState.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	January 2020
 /// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.

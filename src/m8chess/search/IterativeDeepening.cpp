@@ -1,5 +1,5 @@
 /// @file   IterativeDeepening.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Janvier 2020
 /// @brief  Contains the Iterative Deepening algorithm.
 

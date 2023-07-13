@@ -1,5 +1,5 @@
 /// @file   ISearchObserver.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   January 2020
 /// @brief  Contains a virtual base class (interface) for classes that can observe a 
 ///         search and receive "events".

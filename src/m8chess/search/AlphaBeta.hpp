@@ -1,5 +1,5 @@
 /// @file   AlphaBeta.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Decembre 2018
 /// @brief  Contains the AlphaBeta class. This class is responsible for the search
 ///         algorithm of the chess engine.

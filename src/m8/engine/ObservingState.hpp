@@ -1,5 +1,5 @@
 /// @file	ObservingState.hpp 
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date	Decembre 2019
 /// @brief	Contains the ObservingState class. When he is not involved in the game (not 
 ///         searching, pondering or waiting for an opponent to move.)

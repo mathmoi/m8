@@ -1,5 +1,5 @@
 /// @file   Move.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu PagÃ©
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities used to manipulates moves.
 

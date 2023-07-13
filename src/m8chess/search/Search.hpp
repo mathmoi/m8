@@ -1,5 +1,5 @@
 /// @file   Search.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   March 2018
 /// @brief  Contains the Search class. This class is responsible to manage the engine's 
 ///         search. The search algorithm itself is contained elswhere, but is access by
