@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 
-#include "../../m8chess/search/Search.hpp"
+#include "../../m8chess/search/Searcher.hpp"
 #include "../../m8chess/search/SearchSubject.hpp"
 #include "../../m8chess/eval/Eval.hpp"
 #include "../../m8chess/time/ChessClock.hpp"
@@ -112,7 +112,7 @@ namespace m8::engine
         // Searching variables
         ////////////////////////////////////////////////////////////////////////////////// 
         // TODO : The search should become a permanent/reusable object
-        std::unique_ptr<search::Search> search_;
+        std::unique_ptr<search::Searcher> search_;
 		bool searching_;
 		std::mutex search_mutex_; // TODO : This mutex should probable become more global to make the Engine class completely thread safe.
 

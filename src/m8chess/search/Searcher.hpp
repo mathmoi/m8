@@ -1,7 +1,7 @@
-/// @file   Search.hpp
+/// @file   Searcher.hpp
 /// @author Mathieu Pagé
 /// @date   March 2018
-/// @brief  Contains the Search class. This class is responsible to manage the engine's 
+/// @brief  Contains the Searcher class. This class is responsible to manage the engine's 
 ///         search. The search algorithm itself is contained elswhere, but is access by
 ///         the enigne class trough the search class.
 
@@ -32,16 +32,16 @@ namespace m8 { namespace search
 	};
 
     /// Manage the seach for the engine.
-    class Search : public SearchSubject<PV>, public ISearchObserver<PV>
+    class Searcher : public SearchSubject<PV>, public ISearchObserver<PV>
     {
     public:
 		
         /// Constructor
-        Search(const Board& board,
+        Searcher(const Board& board,
 			   std::shared_ptr<time::TimeManager> time_manager);
 
 		/// Destructor
-		~Search();
+		~Searcher();
 
 		/// Update the internal board. This cannnot be called when the search is underway.
 		void set_board(const Board& board);

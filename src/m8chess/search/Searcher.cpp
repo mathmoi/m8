@@ -1,19 +1,19 @@
-/// @file   Search.cpp 
+/// @file   Searcher.cpp 
 /// @author Mathieu Pagé
 /// @date   March 2018
-/// @brief  Contains the Search class. This class is responsible to manage the engine's 
+/// @brief  Contains the Searcher class. This class is responsible to manage the engine's 
 ///         search. The search algorithm itself is contained elswhere, but is access by
 ///         the enigne class trough the search class.
 
 #include <thread>
 
-#include "Search.hpp"
+#include "Searcher.hpp"
 #include "../eval/Eval.hpp"
 #include "../../m8common/logging.hpp"
 
 namespace m8 { namespace search
 {
-    Search::Search(const Board& board,
+    Searcher::Searcher(const Board& board,
 			       std::shared_ptr<time::TimeManager> time_manager) // TODO : Shouldn't that be a std::unique_ptr?
 		: board_(board),
 		  state_(SearchState::Ready),
@@ -22,7 +22,7 @@ namespace m8 { namespace search
 		Attach(time_manager_.get());
 	}
 
-	Search::~Search()
+	Searcher::~Searcher()
 	{
 		if (search_thread_.joinable())
 		{
@@ -37,21 +37,21 @@ namespace m8 { namespace search
 		}
 	}
 
-	void Search::set_board(const Board& board)
+	void Searcher::set_board(const Board& board)
 	{
 		assert(state_ == SearchState::Ready);
 
 		board_ = board;
 	}
 
-	void Search::Start()
+	void Searcher::Start()
 	{
 		assert(state_ == SearchState::Ready);
 		
 		start_time_ = std::chrono::steady_clock::now();
 		state_ = SearchState::Searching;
 
-		// TODO : We should make sure Search objects are not reausable. This would then become obsolete.
+		// TODO : We should make sure Searcher objects are not reausable. This would then become obsolete.
 		// TODO : Can we make the search thread permanant? It would wait for work.
 		if (search_thread_.joinable())
 		{
@@ -60,10 +60,10 @@ namespace m8 { namespace search
 
 		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, time_manager_);
 		ptr_iterative_deepening_->Attach(this);
-		search_thread_ = std::thread(&Search::RunSearchThread, this);
+		search_thread_ = std::thread(&Searcher::RunSearchThread, this);
 	}
 
-	bool Search::StopSearch()
+	bool Searcher::StopSearch()
 	{
 		bool was_searching = false;
 		if (state_ == SearchState::Searching)
@@ -79,7 +79,7 @@ namespace m8 { namespace search
 		return was_searching;
 	}
 
-	void Search::Stop()
+	void Searcher::Stop()
 	{
 		bool was_searching = StopSearch();
 		if (was_searching)
@@ -88,7 +88,7 @@ namespace m8 { namespace search
 		}
 	}
 
-	void Search::RunSearchThread()
+	void Searcher::RunSearchThread()
  	{
 		M8_LOG_SCOPE_THREAD();
 
@@ -103,24 +103,24 @@ namespace m8 { namespace search
 		}
 	}
 
-	double Search::GetSearchTime() const
+	double Searcher::GetSearchTime() const
 	{
 		auto now = std::chrono::steady_clock::now();
 		auto time_span = std::chrono::duration_cast<std::chrono::duration<double>>(now - start_time_);
 		return time_span.count();
 	}
 
-	void Search::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void Searcher::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		NotifyNewBestMove(pv, eval, depth, GetSearchTime(), nodes);
 	}
 
-	void Search::OnIterationStarted()
+	void Searcher::OnIterationStarted()
 	{
 		NotifyIterationStarted();
 	}
 
-	void Search::OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+	void Searcher::OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
 	{
 		NotifyIterationCompleted(pv, eval, depth, GetSearchTime(), nodes);
 	}

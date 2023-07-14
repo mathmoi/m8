@@ -21,7 +21,7 @@ namespace m8::engine
 	SearchState::SearchState(Engine* engine)
 		: EngineState(engine)
 	{
-		engine->search_ = std::make_unique<search::Search>(engine->board_,
+		engine->search_ = std::make_unique<search::Searcher>(engine->board_,
 		                                                   time::TimeManager::CreateTimeManager(*(engine->time_control_),
 														                                        *(engine->clock_)));
 		engine->searching_ = true;
