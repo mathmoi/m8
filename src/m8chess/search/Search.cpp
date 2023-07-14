@@ -52,6 +52,7 @@ namespace m8 { namespace search
 		state_ = SearchState::Searching;
 
 		// TODO : We should make sure Search objects are not reausable. This would then become obsolete.
+		// TODO : Can we make the search thread permanant? It would wait for work.
 		if (search_thread_.joinable())
 		{
 			search_thread_.join();
