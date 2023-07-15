@@ -111,8 +111,7 @@ namespace m8::engine
         //////////////////////////////////////////////////////////////////////////////////
         // Searching variables
         ////////////////////////////////////////////////////////////////////////////////// 
-        // TODO : The search should become a permanent/reusable object
-        std::unique_ptr<search::Searcher> search_;
+        search::Searcher searcher_;
 		bool searching_;
 		std::mutex search_mutex_; // TODO : This mutex should probable become more global to make the Engine class completely thread safe.
 

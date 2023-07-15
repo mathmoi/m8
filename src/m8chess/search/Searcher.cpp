@@ -13,14 +13,9 @@
 
 namespace m8 { namespace search
 {
-    Searcher::Searcher(const Board& board,
-			       std::shared_ptr<time::TimeManager> time_manager) // TODO : Shouldn't that be a std::unique_ptr?
-		: board_(board),
-		  state_(SearchState::Ready),
-		  time_manager_(time_manager)
-    {
-		Attach(time_manager_.get());
-	}
+    Searcher::Searcher()
+	 : state_(SearchState::Ready)
+    {}
 
 	Searcher::~Searcher()
 	{
@@ -37,28 +32,23 @@ namespace m8 { namespace search
 		}
 	}
 
-	void Searcher::set_board(const Board& board)
+	void Searcher::Start(std::shared_ptr<Search> search)
 	{
 		assert(state_ == SearchState::Ready);
 
-		board_ = board;
-	}
+		state_          = SearchState::Searching;
+		current_search_ = search;
+		start_time_     = std::chrono::steady_clock::now();
 
-	void Searcher::Start()
-	{
-		assert(state_ == SearchState::Ready);
+		Attach(&current_search_->time_manager());
 		
-		start_time_ = std::chrono::steady_clock::now();
-		state_ = SearchState::Searching;
-
-		// TODO : We should make sure Searcher objects are not reausable. This would then become obsolete.
 		// TODO : Can we make the search thread permanant? It would wait for work.
 		if (search_thread_.joinable())
 		{
 			search_thread_.join();
 		}
 
-		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(board_, time_manager_);
+		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(search->board(), search->time_manager()); // TODO : We should pass the search object to ITerativeDeepening
 		ptr_iterative_deepening_->Attach(this);
 		search_thread_ = std::thread(&Searcher::RunSearchThread, this);
 	}
@@ -74,6 +64,8 @@ namespace m8 { namespace search
 			{
 				was_searching = true;
 				state_ = SearchState::Stopped;
+				Detatch(&current_search_->time_manager());
+				current_search_.reset();
 			}
 		}
 		return was_searching;

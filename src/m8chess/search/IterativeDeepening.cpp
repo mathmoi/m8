@@ -8,9 +8,9 @@
 namespace m8::search {
 
     IterativeDeepening::IterativeDeepening(const Board& board,
-                                           std::shared_ptr<time::TimeManager> time_manager)
+                                          time::TimeManager& time_manager)
         : alpha_beta_(board,
-                      *time_manager),
+                      time_manager),
           time_manager_(time_manager)
     {
         alpha_beta_.Attach(this);
@@ -26,7 +26,7 @@ namespace m8::search {
         DepthType current_depth = 1;
         while(current_depth <= kMinimumSearchDepth ||
                   (current_depth <= depth &&
-                 time_manager_->can_start_new_iteration()))
+                 time_manager_.can_start_new_iteration()))
         {
             NotifyIterationStarted();
             result = alpha_beta_.Search(current_depth);

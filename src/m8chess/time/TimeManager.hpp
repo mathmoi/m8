@@ -35,7 +35,7 @@ namespace m8::time
         /// 
         /// @param time_control Time control to use
         /// @param clock        Clock used to keep the engine's time
-        static std::shared_ptr<TimeManager> CreateTimeManager(const TimeControl& time_control,
+        static std::unique_ptr<TimeManager> CreateTimeManager(const TimeControl& time_control,
                                                               ChessClock& clock);
 
         /// Initialise the time manager for a search. This should be called before the

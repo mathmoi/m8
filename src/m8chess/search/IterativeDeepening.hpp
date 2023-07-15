@@ -20,7 +20,7 @@ namespace m8::search {
 	public:
 		/// Constructor.
 		IterativeDeepening(const Board& board,
-		                   std::shared_ptr<time::TimeManager> time_manager);
+		                   time::TimeManager& time_manager);
 
 		// TODO : Remove depth from the Search method and replace by proper time management
 		/// Start a search on a given position.
@@ -35,8 +35,8 @@ namespace m8::search {
 	private:
 		const DepthType kMinimumSearchDepth = 3;
 
-		AlphaBeta                          alpha_beta_;
-		std::shared_ptr<time::TimeManager> time_manager_;
+		AlphaBeta          alpha_beta_;
+		time::TimeManager& time_manager_;
 	};
 }
 

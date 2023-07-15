@@ -21,11 +21,13 @@ namespace m8::engine
 	SearchState::SearchState(Engine* engine)
 		: EngineState(engine)
 	{
-		engine->search_ = std::make_unique<search::Searcher>(engine->board_,
-		                                                   time::TimeManager::CreateTimeManager(*(engine->time_control_),
-														                                        *(engine->clock_)));
 		engine->searching_ = true;
-		engine->search_->Attach(this);
+		engine->searcher_.Attach(this);
+	}
+
+	SearchState::~SearchState()
+	{
+		engine_->searcher_.Detatch(this);
 	}
 
 	void SearchState::BeginState()
@@ -36,7 +38,9 @@ namespace m8::engine
 
 		engine_->NotifySearchStarted();
 
-		engine_->search_->Start();
+		auto time_manager = time::TimeManager::CreateTimeManager(*(engine_->time_control_), *(engine_->clock_));
+		search_= std::make_shared<search::Search>(engine_->board_, std::move(time_manager));
+		engine_->searcher_.Start(search_);
 	}
 
 	void SearchState::OnSearchCompleted(const search::PV& pv, double time, const search::SearchStats& stats)
@@ -50,13 +54,10 @@ namespace m8::engine
 				was_searching = true;
 
 				auto pv_str = RenderPVMoves(pv);
-
 				engine_->board_.Make(pv.first());
 
 				engine_->NotifySearchCompleted(pv_str, time, stats);
-
 				engine_->clock_->Stop();
-
 				engine_->searching_ = false;
 			}
 		}
@@ -113,7 +114,7 @@ namespace m8::engine
 
 		if (engine_->searching_)
 		{
-			engine_->search_->Stop();
+			engine_->searcher_.Stop();
 			engine_->searching_ = false;
 		}
 

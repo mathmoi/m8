@@ -5,23 +5,26 @@
 ///         search. The search algorithm itself is contained elswhere, but is access by
 ///         the enigne class trough the search class.
 
-#ifndef M8_SEARCH_HPP_
-#define M8_SEARCH_HPP_
+#ifndef M8_SEARCH_SEARCHER_HPP_
+#define M8_SEARCH_SEARCHER_HPP_
 
-#include <vector>
-#include <thread>
-#include <mutex>
+#include <chrono>
 #include <functional>
 #include <memory>
-#include <chrono>
+#include <mutex>
+#include <thread>
+#include <vector>
+
+#include "../time/TimeManager.hpp"
 
 #include "../Board.hpp"
-#include "../time/TimeManager.hpp"
+
+#include "IterativeDeepening.hpp"
+#include "Search.hpp"
 #include "SearchResult.hpp"
 #include "SearchSubject.hpp"
-#include "IterativeDeepening.hpp"
 
-namespace m8 { namespace search
+namespace m8::search
 {
 	/// States of the search object.
 	enum class SearchState
@@ -37,20 +40,17 @@ namespace m8 { namespace search
     public:
 		
         /// Constructor
-        Searcher(const Board& board,
-			   std::shared_ptr<time::TimeManager> time_manager);
+        Searcher();
 
 		/// Destructor
 		~Searcher();
-
-		/// Update the internal board. This cannnot be called when the search is underway.
-		void set_board(const Board& board);
 
 		/// returns the search state.
 		inline SearchState state() const { return state_; };
 
 		/// Start the search
-		void Start();
+		///
+		void Start(std::shared_ptr<Search> search);
 
 		/// Stop the search
 		void Stop();
@@ -72,10 +72,10 @@ namespace m8 { namespace search
 		std::thread search_thread_;
 		std::mutex mutex_;
         
-		Board board_;
 		SearchState state_;
 		std::unique_ptr<IterativeDeepening> ptr_iterative_deepening_;
-		std::shared_ptr<time::TimeManager> time_manager_; // TODO : Could this pointer be unique? Do we really share the ownership?
+
+		std::shared_ptr<Search> current_search_;
 
 		std::chrono::steady_clock::time_point start_time_;
 
@@ -84,6 +84,6 @@ namespace m8 { namespace search
 		bool StopSearch();
     };
 
-}}
+}
 
-#endif // M8_SEARCH_HPP_
+#endif // M8_SEARCH_SEARCHER_HPP_

@@ -9,7 +9,9 @@
 
 #include <thread>
 
+#include "../../m8chess/search/Search.hpp"
 #include "../../m8chess/search/Searcher.hpp"
+
 #include "../../m8chess/Types.hpp"
 
 #include "EngineState.hpp"
@@ -23,6 +25,9 @@ namespace m8::engine {
 
 		/// Constructor from a previous state
 		SearchState(Engine* engine);
+
+		/// Destructor
+		~SearchState();
 
 		/// Return the name of the state
         inline const std::string state_name() const { return "SearchState"; }
@@ -51,6 +56,7 @@ namespace m8::engine {
 		bool StopSearch();
 
 		std::vector<std::string> RenderPVMoves(const search::PV& pv);
+		std::shared_ptr<search::Search> search_;
 	};
 }
 
