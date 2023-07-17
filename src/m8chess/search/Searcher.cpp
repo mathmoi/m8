@@ -14,7 +14,9 @@
 namespace m8 { namespace search
 {
     Searcher::Searcher()
-	 : state_(SearchState::Ready),
+	 : destroying_(false),
+	   search_thread_(&Searcher::RunSearchThread, this),	   
+	   state_(SearchState::Ready),
 	   iterative_deepening_()
     {
 		iterative_deepening_.Attach(this);
@@ -22,6 +24,12 @@ namespace m8 { namespace search
 
 	Searcher::~Searcher()
 	{
+		{
+			std::lock_guard lock(mutex_);
+			destroying_ = true;
+		}
+		condition_variable_.notify_all();
+
 		if (search_thread_.joinable())
 		{
 			if (search_thread_.get_id() == std::this_thread::get_id())
@@ -41,19 +49,16 @@ namespace m8 { namespace search
 	{
 		assert(state_ == SearchState::Ready);
 
-		state_          = SearchState::Searching;
-		current_search_ = search;
-		start_time_     = std::chrono::steady_clock::now();
-
-		Attach(&current_search_->time_manager());
-		
-		// TODO : Can we make the search thread permanant? It would wait for work.
-		if (search_thread_.joinable())
 		{
-			search_thread_.join();
-		}
+			std::lock_guard lock(mutex_);
 
-		search_thread_ = std::thread(&Searcher::RunSearchThread, this, search);
+			state_          = SearchState::Searching;
+			current_search_ = search;
+			start_time_     = std::chrono::steady_clock::now();
+
+			Attach(&current_search_->time_manager());
+		}
+		condition_variable_.notify_one();
 	}
 
 	bool Searcher::StopSearch()
@@ -80,20 +85,35 @@ namespace m8 { namespace search
 		StopSearch();
 	}
 
-	void Searcher::RunSearchThread(std::shared_ptr<Search> search)
+	void Searcher::RunSearchThread()
  	{
 		M8_LOG_SCOPE_THREAD();
 
-		NotifySearchStarted();
-
-		auto search_result = iterative_deepening_.Start(search);
-
-		bool was_searching = StopSearch();
-		if (was_searching)
+		while(!destroying_)
 		{
-			NotifySearchCompleted(search_result.pv_, GetSearchTime(), search_result.stats_);
+			std::shared_ptr<Search> search_to_run;
+			{
+				std::unique_lock lock(mutex_);
+				condition_variable_.wait(lock, [this]{ return destroying_ || current_search_; });
+
+				if (!destroying_ && current_search_)
+				{
+					search_to_run = current_search_;
+				}
+			}
+
+			if (search_to_run)
+			{
+				NotifySearchStarted();
+				auto search_result = iterative_deepening_.Start(search_to_run);
+				bool was_searching = StopSearch();
+				if (was_searching)
+				{
+					NotifySearchCompleted(search_result.pv_, GetSearchTime(), search_result.stats_);
+				}
+				state_ = SearchState::Ready;
+			}
 		}
-		state_ = SearchState::Ready;
 	}
 
 	double Searcher::GetSearchTime() const
