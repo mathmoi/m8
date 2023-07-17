@@ -159,7 +159,6 @@ namespace m8
         shell_intrf_.AddCmd(ShellCmd("undo",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("time",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("otim",     "", "", std::bind([] {})));
-        shell_intrf_.AddCmd(ShellCmd("level",    "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("computer", "", "", std::bind([] {})));
     }
 
