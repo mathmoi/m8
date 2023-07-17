@@ -11,6 +11,7 @@
 #include "../eval/Eval.hpp"
 #include "../../m8common/logging.hpp"
 
+// TODO : Fix the indentation in this file ans Searcher.hpp
 namespace m8 { namespace search
 {
     Searcher::Searcher()
