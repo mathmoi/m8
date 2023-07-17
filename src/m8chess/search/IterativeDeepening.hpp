@@ -6,12 +6,15 @@
 #ifndef M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_
 #define M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_
 
+#include "../time/TimeManager.hpp"
+
 #include "../Board.hpp"
 #include "../Types.hpp"
-#include "../time/TimeManager.hpp"
+
+#include "AlphaBeta.hpp"
+#include "Search.hpp"
 #include "SearchResult.hpp"
 #include "SearchSubject.hpp"
-#include "AlphaBeta.hpp"
 
 namespace m8::search {
 
@@ -19,24 +22,16 @@ namespace m8::search {
 	{
 	public:
 		/// Constructor.
-		IterativeDeepening(const Board& board,
-		                   time::TimeManager& time_manager);
+		IterativeDeepening();
 
-		// TODO : Remove depth from the Search method and replace by proper time management
 		/// Start a search on a given position.
-		SearchResult Search(DepthType depth);
+		SearchResult Start(std::shared_ptr<Search> search);
 
 		/// Method called when a new best move is found at the root.
 		void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
-		/// Stop the search
-		void Stop();
-
 	private:
 		const DepthType kMinimumSearchDepth = 3;
-
-		AlphaBeta          alpha_beta_;
-		time::TimeManager& time_manager_;
 	};
 }
 

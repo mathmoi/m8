@@ -14,8 +14,11 @@
 namespace m8 { namespace search
 {
     Searcher::Searcher()
-	 : state_(SearchState::Ready)
-    {}
+	 : state_(SearchState::Ready),
+	   iterative_deepening_()
+    {
+		iterative_deepening_.Attach(this);
+	}
 
 	Searcher::~Searcher()
 	{
@@ -30,6 +33,8 @@ namespace m8 { namespace search
 				search_thread_.join();
 			}
 		}
+
+		iterative_deepening_.Detatch(this);
 	}
 
 	void Searcher::Start(std::shared_ptr<Search> search)
@@ -48,9 +53,7 @@ namespace m8 { namespace search
 			search_thread_.join();
 		}
 
-		ptr_iterative_deepening_ = std::make_unique<IterativeDeepening>(search->board(), search->time_manager()); // TODO : We should pass the search object to ITerativeDeepening
-		ptr_iterative_deepening_->Attach(this);
-		search_thread_ = std::thread(&Searcher::RunSearchThread, this);
+		search_thread_ = std::thread(&Searcher::RunSearchThread, this, search);
 	}
 
 	bool Searcher::StopSearch()
@@ -65,6 +68,7 @@ namespace m8 { namespace search
 				was_searching = true;
 				state_ = SearchState::Stopped;
 				Detatch(&current_search_->time_manager());
+				current_search_->Abort();
 				current_search_.reset();
 			}
 		}
@@ -73,26 +77,23 @@ namespace m8 { namespace search
 
 	void Searcher::Stop()
 	{
-		bool was_searching = StopSearch();
-		if (was_searching)
-		{
-			ptr_iterative_deepening_->Stop();
-		}
+		StopSearch();
 	}
 
-	void Searcher::RunSearchThread()
+	void Searcher::RunSearchThread(std::shared_ptr<Search> search)
  	{
 		M8_LOG_SCOPE_THREAD();
 
 		NotifySearchStarted();
 
-		auto search_result = ptr_iterative_deepening_->Search(60); // TODO : Change depth here
+		auto search_result = iterative_deepening_.Start(search);
 
 		bool was_searching = StopSearch();
 		if (was_searching)
 		{
 			NotifySearchCompleted(search_result.pv_, GetSearchTime(), search_result.stats_);
 		}
+		state_ = SearchState::Ready;
 	}
 
 	double Searcher::GetSearchTime() const

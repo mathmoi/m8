@@ -7,17 +7,16 @@
 
 namespace m8::search {
 
-    IterativeDeepening::IterativeDeepening(const Board& board,
-                                          time::TimeManager& time_manager)
-        : alpha_beta_(board,
-                      time_manager),
-          time_manager_(time_manager)
+    IterativeDeepening::IterativeDeepening()
     {
-        alpha_beta_.Attach(this);
+        
     }
 
-    SearchResult IterativeDeepening::Search(DepthType depth)
+    SearchResult IterativeDeepening::Start(std::shared_ptr<Search> search)
     {
+        AlphaBeta alpha_beta(search);
+        alpha_beta.Attach(this);
+
         std::optional<SearchResult> result;
         std::optional<SearchResult> last_result;
 
@@ -25,11 +24,11 @@ namespace m8::search {
 
         DepthType current_depth = 1;
         while(current_depth <= kMinimumSearchDepth ||
-                  (current_depth <= depth &&
-                 time_manager_.can_start_new_iteration()))
+                  (current_depth <= search->max_depth() &&
+                 search->time_manager().can_start_new_iteration()))
         {
             NotifyIterationStarted();
-            result = alpha_beta_.Search(current_depth);
+            result = alpha_beta.Start(current_depth);
             if (result.has_value())
             {
                 NotifyIterationCompleted(result.value().pv_,
@@ -47,11 +46,6 @@ namespace m8::search {
         NotifySearchCompleted(last_result.value().pv_, 0, last_result.value().stats_);
 
         return last_result.value();
-    }
-
-    void IterativeDeepening::Stop()
-    {
-        alpha_beta_.Stop();
     }
 
     void IterativeDeepening::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)

@@ -35,6 +35,9 @@ namespace m8::engine {
 		/// Method that is run when this state becomes the new current state
 		void BeginState();
 
+		/// Method that is run before a state is replaced by a new state
+        void EndState();
+
 		/// Set the engine to play neither color.
 		void Force();
 

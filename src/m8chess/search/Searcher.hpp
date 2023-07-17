@@ -73,14 +73,14 @@ namespace m8::search
 		std::mutex mutex_;
         
 		SearchState state_;
-		std::unique_ptr<IterativeDeepening> ptr_iterative_deepening_;
+		IterativeDeepening iterative_deepening_;
 
 		std::shared_ptr<Search> current_search_;
 
 		std::chrono::steady_clock::time_point start_time_;
 
 		double GetSearchTime() const;
-		void RunSearchThread();
+		void RunSearchThread(std::shared_ptr<Search> search);
 		bool StopSearch();
     };
 

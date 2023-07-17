@@ -9,7 +9,9 @@
 #include <memory>
 
 #include "../time/TimeManager.hpp"
+
 #include "../Board.hpp"
+#include "../Types.hpp"
 
 namespace m8::search
 {
@@ -23,20 +25,34 @@ namespace m8::search
         /// @param time_manager time_manager to use for this search. The class 
         ///                     will take ownership of the time_manager.
         inline Search(const Board& board,
-                      std::unique_ptr<time::TimeManager> time_manager)
+                      std::unique_ptr<time::TimeManager> time_manager,
+                      DepthType max_depth)
         : board_(board),
-          time_manager_(std::move(time_manager))
+          time_manager_(std::move(time_manager)),
+          max_depth_(max_depth),
+          is_aborted_(false)
         {}
 
         /// Returns the board representing the position searched
-        const Board& board() const { return board_; }
+        inline const Board& board() const { return board_; }
 
-        /// Return a reférence to the time manager for the search.
-        time::TimeManager& time_manager() const { return *time_manager_; }
+        /// Returns a reference to the time manager for the search.
+        inline time::TimeManager& time_manager() const { return *time_manager_; }
+
+        /// Returns the maximum depth for the search.
+        inline DepthType max_depth() const { return max_depth_; }
+
+        /// Indicate if the search is aborted
+        inline bool is_aborted() const { return is_aborted_; }
+
+        /// Abort the search
+        inline void Abort() { is_aborted_ = true; }
         
     private:
         Board board_;
-        std::unique_ptr<time::TimeManager> time_manager_;    
+        std::unique_ptr<time::TimeManager> time_manager_;
+        DepthType max_depth_;
+        bool is_aborted_;
     };
 }
 

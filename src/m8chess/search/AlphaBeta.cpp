@@ -7,24 +7,25 @@
 #include <chrono>
 
 #include "../eval/Eval.hpp"
+
 #include "../MoveGen.hpp"
 #include "../Checkmate.hpp"
 
+#include "Search.hpp"
 #include "AlphaBeta.hpp"
 
 namespace m8::search {
 
-	AlphaBeta::AlphaBeta(const Board& board,
-						 const time::TimeManager& time_manager)
-		: board_(board),
+	AlphaBeta::AlphaBeta(std::shared_ptr<Search> search)
+		: board_(search->board()),
 		  continue_(true),
 		  best_move_(kNullMove),
 		  nodes_count_next_time_check_(kNodesBeforeFirstCheck),
-		  time_manager_(time_manager)
+		  search_(search)
 	{}
 
 	template<bool root, bool qsearch>
-	EvalType AlphaBeta::Search(EvalType alpha, EvalType beta, DepthType depth, PV& pv)
+	EvalType AlphaBeta::AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, PV& pv)
 	{
 		PV local_pv;
 
@@ -35,12 +36,12 @@ namespace m8::search {
 		// We check if we need to abort the search because of time constraint
 		if (!qsearch && nodes_count_next_time_check_ <= stats_.nodes)
 		{
-			continue_ = time_manager_.can_continue();
+			continue_ = !search_->is_aborted() && search_->time_manager().can_continue();
 			if (!continue_)
 			{
 				return 0;
 			}
-			nodes_count_next_time_check_ = stats_.nodes + time_manager_.CalculateNodesBeforeNextCheck(stats_.nodes);
+			nodes_count_next_time_check_ = stats_.nodes + search_->time_manager().CalculateNodesBeforeNextCheck(stats_.nodes);
 		}
 
 		// If we are in the qsearch we must evaluate the stand path option.
@@ -64,7 +65,7 @@ namespace m8::search {
 			                 : GenerateAllMoves(board_, moves.data());
 				
 		// Evaluate all moves
-		for (Move* next = first; next < last && continue_; ++next)
+		for (Move* next = first; next < last && continue_; ++next) // TODO : Is the check for continue necessary here? we just checked in the previous loop.
 		{
 			EvalType value;
 
@@ -84,12 +85,12 @@ namespace m8::search {
 				if (!qsearch && depth > 1)
 				{
 					// Recursive call to the search function
-					value = -Search<false, false>(-beta, -alpha, depth - 1, local_pv);
+					value = -AlphaBetaSearch<false, false>(-beta, -alpha, depth - 1, local_pv);
 				}
 				else
 				{
 					// Call to the qsearch
-					value = -Search<false, true>(-beta, -alpha, 0, local_pv);
+					value = -AlphaBetaSearch<false, true>(-beta, -alpha, 0, local_pv);
 				}
 				value = eval::AddDepthToMate(value);
 				board_.Unmake(*next, unmake_info);
@@ -130,13 +131,13 @@ namespace m8::search {
 		return alpha;
 	}
 
-	std::optional<SearchResult> AlphaBeta::Search(DepthType depth)
+	std::optional<SearchResult> AlphaBeta::Start(DepthType depth)
 	{
 		PV pv;
 
 		NotifySearchStarted();
 
-		auto value = Search<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
+		auto value = AlphaBetaSearch<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
 		
 		// If we are aborting the search we need to leave immediately.
 		if (!continue_) // TODO : Find a way to return the nodes_count separately from the pv/value
@@ -150,11 +151,6 @@ namespace m8::search {
 		NotifySearchCompleted(pv, 0, stats_);
 
 		return result;
-	}
-
-	void AlphaBeta::Stop()
-	{
-		continue_ = false;
 	}
 
 }

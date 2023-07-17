@@ -39,8 +39,13 @@ namespace m8::engine
 		engine_->NotifySearchStarted();
 
 		auto time_manager = time::TimeManager::CreateTimeManager(*(engine_->time_control_), *(engine_->clock_));
-		search_= std::make_shared<search::Search>(engine_->board_, std::move(time_manager));
+		search_= std::make_shared<search::Search>(engine_->board_, std::move(time_manager), 60); // TODO : Replace the hardcoded 60 with a value from the SD command 
 		engine_->searcher_.Start(search_);
+	}
+
+	void SearchState::EndState()
+	{
+		engine_->clock_->Stop();
 	}
 
 	void SearchState::OnSearchCompleted(const search::PV& pv, double time, const search::SearchStats& stats)
@@ -57,7 +62,6 @@ namespace m8::engine
 				engine_->board_.Make(pv.first());
 
 				engine_->NotifySearchCompleted(pv_str, time, stats);
-				engine_->clock_->Stop();
 				engine_->searching_ = false;
 			}
 		}
