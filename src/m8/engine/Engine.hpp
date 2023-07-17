@@ -50,7 +50,7 @@ namespace m8::engine
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        void set_fen(std::string fen);
+        void SetBoard(std::string fen);
 
         /// Return engine's chess clock
         inline const time::ChessClock& clock() const { return *clock_; }

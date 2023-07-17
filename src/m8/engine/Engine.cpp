@@ -51,7 +51,7 @@ namespace m8::engine
         return eval::Evaluate(board_);
     }
 
-    void Engine::set_fen(std::string fen) { state_->set_fen(fen); }
+    void Engine::SetBoard(std::string fen) { state_->SetBoard(fen); }
 
     void Engine::SetTimeControl(time::ChessClock::Duration time_per_move) { state_->SetTimeControl(time_per_move); }
 

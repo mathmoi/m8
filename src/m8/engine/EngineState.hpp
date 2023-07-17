@@ -53,7 +53,7 @@ namespace m8::engine
         /// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        virtual inline void set_fen(std::string fen) { throw InvalidEngineCommandException("set_fen"); }
+        virtual inline void SetBoard(std::string fen) { throw InvalidEngineCommandException("SetBoard"); }
 
         /// Run a perft tests.
         ///

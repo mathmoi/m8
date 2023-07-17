@@ -193,7 +193,7 @@ namespace m8
 
             try
             {
-                CallEngineCommand([this, fen]() { engine_.set_fen(fen); }, "fen");
+                CallEngineCommand([this, fen]() { engine_.SetBoard(fen); }, "fen");
             }
             catch (const InvalFenError&)
             {

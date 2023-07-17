@@ -26,7 +26,7 @@ namespace m8::engine {
 		/// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        inline void set_fen(std::string fen) { engine_->board_ = Board(fen, engine_->psqt_); }; // TODO : Rename this to SetBoard to mimic the xboard protocol
+        inline void SetBoard(std::string fen) { engine_->board_ = Board(fen, engine_->psqt_); };
 
 		/// Run a perft tests.
 		///
