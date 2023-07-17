@@ -65,7 +65,7 @@ namespace m8::search {
 			                 : GenerateAllMoves(board_, moves.data());
 				
 		// Evaluate all moves
-		for (Move* next = first; next < last && continue_; ++next) // TODO : Is the check for continue necessary here? we just checked in the previous loop.
+		for (Move* next = first; next < last; ++next)
 		{
 			EvalType value;
 
