@@ -11,7 +11,6 @@
 #include "../m8chess/Init.hpp"
 
 #include "../m8common/logging.hpp"
-#include "../m8common/ThreadPool.hpp"
 
 #include "options/Options.hpp"
 

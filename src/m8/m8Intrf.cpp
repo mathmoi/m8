@@ -156,6 +156,7 @@ namespace m8
         shell_intrf_.AddCmd(ShellCmd("random",   "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("post",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("hard",     "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("easy",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("undo",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("time",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("otim",     "", "", std::bind([] {})));

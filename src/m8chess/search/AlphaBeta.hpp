@@ -12,8 +12,6 @@
 
 #include "../../m8chess/time/TimeManager.hpp"
 
-#include "../../m8common/ThreadPool.hpp"
-
 #include "../Board.hpp"
 #include "../Types.hpp"
 
