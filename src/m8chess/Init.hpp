@@ -1,5 +1,5 @@
 /// @file   Init.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   December 2015
 /// @brief  Contains initialization functionalities.
 

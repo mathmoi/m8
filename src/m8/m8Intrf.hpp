@@ -39,15 +39,15 @@ namespace m8
       void OnSearchCompleted(const std::vector<std::string> &pv, double time, const search::SearchStats& stats);
 
       /// Method called everytime a partial perf result is ready
-		/// 
-		/// @param move  The move for which the result is available 
-		/// @param count The number of nodes
+      /// 
+      /// @param move  The move for which the result is available 
+      /// @param count The number of nodes
       void OnPartialPerftResult(const std::string& move, std::uint64_t count);
 
       /// Method called at the end of the perft test
-		/// 
-		/// @param count The number of nodes
-		/// @param time  The time used to complete the test
+      /// 
+      /// @param count The number of nodes
+      /// @param time  The time used to complete the test
       void OnPerftCompleted(std::uint64_t count, double time);
 
    private:

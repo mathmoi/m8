@@ -1,5 +1,5 @@
 /// @file   Sq_tests.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains tests of the types and functionalities in Sq.hpp.
 

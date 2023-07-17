@@ -1,5 +1,5 @@
 /// @file stringHelpers.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date Novembre 2017
 /// @brief File  containing helper methods to work with strings.
 

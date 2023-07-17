@@ -33,7 +33,7 @@ namespace m8::time
         {}
 
         /// Method called when the search starts.
-		inline void OnSearchStarted()
+        inline void OnSearchStarted()
         {
             auto time_on_clock = clock().time_on_clock();
             target_time_ = time_on_clock / kMovesRemainingsEstimate + time_control_.increment();

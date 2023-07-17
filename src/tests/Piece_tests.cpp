@@ -1,5 +1,5 @@
 /// @file   Piece_tests.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains tests of the types and functionalities in Piece.hpp.
 

@@ -51,31 +51,31 @@ namespace m8::search
 
     protected:
         /// Method called when the search starts.
-		inline void NotifySearchStarted()
+        inline void NotifySearchStarted()
         {
             Notify( [](ISearchObserver<TPV>* observer){ observer->OnSearchStarted(); } );
         }
 
-		/// Method called when a new best move is found at the root.
-		inline void NotifyNewBestMove(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+        /// Method called when a new best move is found at the root.
+        inline void NotifyNewBestMove(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
         {
             Notify( [pv, eval, depth, time, nodes](ISearchObserver<TPV>* observer){ observer->OnNewBestMove(pv, eval, depth, time, nodes); } );
         }
 
         /// Method called when the an iteration is started.
-		inline void NotifyIterationStarted()
+        inline void NotifyIterationStarted()
         {
             Notify( [](ISearchObserver<TPV>* observer){ observer->OnIterationStarted(); } );
         }
 
-		/// Method called when an iteration is completed.
-		inline void NotifyIterationCompleted(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
+        /// Method called when an iteration is completed.
+        inline void NotifyIterationCompleted(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
         {
             Notify( [pv, eval, depth, time, nodes](ISearchObserver<TPV>* observer){ observer->OnIterationCompleted(pv, eval, depth, time, nodes); } );
         }
 
-		/// Method when the search is completed.
-		inline void NotifySearchCompleted(const TPV& pv, double time, const SearchStats& stats)
+        /// Method when the search is completed.
+        inline void NotifySearchCompleted(const TPV& pv, double time, const SearchStats& stats)
         {
             Notify( [pv, time, stats](ISearchObserver<TPV>* observer){ observer->OnSearchCompleted(pv, time, stats); } );
         }

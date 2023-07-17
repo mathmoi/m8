@@ -1,5 +1,5 @@
 /// @file   Attacks.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains methods and array used to generate attacks bitboards.
 

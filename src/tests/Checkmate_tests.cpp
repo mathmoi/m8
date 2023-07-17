@@ -1,5 +1,5 @@
 /// @file   Checkmate_tests.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains tests for the methods located in checkmate.hpp.
 

@@ -1,5 +1,5 @@
 /// @file   ShellIntrf.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   May 2015
 /// @brief  Contains classes that are used to create a shell-like interface.
 
@@ -108,8 +108,8 @@ namespace m8
       /// Display a list of the commands and their descriptions
       void DisplayHelp() const;
 
-	  /// Display the invite
-	  void DisplayInvit() const;
+     /// Display the invite
+     void DisplayInvit() const;
 
    private:
 

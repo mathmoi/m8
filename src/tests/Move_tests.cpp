@@ -1,5 +1,5 @@
 /// @file   Move_tests.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   December 2015
 /// @brief  Contains tests of the types and functionalities in Move.hpp.
 

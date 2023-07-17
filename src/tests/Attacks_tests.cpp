@@ -1,5 +1,5 @@
 /// @file   Attacks_tests.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains tests of the types and functionalities in Attacks.hpp.
 

@@ -26,64 +26,64 @@
 
 namespace m8::search
 {
-	/// States of the search object.
-	enum class SearchState
-	{
-		Ready,
-		Searching,
-		Stopped
-	};
+    /// States of the search object.
+    enum class SearchState
+    {
+        Ready,
+        Searching,
+        Stopped
+    };
 
     /// Manage the seach for the engine.
     class Searcher : public SearchSubject<PV>, public ISearchObserver<PV>
     {
     public:
-		
+        
         /// Constructor
         Searcher();
 
-		/// Destructor
-		~Searcher();
+        /// Destructor
+        ~Searcher();
 
-		/// returns the search state.
-		inline SearchState state() const { return state_; };
+        /// returns the search state.
+        inline SearchState state() const { return state_; };
 
-		/// Start the search
-		///
-		void Start(std::shared_ptr<Search> search);
+        /// Start the search
+        ///
+        void Start(std::shared_ptr<Search> search);
 
-		/// Stop the search
-		void Stop();
+        /// Stop the search
+        void Stop();
 
-		////////////////////////////////////////////////////////////////////////////////// 
-		/// Implementation of ISearchObserver
-		//////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////// 
+        /// Implementation of ISearchObserver
+        //////////////////////////////////////////////////////////////////////////////////
 
-		/// Method called when a new best move is found at the root.
-		inline void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+        /// Method called when a new best move is found at the root.
+        inline void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
-		/// Method called when an iteration is started.
-		inline void OnIterationStarted();
+        /// Method called when an iteration is started.
+        inline void OnIterationStarted();
 
-		/// Method called when an iteration is completed.
-		inline void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+        /// Method called when an iteration is completed.
+        inline void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
     private:
-		bool destroying_; // Indicate if the object is being destroyed (to stop threads).
-		std::thread search_thread_;
-		std::condition_variable condition_variable_;
-		std::mutex mutex_;
-		
-		SearchState state_;
-		IterativeDeepening iterative_deepening_;
+        bool destroying_; // Indicate if the object is being destroyed (to stop threads).
+        std::thread search_thread_;
+        std::condition_variable condition_variable_;
+        std::mutex mutex_;
+        
+        SearchState state_;
+        IterativeDeepening iterative_deepening_;
 
-		std::shared_ptr<Search> current_search_;
+        std::shared_ptr<Search> current_search_;
 
-		std::chrono::steady_clock::time_point start_time_;
+        std::chrono::steady_clock::time_point start_time_;
 
-		double GetSearchTime() const;
-		void RunSearchThread();
-		bool StopSearch();
+        double GetSearchTime() const;
+        void RunSearchThread();
+        bool StopSearch();
     };
 
 }

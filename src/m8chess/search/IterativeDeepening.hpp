@@ -18,21 +18,21 @@
 
 namespace m8::search {
 
-	class IterativeDeepening : public SearchSubject<PV>, public ISearchObserver<PV>
-	{
-	public:
-		/// Constructor.
-		IterativeDeepening();
+    class IterativeDeepening : public SearchSubject<PV>, public ISearchObserver<PV>
+    {
+    public:
+        /// Constructor.
+        IterativeDeepening();
 
-		/// Start a search on a given position.
-		SearchResult Start(std::shared_ptr<Search> search);
+        /// Start a search on a given position.
+        SearchResult Start(std::shared_ptr<Search> search);
 
-		/// Method called when a new best move is found at the root.
-		void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+        /// Method called when a new best move is found at the root.
+        void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
-	private:
-		const DepthType kMinimumSearchDepth = 3;
-	};
+    private:
+        const DepthType kMinimumSearchDepth = 3;
+    };
 }
 
 #endif // M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_

@@ -24,32 +24,32 @@
 #include "SearchSubject.hpp"
 
 namespace m8 {
-	namespace search
-	{
-		/// Manage the seach for the engine.
-		class AlphaBeta : public SearchSubject<PV>
-		{
-		public:
-			/// Constructor.
-			AlphaBeta(std::shared_ptr<Search> search);
+    namespace search
+    {
+        /// Manage the seach for the engine.
+        class AlphaBeta : public SearchSubject<PV>
+        {
+        public:
+            /// Constructor.
+            AlphaBeta(std::shared_ptr<Search> search);
 
-			/// Start a search on a given position.
-			std::optional<SearchResult> Start(DepthType depth);
+            /// Start a search on a given position.
+            std::optional<SearchResult> Start(DepthType depth);
 
-		private:
-			const NodeCounterType kNodesBeforeFirstCheck = 20000;
+        private:
+            const NodeCounterType kNodesBeforeFirstCheck = 20000;
 
-			Board board_;
-			bool continue_;
-			SearchStats stats_;
-			NodeCounterType nodes_count_next_time_check_;
-			std::shared_ptr<Search> search_;
+            Board board_;
+            bool continue_;
+            SearchStats stats_;
+            NodeCounterType nodes_count_next_time_check_;
+            std::shared_ptr<Search> search_;
 
-			template<bool root, bool qsearch>
-			EvalType AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, PV& pv);
-		};
+            template<bool root, bool qsearch>
+            EvalType AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, PV& pv);
+        };
 
-	}
+    }
 }
 
 #endif // M8_ALPHA_BETA_HPP_

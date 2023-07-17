@@ -1,5 +1,5 @@
 /// @file   0x88.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains method related to the 0x88 indexing scheme.
 

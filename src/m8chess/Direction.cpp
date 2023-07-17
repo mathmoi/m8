@@ -1,5 +1,5 @@
 /// @file   Direction.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains types and method about directions on a chess board.
 

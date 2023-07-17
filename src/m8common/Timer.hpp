@@ -1,5 +1,5 @@
 /// @file   Timer.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   January 2018
 /// @brief  Contains a timer class that can be used to measure time intervals.
 

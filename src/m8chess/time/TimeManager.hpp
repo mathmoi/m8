@@ -57,7 +57,7 @@ namespace m8::time
         }
 
         /// Method called when an iteration is completed.
-		inline void OnIterationCompleted(const search::PV& pv,
+        inline void OnIterationCompleted(const search::PV& pv,
                                                 EvalType eval,
                                                 DepthType depth,
                                                 double time,

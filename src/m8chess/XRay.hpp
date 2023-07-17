@@ -1,5 +1,5 @@
 /// @file   XRay.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Janurary 2018
 /// @brief  Contains methods to compute XRay attacks. XRay attacks are attacks by sliders
 ///         "through" a defending play. For exemple, a rook on a1 would xray-attack a king

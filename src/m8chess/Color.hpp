@@ -1,5 +1,5 @@
 /// @file   Color.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains the definition of the Color type.
 

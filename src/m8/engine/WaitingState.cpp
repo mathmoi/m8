@@ -1,7 +1,7 @@
-/// @file	WaitingState.cpp
+/// @file   WaitingState.cpp
 /// @author Mathieu Pagé
-/// @date	January 2020
-/// @brief	Contains the WaitingState class. Controlling the engine behavior when it's 
+/// @date   January 2020
+/// @brief  Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.
 
 #include "../../m8common/logging.hpp"
@@ -29,7 +29,7 @@ namespace m8::engine
     {}
 
     void WaitingState::UserMove(std::string str_move)
-    {	
+    {
         M8_TRACE <<"WaitingState::UserMove(\"" <<str_move <<"\")";
         
         Move move = ParseMove(str_move);
@@ -61,9 +61,9 @@ namespace m8::engine
     void WaitingState::New()
     {
         engine_->board_ = Board(kStartingPositionFEN, engine_->psqt_);
-		engine_->engine_color_ = kBlack;
+        engine_->engine_color_ = kBlack;
         engine_->clock_ = time::ChessClock::CreateChessClock(*engine_->time_control_);
-		engine_->max_depth_ = engine_->kMaxMaxDepth;
+        engine_->max_depth_ = engine_->kMaxMaxDepth;
     }
 
     void WaitingState::Go()

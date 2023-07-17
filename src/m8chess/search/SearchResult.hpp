@@ -14,29 +14,29 @@
 
 namespace m8::search {
 
-	/// Result of a search
-	struct SearchResult
-	{
-	public:
-		/// Default constuctor
-		inline SearchResult()
-			: value_(0)
-		{}
+    /// Result of a search
+    struct SearchResult
+    {
+    public:
+        /// Default constuctor
+        inline SearchResult()
+            : value_(0)
+        {}
 
-		// Constructor.
-		inline SearchResult(const PV& pv,
-			         EvalType value,
-			         const SearchStats& stats)
-			: value_(value),
-			  pv_(pv),
-			  stats_(stats)
-		{}
+        // Constructor.
+        inline SearchResult(const PV& pv,
+                     EvalType value,
+                     const SearchStats& stats)
+            : value_(value),
+              pv_(pv),
+              stats_(stats)
+        {}
 
-		EvalType        value_;
-		PV				pv_;
-		SearchStats		stats_;
+        EvalType    value_;
+        PV          pv_;
+        SearchStats stats_;
 
-	};
+    };
 }
 
 #endif // M8_SEARCH_RESULT_HPP_

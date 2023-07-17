@@ -1,5 +1,5 @@
 /// @file   magic-finder.cpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   December 2015
 /// @brief  Contains the entry point of the magic-finder tool for m8.
 

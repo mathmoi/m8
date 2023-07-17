@@ -30,7 +30,7 @@ namespace m8
 {
     m8Intrf::m8Intrf()
         : engine_(eval::GeneratePieceSqTable()),
-		  xboard_(false),
+          xboard_(false),
           shell_intrf_()
     {
         engine_.Attach(this);
@@ -80,22 +80,22 @@ namespace m8
             "Get or set the value of an option",
             "option {name} [value]",
             std::bind(&m8Intrf::HandleOption, this, std::placeholders::_1)));
-		shell_intrf_.AddCmd(ShellCmd("go",
-			"Force the engine to play the side to move and to start playing",
-			"go",
-			std::bind(&m8Intrf::HandleGo, this)));
+        shell_intrf_.AddCmd(ShellCmd("go",
+            "Force the engine to play the side to move and to start playing",
+            "go",
+            std::bind(&m8Intrf::HandleGo, this)));
         shell_intrf_.AddCmd(ShellCmd("stop",
             "Stops the current operation",
             "stop",
             std::bind(&m8Intrf::HandleStop, this)));
-		shell_intrf_.AddCmd(ShellCmd("xboard",
-			"Enable xboard mode",
-			"xboard",
-			std::bind(&m8Intrf::HandleXboard, this)));
-		shell_intrf_.AddCmd(ShellCmd("new",
-			"Start a new game",
-			"new",
-			std::bind(&m8Intrf::HandleNew, this)));
+        shell_intrf_.AddCmd(ShellCmd("xboard",
+            "Enable xboard mode",
+            "xboard",
+            std::bind(&m8Intrf::HandleXboard, this)));
+        shell_intrf_.AddCmd(ShellCmd("new",
+            "Start a new game",
+            "new",
+            std::bind(&m8Intrf::HandleNew, this)));
         shell_intrf_.AddCmd(ShellCmd("",
             "Handle a move by the user",
             "",
@@ -122,24 +122,24 @@ namespace m8
             std::bind(&m8Intrf::HandleLevel, this, std::placeholders::_1)));
     }
 
-	void m8Intrf::SetupXboardMode()
-	{
-		xboard_ = true;
-		shell_intrf_.set_invit("");
+    void m8Intrf::SetupXboardMode()
+    {
+        xboard_ = true;
+        shell_intrf_.set_invit("");
 
-		shell_intrf_.AddCmd(ShellCmd("protover", 
-			"Indicate to the engine the xboard protocol version",
-			"protover {vesion}",
-			std::bind(&m8Intrf::HandleProtover, this, std::placeholders::_1)));
+        shell_intrf_.AddCmd(ShellCmd("protover", 
+            "Indicate to the engine the xboard protocol version",
+            "protover {vesion}",
+            std::bind(&m8Intrf::HandleProtover, this, std::placeholders::_1)));
 
-		shell_intrf_.AddCmd(ShellCmd("accepted",
-			"Indicate to the engine that a feature was accepted",
-			"accepted {Feature name}",
+        shell_intrf_.AddCmd(ShellCmd("accepted",
+            "Indicate to the engine that a feature was accepted",
+            "accepted {Feature name}",
             std::bind([] {})));
 
         shell_intrf_.AddCmd(ShellCmd("rejected",
-			"Indicate to the engine that a feature was rejected",
-			"rejected {Feature name}",
+            "Indicate to the engine that a feature was rejected",
+            "rejected {Feature name}",
             std::bind(&m8Intrf::HandleRejected, this, std::placeholders::_1)));
 
         shell_intrf_.AddCmd(ShellCmd("ping",
@@ -161,7 +161,7 @@ namespace m8
         shell_intrf_.AddCmd(ShellCmd("otim",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("level",    "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("computer", "", "", std::bind([] {})));
-	}
+    }
 
     void m8Intrf::HandleExit()
     {
@@ -303,17 +303,17 @@ namespace m8
         }
     }
 
-	void m8Intrf::HandleXboard()
-	{
-		SetupXboardMode();
-		std::cout << std::endl;
-	}
+    void m8Intrf::HandleXboard()
+    {
+        SetupXboardMode();
+        std::cout << std::endl;
+    }
 
-	void m8Intrf::HandleProtover(std::vector<std::string> args_list)
-	{
+    void m8Intrf::HandleProtover(std::vector<std::string> args_list)
+    {
         std::lock_guard<std::recursive_mutex> lock(output_mutex_);
         M8_OUT_LINE(<< "feature done=0");
-		M8_OUT_LINE(<< "feature myname=\"m8 0.1\"");
+        M8_OUT_LINE(<< "feature myname=\"m8 0.1\"");
         M8_OUT_LINE(<< "feature sigint=0");
         M8_OUT_LINE(<< "feature sigterm=0");
         M8_OUT_LINE(<< "feature setboard=1");
@@ -321,21 +321,21 @@ namespace m8
         M8_OUT_LINE(<< "feature playother=0");
         M8_OUT_LINE(<< "feature colors=0");
         M8_OUT_LINE(<< "feature san=1");
-		M8_OUT_LINE(<< "feature done=1");
-	}
+        M8_OUT_LINE(<< "feature done=1");
+    }
 
     void m8Intrf::HandleRejected(std::vector<std::string> args_list)
-	{
+    {
         if (args_list[1] == "san")
         {
             options::Options::get().use_san = false;
         }
     }
 
-	void m8Intrf::HandleGo()
-	{
+    void m8Intrf::HandleGo()
+    {
         CallEngineCommand([this]() {engine_.Go(); }, "go");
-	}
+    }
 
     void m8Intrf::HandleForce()
     {
@@ -461,10 +461,10 @@ namespace m8
         CallEngineCommand([this]() {engine_.Stop(); }, "stop");
     }
 
-	void m8Intrf::HandleNew()
-	{
+    void m8Intrf::HandleNew()
+    {
         CallEngineCommand([this]() {engine_.New(); }, "new");
-	}
+    }
 
     void m8Intrf::HandlePing(std::vector<std::string> args_list)
     {
@@ -731,16 +731,16 @@ namespace m8
         }
     }
 
-	void m8Intrf::ClearLine() const
-	{
-		auto width = GetConsoleWidth();
-		std::cout << '\r';
-		for (auto x = 0; x < width; ++x)
-		{
-			std::cout << ' ';
-		}
-		std::cout << '\r';
-	}
+    void m8Intrf::ClearLine() const
+    {
+        auto width = GetConsoleWidth();
+        std::cout << '\r';
+        for (auto x = 0; x < width; ++x)
+        {
+            std::cout << ' ';
+        }
+        std::cout << '\r';
+    }
 
     void m8Intrf::OnSearchStarted()
     {

@@ -1,7 +1,7 @@
-/// @file	Engine.hpp
+/// @file   Engine.hpp
 /// @author Mathieu Pagé
-/// @date	November 2017
-/// @brief	Contains the Engine class that encapsulate all m8 functionalities.
+/// @date   November 2017
+/// @brief  Contains the Engine class that encapsulate all m8 functionalities.
 
 #ifndef M8_ENGINE_ENGINE_HPP_
 #define M8_ENGINE_ENGINE_HPP_
@@ -123,8 +123,8 @@ namespace m8::engine
         // Searching variables
         ////////////////////////////////////////////////////////////////////////////////// 
         search::Searcher searcher_;
-		bool searching_;
-		std::mutex search_mutex_;
+        bool searching_;
+        std::mutex search_mutex_;
 
         /// Change the state of the engine
         void ChangeState(std::unique_ptr<EngineState> new_state);

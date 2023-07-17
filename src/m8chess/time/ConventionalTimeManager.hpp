@@ -34,7 +34,7 @@ namespace m8::time
         {}
 
         /// Method called when the search starts.
-		inline void OnSearchStarted()
+        inline void OnSearchStarted()
         {
             // Calculate a target time to get to the next control
             auto moves_before_control   = dynamic_cast<const ConventionalChessClock&>(clock()).moves_before_control();

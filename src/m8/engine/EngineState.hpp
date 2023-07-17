@@ -1,7 +1,7 @@
-/// @file	EngineState.hpp
+/// @file   EngineState.hpp
 /// @author Mathieu Pagé
-/// @date	Decembre 2019
-/// @brief	Contains the EngineState class. This is an abstract class that represent the
+/// @date   Decembre 2019
+/// @brief  Contains the EngineState class. This is an abstract class that represent the
 ///         state of the engine at a given time.
 
 #ifndef M8_ENGINE_ENGINE_STATE_HPP_
@@ -15,7 +15,7 @@
 #include "../../m8/engine/IPerftObserver.hpp"
 
 #include "../../m8chess/Perft.hpp"
-#include "../../m8chess/Color.hpp"	
+#include "../../m8chess/Color.hpp"
 #include "../../m8chess/Board.hpp"
 #include "../../m8chess/search/SearchSubject.hpp"
 

@@ -1,5 +1,5 @@
 /// @file   Sq.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains the definition of types and utilities used to manipulates 
 ///         chess board coordinates.

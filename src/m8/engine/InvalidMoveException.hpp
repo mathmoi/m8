@@ -1,5 +1,5 @@
 /// @file   InvalidMoveException.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   January 2020
 /// @brief  Contains an exception classe used to indicate that an invalid move was tried.
 

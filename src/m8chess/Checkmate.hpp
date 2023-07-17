@@ -10,7 +10,7 @@
 
 namespace m8
 {   
-	/// Verify if a given color is in check.
+    /// Verify if a given color is in check.
     ///
     /// @param color Color of the side to for which to verify if the king is in check.
     inline bool IsInCheck(Color color, const Board& board)
@@ -23,12 +23,12 @@ namespace m8
         return (attackers & opponent_pieces) != kEmptyBb;
     }
 
-	/// Verify if the king that is not on move is check, which would be an invalid 
-	/// position.
-	inline bool IsInvalidCheckPosition(const Board& board)
-	{
-		return IsInCheck(OpposColor(board.side_to_move()), board);
-	}
+    /// Verify if the king that is not on move is check, which would be an invalid 
+    /// position.
+    inline bool IsInvalidCheckPosition(const Board& board)
+    {
+        return IsInCheck(OpposColor(board.side_to_move()), board);
+    }
 
     /// This method check if the side to move is mat. For performance reasons no 
     /// verification is made to make sure that the king is currently attacked (in check)

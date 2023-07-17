@@ -9,30 +9,30 @@
 #include <cstdint>
 
 #if defined(_MSC_VER)
-#	include <Windows.h>
+#include <Windows.h>
 #elif defined(__GNUC__)
-#	include <sys/ioctl.h>
-#	include <unistd.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 #endif
 
 namespace m8 {
 
-	inline std::int16_t GetConsoleWidth()
-	{
-		int columns;
+    inline std::int16_t GetConsoleWidth()
+    {
+        int columns;
 
 #if defined(_MSC_VER)
-		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		
-		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-		columns = csbi.srWindow.Right - csbi.srWindow.Left;
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        columns = csbi.srWindow.Right - csbi.srWindow.Left;
 #elif defined(__GNUC__)
-		struct winsize size;
-		ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
-		columns = size.ws_col;
+        struct winsize size;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+        columns = size.ws_col;
 #endif
-		return columns;
-	}
+        return columns;
+    }
 }
 
 #endif // M8_CONSOLE_HPP_

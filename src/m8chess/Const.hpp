@@ -1,5 +1,5 @@
 /// @file   Const.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains constants variables, globales variables that acts like 
 ///         constants after their initialisations and functions that compute and

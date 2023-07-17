@@ -1,5 +1,5 @@
 /// @file   PieceSqTable.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   Feburary 2015
 /// @brief  Contains functionalities about the piece-square table evaluation features.
 

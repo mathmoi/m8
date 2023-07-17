@@ -247,8 +247,8 @@ namespace m8
         /// Value of the material on the board.
         int material_value_;
 
-		/// Initialize the board with no pieces.
-		void Clear();
+        /// Initialize the board with no pieces.
+        void Clear();
 
         /// Move a piece on the board.
         ///

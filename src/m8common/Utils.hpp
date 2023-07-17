@@ -1,5 +1,5 @@
 /// @file   Utils.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   April 2015
 /// @brief  Contains generic tools used in m8.
 
