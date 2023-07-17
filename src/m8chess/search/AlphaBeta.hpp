@@ -33,7 +33,6 @@ namespace m8 {
 			/// Constructor.
 			AlphaBeta(std::shared_ptr<Search> search);
 
-			// TODO : Remove depth from the Search method and replace by proper time management
 			/// Start a search on a given position.
 			std::optional<SearchResult> Start(DepthType depth);
 
@@ -42,7 +41,6 @@ namespace m8 {
 
 			Board board_;
 			bool continue_;
-			Move best_move_; // TODO : Remove this hack by returning a proper PV.
 			SearchStats stats_;
 			NodeCounterType nodes_count_next_time_check_;
 			std::shared_ptr<Search> search_;

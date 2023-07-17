@@ -19,7 +19,6 @@ namespace m8::search {
 	AlphaBeta::AlphaBeta(std::shared_ptr<Search> search)
 		: board_(search->board()),
 		  continue_(true),
-		  best_move_(kNullMove),
 		  nodes_count_next_time_check_(kNodesBeforeFirstCheck),
 		  search_(search)
 	{}
@@ -119,9 +118,8 @@ namespace m8::search {
 					}
 
 					// If it is a new best move we notify the user.
-					if (root && *next != best_move_)
+					if (root)
 					{
-						best_move_ = *next;
 						NotifyNewBestMove(pv, alpha, depth, 0, stats_.nodes);
 					}
 				}
@@ -140,7 +138,7 @@ namespace m8::search {
 		auto value = AlphaBetaSearch<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
 		
 		// If we are aborting the search we need to leave immediately.
-		if (!continue_) // TODO : Find a way to return the nodes_count separately from the pv/value
+		if (!continue_)
 		{
 			// TODO : If we make sure that we always search the previous best move first, we could still use the result of a partial search.
 			return std::nullopt;

@@ -13,7 +13,7 @@ namespace m8
 	/// Verify if a given color is in check.
     ///
     /// @param color Color of the side to for which to verify if the king is in check.
-    inline bool IsInCheck(Color color, const Board& board) // TODO Maybe we could do a Position Class that would use a Board to compute things like attacks, IsCheck, etc.
+    inline bool IsInCheck(Color color, const Board& board)
     {
         Piece king = NewPiece(kKing, color);
         Bb bb_king = board.bb_piece(king);
