@@ -34,14 +34,13 @@ namespace m8::eval
 		{
 			return value - 1;
 		}
-		else if (value < -kEvalMat + kMaxMat)
+
+		if (value < -kEvalMat + kMaxMat)
 		{
 			return value + 1;
 		}
-		else // TODO : If we do this first (most common case) it might be a bit faster. Or maybe not. Test it.
-		{
-			return value;
-		}
+		
+		return value;
 	}
 
 	inline double GetEvaluationInPawns(EvalType value)
