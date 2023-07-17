@@ -83,6 +83,7 @@ namespace m8
       void HandlePing(std::vector<std::string> args_list);
       void HandleSt(std::vector<std::string> args_list);
       void HandleLevel(std::vector<std::string> args_list);
+      void HandleSd(std::vector<std::string> args_list);
 
       void DisplayOption(const options::ModifiableOption &option) const;
       void DisplayOption(const std::string &option_name) const;

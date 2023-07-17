@@ -1,5 +1,5 @@
 /// @file   ThreadPool.hpp
-/// @author Mathieu Pagé
+/// @author Mathieu Pagï¿½
 /// @date   March 2018
 /// @brief  Contains the definition of the ThreadPool class.
 
@@ -14,6 +14,7 @@
 #include <condition_variable>
 
 namespace m8 {
+    // TODO : Is the ThreadPool class usefull?
 
     /// Implement a simple thread pool.
     class ThreadPool

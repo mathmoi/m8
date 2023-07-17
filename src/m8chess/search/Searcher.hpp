@@ -69,7 +69,7 @@ namespace m8::search
 		inline void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
     private:
-		std::thread search_thread_;
+		std::thread search_thread_; // TODO : Make the search thread permanant.
 		std::mutex mutex_;
         
 		SearchState state_;

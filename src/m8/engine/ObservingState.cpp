@@ -53,8 +53,10 @@ namespace m8::engine {
 
 	void ObservingState::New()
 	{
-		engine_->set_fen(kStartingPositionFEN);
+		engine_->board_ = Board(kStartingPositionFEN, engine_->psqt_);
 		engine_->engine_color_ = kBlack;
+        engine_->clock_ = time::ChessClock::CreateChessClock(*engine_->time_control_);
+		engine_->max_depth_ = engine_->kMaxMaxDepth;
 
 		auto waiting_state = std::make_unique<WaitingState>(engine_);
 		engine_->ChangeState(std::move(waiting_state));
@@ -84,5 +86,10 @@ namespace m8::engine {
 	{
 		engine_->time_control_ = std::make_unique<time::IncrementalTimeControl>(base, increment);
 		engine_->clock_ = std::make_unique<time::IncrementalChessClock>(static_cast<time::IncrementalTimeControl&>(*engine_->time_control_));
+	}
+
+    void ObservingState::SetDepth(DepthType depth)
+	{
+		engine_->max_depth_ = depth;
 	}
 }

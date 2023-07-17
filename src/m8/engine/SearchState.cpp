@@ -39,7 +39,7 @@ namespace m8::engine
 		engine_->NotifySearchStarted();
 
 		auto time_manager = time::TimeManager::CreateTimeManager(*(engine_->time_control_), *(engine_->clock_));
-		search_= std::make_shared<search::Search>(engine_->board_, std::move(time_manager), 60); // TODO : Replace the hardcoded 60 with a value from the SD command 
+		search_= std::make_shared<search::Search>(engine_->board_, std::move(time_manager), engine_->max_depth_);
 		engine_->searcher_.Start(search_);
 	}
 

@@ -92,6 +92,9 @@ namespace m8::engine
         /// @param increment Incremental time added after each move
         virtual inline void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment) { throw InvalidEngineCommandException("SetTimeControl"); }
 
+        /// Set the maximum depth the engine should search.
+        virtual void SetDepth(DepthType depth) { throw InvalidEngineCommandException("SetDepth"); }
+
     protected:
         Engine* engine_;
     };

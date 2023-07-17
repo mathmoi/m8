@@ -112,6 +112,10 @@ namespace m8
             "Set the exact number of seconds to use for each move",
             "st {seconds}",
             std::bind(&m8Intrf::HandleSt, this, std::placeholders::_1)));
+        shell_intrf_.AddCmd(ShellCmd("sd",
+            "Set the maximum depth the engine should search",
+            "sd {depth}",
+            std::bind(&m8Intrf::HandleSd, this, std::placeholders::_1)));
         shell_intrf_.AddCmd(ShellCmd("level",
             "Set the time control in conventional or incremental mode",
             "level {moves} {base} {increment}",
@@ -354,6 +358,26 @@ namespace m8
         {
             time::ChessClock::Duration time_per_move = FloatToNanoseconds(seconds.value());
             CallEngineCommand([this, time_per_move]() {engine_.SetTimeControl(time_per_move); }, "st");
+        }
+    }
+
+    void m8Intrf::HandleSd(std::vector<std::string> args_list)
+    {
+        const std::string kUsage("Usage : sd {depth}");
+
+        // Check number of arguments
+        if (args_list.size() != 2)
+        {
+            std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            M8_OUT_LINE(<< kUsage);
+            return;
+        }
+
+        auto depth = ConvertArgument<DepthType>(args_list[1], kUsage);
+
+        if (depth.has_value())
+        {
+            CallEngineCommand([this, depth]() {engine_.SetDepth(depth.value()); }, "sd");
         }
     }
 

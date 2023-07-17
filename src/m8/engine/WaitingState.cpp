@@ -60,8 +60,10 @@ namespace m8::engine
 
     void WaitingState::New()
     {
-        set_fen(kStartingPositionFEN);
-        engine_->engine_color_ = kBlack;
+        engine_->board_ = Board(kStartingPositionFEN, engine_->psqt_);
+		engine_->engine_color_ = kBlack;
+        engine_->clock_ = time::ChessClock::CreateChessClock(*engine_->time_control_);
+		engine_->max_depth_ = engine_->kMaxMaxDepth;
     }
 
     void WaitingState::Go()

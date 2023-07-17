@@ -26,7 +26,7 @@ namespace m8::engine {
 		/// Set the board position using a fen string.
         ///
         /// @param fen XFen string representing the new position.
-        inline void set_fen(std::string fen) { engine_->board_ = Board(fen, engine_->psqt_); };
+        inline void set_fen(std::string fen) { engine_->board_ = Board(fen, engine_->psqt_); }; // TODO : Rename this to SetBoard to mimic the xboard protocol
 
 		/// Run a perft tests.
 		///
@@ -64,6 +64,9 @@ namespace m8::engine {
         /// @param base      Base time
         /// @param increment Incremental time added after each move
         void SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment);
+
+		/// Set the maximum depth the engine should search.
+        void SetDepth(DepthType depth);
 
 	private:
 		Move ParseMove(const std::string& str_move);

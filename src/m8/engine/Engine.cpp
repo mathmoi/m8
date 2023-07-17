@@ -19,6 +19,7 @@ namespace m8::engine
     : psqt_(psqt),
       board_(kStartingPositionFEN, psqt),
       engine_color_(kBlack),
+      max_depth_(kMaxMaxDepth),
       time_control_(std::make_unique<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
       clock_(time::ChessClock::CreateChessClock(*time_control_))
     {
@@ -57,6 +58,8 @@ namespace m8::engine
     void Engine::SetTimeControl(std::uint32_t moves, time::ChessClock::Duration time) { state_->SetTimeControl(moves, time); }
 
     void Engine::SetTimeControl(time::ChessClock::Duration base, time::ChessClock::Duration increment) { state_->SetTimeControl(base, increment); }
+
+    void Engine::SetDepth(DepthType depth) { state_->SetDepth(depth); }
 
     void Engine::Perft(int depth, IPerftObserver* observer) { return state_->Perft(depth, observer); }
 
