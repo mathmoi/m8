@@ -23,9 +23,8 @@ namespace m8::search {
         NotifySearchStarted();
 
         DepthType current_depth = 1;
-        while(current_depth <= kMinimumSearchDepth ||
-                  (current_depth <= search->max_depth() &&
-                 search->time_manager().can_start_new_iteration()))
+        while(current_depth <= search->max_depth() &&
+              search->time_manager().can_start_new_iteration())
         {
             NotifyIterationStarted();
             result = alpha_beta.Start(current_depth);

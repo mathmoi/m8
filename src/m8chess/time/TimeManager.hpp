@@ -80,7 +80,7 @@ namespace m8::time
         virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const = 0;
 
     protected:
-        const DepthType            kMinDepth                 = 5;
+        const DepthType            kMinDepth                 = 3;
         const ChessClock::Duration kSafetyBuffer             = std::chrono::milliseconds( 50);
         const ChessClock::Duration kMinDurationBetweenChecks = std::chrono::milliseconds( 10);
         const ChessClock::Duration kMaxDurationBetweenChecks = std::chrono::milliseconds(400);

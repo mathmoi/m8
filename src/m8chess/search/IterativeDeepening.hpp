@@ -29,9 +29,6 @@ namespace m8::search {
 
         /// Method called when a new best move is found at the root.
         void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
-
-    private:
-        const DepthType kMinimumSearchDepth = 3;
     };
 }
 
