@@ -11,7 +11,7 @@ namespace m8::engine {
 
     void PerftState::BeginState()
     {
-        perft_.RunParallel();
+        perft_.Start();
     }
 
     void PerftState::OnPartialPerftResult(const std::string& move, std::uint64_t count)
