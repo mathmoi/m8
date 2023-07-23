@@ -187,6 +187,7 @@ namespace m8
 
         std::uint64_t RecursivePerft(Board& board, int depth);
         void ContributeAtSharedNode(PerftNode& node, Board& board, int depth);
+        void PerftMoveRecursive(PerftMove& move, Board& board, int depth);
         void ParallelPerft(PerftNode& node,
                            Board& board,
                            int depth,
