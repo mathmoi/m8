@@ -44,13 +44,12 @@ namespace m8
     {
     public:
         /// Constructor
-        /// 
+        ///
         /// @param move Chess move represented by this PerftMove
         PerftMove(Move move)
         : move_(move),
           status_(PerftMoveStatus::New),
-          node_(nullptr),
-          searcher_(0)
+          node_(nullptr)
         {}
 
         /// Returns the status  of the move.
@@ -73,27 +72,6 @@ namespace m8
             return count_;
         }
 
-        /// Return the number of searcher at this node
-        std::int32_t searcher() const
-        {
-            assert(status_ == PerftMoveStatus::Shared);
-            return searcher_;
-        }
-
-        /// Increment the number of searcher at this move
-        inline void AddSearcher()
-        {
-            assert(status_ == PerftMoveStatus::Shared);
-            ++searcher_;
-        }
-
-        /// Decrement the number of searcher at this move
-        inline void RemoveSearcher()
-        {
-            assert(status_ == PerftMoveStatus::Shared);
-            --searcher_;
-        }
-
         /// Change this node to a shared node.
         void MakeShared(std::unique_ptr<PerftNode> node)
         {
@@ -110,7 +88,7 @@ namespace m8
         }
 
         /// Change the status of the node to done.
-        void MakeDone();
+        void CheckSharedDone();
 
         /// Change the status of the node to done.
         void MakeDone(std::uint64_t count)
@@ -125,7 +103,6 @@ namespace m8
         PerftMoveStatus            status_;
         std::unique_ptr<PerftNode> node_;
         std::uint64_t              count_;
-        std::uint32_t              searcher_;
     };
 
     /// Represent a shared node during a perft test
@@ -133,7 +110,7 @@ namespace m8
     {
     public:
         /// Constructor
-        /// 
+        ///
         /// @param board position at the current node
         PerftNode(Board& board);
 
@@ -149,7 +126,7 @@ namespace m8
             return std::ranges::all_of(moves_,
                                        [](const PerftMove& move){ return move.status() == PerftMoveStatus::Done; });
         }
-        
+
         /// Returns the sum of the count of all moves at this node.
         inline std::uint64_t count() const
         {
@@ -159,7 +136,7 @@ namespace m8
             return std::accumulate(counts.begin(), counts.end(), UINT64_C(0));
         }
 
-        
+
     private:
         std::vector<PerftMove> moves_;
 
@@ -181,7 +158,7 @@ namespace m8
 
         /// Destructor.
         ~Perft() { JoinThreads(); };
-        
+
         /// Run the test in prallel.
         void Start();
 
@@ -191,7 +168,7 @@ namespace m8
             abort_ = true;
             // TODO : Join threads?
         }
-        
+
     private:
         const int kMinParallelDepth = 3;
 
@@ -209,8 +186,14 @@ namespace m8
         engine::IPerftObserver* observer_;
 
         std::uint64_t RecursivePerft(Board& board, int depth);
-        void CalculateAtSharedNode(PerftNode& node, Board& board, int depth);
-        void FindNodeToHelp(PerftNode& node, Board& board, int depth, bool is_root);
+        void ContributeAtSharedNode(PerftNode& node, Board& board, int depth);
+        void ParallelPerft(PerftNode& node,
+                           Board& board,
+                           int depth,
+                           PerftMoveStatus node_type,
+                           bool is_root,
+                           std::function<void(PerftMove&, Board&, int)> recurse);
+        void FindNodeToContribute(PerftNode& node, Board& board, int depth, bool is_root);
         void StartThreads();
         void JoinThreads();
         void RunThread();

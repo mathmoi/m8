@@ -195,7 +195,7 @@ TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SingleCaptureRetur
 
     next_move = GenerateKingMoves(board, kWhite, true, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -212,7 +212,7 @@ TEST_CASE("GeneratePawnMoves_NoPawnsOfTheRequestedColor_NoMoves")
 
     next_move = GeneratePawnMoves(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -233,7 +233,7 @@ TEST_CASE("GeneratePawnMoves_TwoPawnsThatCanMoveForward_TwoMoves")
 
     next_move = GeneratePawnMoves(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -250,7 +250,7 @@ TEST_CASE("GeneratePawnMoves_BlockedPawn_NoMoves")
 
     next_move = GeneratePawnMoves(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
 }
 
 TEST_CASE("GeneratePawnMoves_PawnOnStartingRow_TwoMoves")
@@ -267,7 +267,7 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRow_TwoMoves")
 
     next_move = GeneratePawnMoves(board, kBlack, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -287,7 +287,7 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRowDoubleMoveBlocked_OneMoves")
 
     next_move = GeneratePawnMoves(board, kBlack, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -304,7 +304,7 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRowBlocked_NoMoves")
 
     next_move = GeneratePawnMoves(board, kBlack, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -335,7 +335,7 @@ TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnLeft_OneMovesReturned")
 
     next_move = GeneratePawnCaptures(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -355,7 +355,7 @@ TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnRight_OneMovesReturned")
 
     next_move = GeneratePawnCaptures(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -378,7 +378,7 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToPromote_FourMovesReturned")
 
     next_move = GeneratePawnCaptures(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -401,7 +401,7 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
 
     next_move = GeneratePawnCaptures(board, kWhite, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -443,7 +443,7 @@ TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_r
 
     next_move = GenerateRookMoves(board, kBlack, false, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -464,7 +464,7 @@ TEST_CASE("GenerateRookMoves__called_for_captures__return_all_captures_rook_move
 
     next_move = GenerateRookMoves(board, kBlack, true, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -490,7 +490,7 @@ TEST_CASE("GenerateBishopMoves__called_for_non_captures__return_all_non_captures
 
     next_move = GenerateBishopMoves(board, kBlack, false, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -523,7 +523,7 @@ TEST_CASE("GenerateBishopMoves__called_for_captures__return_all_captures_bishop_
 
     next_move = GenerateBishopMoves(board, kBlack, true, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -549,7 +549,7 @@ TEST_CASE("GenerateQueenMoves__called_for_non_captures__return_all_non_captures_
 
     next_move = GenerateQueenMoves(board, kWhite, false, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -570,7 +570,7 @@ TEST_CASE("GenerateQueenMoves__called_for_captures__return_all_captures_queen_mo
 
     next_move = GenerateQueenMoves(board, kWhite, true, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));
@@ -622,7 +622,7 @@ TEST_CASE("GenerateCastlingMoves__chess960_position__correct_moves_including_cas
 
     next_move = GenerateKingMoves(board, kWhite, false, next_move);
 
-    REQUIRE((next_move - moves.data()) == expected_moves.size());
+    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
     for (auto expected : expected_moves)
     {
         REQUIRE(Contains(moves.data(), next_move, expected));

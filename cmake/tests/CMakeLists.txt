@@ -33,4 +33,4 @@ ucm_add_target(NAME m8_tests
 target_link_libraries(m8_tests ${Boost_LIBRARIES} ${Boost_LIBRARIES}
                                ${CMAKE_THREAD_LIBS_INIT})
 
-set_property(TARGET m8_tests PROPERTY CXX_STANDARD 17)
+set_property(TARGET m8_tests PROPERTY CXX_STANDARD 20)

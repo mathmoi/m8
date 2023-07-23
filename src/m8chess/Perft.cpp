@@ -18,13 +18,15 @@
 
 namespace m8
 {
-    void PerftMove::MakeDone()
+    void PerftMove::CheckSharedDone()
     {
         assert(status_ == PerftMoveStatus::Shared);
-        assert(searcher_ == 0);
-        count_ = node_->count();
-        node_.reset();
-        status_ = PerftMoveStatus::Done;
+        if (node_->done())
+        {
+            count_ = node_->count();
+            node_.reset();
+            status_ = PerftMoveStatus::Done;
+        }
     }
 
     PerftNode::PerftNode(Board& board)
@@ -88,37 +90,15 @@ namespace m8
         return count;
     }
 
-    void Perft::CalculateAtSharedNode(PerftNode& node, Board& board, int depth)
+    void Perft::ParallelPerft(PerftNode& node,
+                              Board& board,
+                              int depth,
+                              PerftMoveStatus node_type,
+                              bool is_root,
+                              std::function<void(PerftMove&, Board&, int)> recurse)
     {
-        // Find a new move that we can start to search on our own
-        auto new_moves = node | std::views::filter([](const PerftMove& move){ return move.status() == PerftMoveStatus::New; });
-        for (auto& perft_move : new_moves)
-        {
-            perft_move.MakeSearching();
-
-            UnmakeInfo unmake_info = board.Make(perft_move.move());
-
-            if (!IsInCheck(OpposColor(board.side_to_move()), board))
-            {
-                mutex_.unlock();
-                auto count = RecursivePerft(board, depth - 1);
-                mutex_.lock();
-                
-                perft_move.MakeDone(count);
-            }
-            else
-            {
-                perft_move.MakeDone(0);
-            }
-
-            board.Unmake(perft_move.move(), unmake_info);
-        }
-    }
-
-    void Perft::FindNodeToHelp(PerftNode& node, Board& board, int depth, bool is_root = false)
-    {
-        auto new_moves = node | std::views::filter([](const PerftMove& move){ return move.status() == PerftMoveStatus::New; });
-        for (auto& perft_move : new_moves)
+        auto moves = node | std::views::filter([node_type](const PerftMove& move){ return move.status() == node_type; });
+        for (auto& perft_move : moves)
         {
             UnmakeInfo unmake_info = board.Make(perft_move.move());
 
@@ -130,16 +110,7 @@ namespace m8
                 }
                 else if (kMinParallelDepth < depth)
                 {
-                    perft_move.MakeShared(std::make_unique<PerftNode>(board));
-                    perft_move.AddSearcher();
-                    CalculateAtSharedNode(perft_move.node(), board, depth - 1);
-                    perft_move.RemoveSearcher();
-
-                    // If the node we just calculate at is done we make the move done.
-                    if (perft_move.node().done())
-                    {
-                        perft_move.MakeDone();
-                    }
+                    recurse(perft_move, board, depth - 1);
                 }
                 else
                 {
@@ -165,30 +136,40 @@ namespace m8
                 observer_->OnPartialPerftResult(san_move, perft_move.count());
             }
         }
+    }
 
-        auto shared_moves = node | std::views::filter([](const PerftMove& move){ return move.status() == PerftMoveStatus::Shared; });
-        for (auto& perft_move : shared_moves)
-        {
-            UnmakeInfo unmake_info = board.Make(perft_move.move());
-
-            perft_move.AddSearcher();
-            FindNodeToHelp(perft_move.node(), board, depth - 1);
-            perft_move.RemoveSearcher();
-
-            board.Unmake(perft_move.move(), unmake_info);
-
-            // If the node we just calculate at is done we make the move done.
-            if (perft_move.node().done())
+    void Perft::ContributeAtSharedNode(PerftNode& node, Board& board, int depth)
+    {
+        ParallelPerft(node, board, depth, PerftMoveStatus::New, false,
+            [this](PerftMove& move, Board& board, int depth)
             {
-                perft_move.MakeDone();
+                move.MakeSearching();
+                mutex_.unlock();
+                auto count = RecursivePerft(board, depth);
+                mutex_.lock();
+                move.MakeDone(count);
+            });
+    }
 
-                if (is_root)
-                {
-                    auto san_move = RenderSAN(perft_move.move(), board_);
-                    observer_->OnPartialPerftResult(san_move, perft_move.count());
-                }
-            }
-        }
+    void Perft::FindNodeToContribute(PerftNode& node, Board& board, int depth, bool is_root = false)
+    {
+        // At the current node we first look for a New child that we can transform in a 
+        // Shared child and start work on it.
+        ParallelPerft(node, board, depth, PerftMoveStatus::New, is_root,
+            [this](PerftMove& move, Board& board, int depth)
+            {
+                move.MakeShared(std::make_unique<PerftNode>(board));
+                ContributeAtSharedNode(move.node(), board, depth);
+                move.CheckSharedDone();
+            });
+
+        // When there is no more New children, we look for a shared child to contribute to
+        ParallelPerft(node, board, depth, PerftMoveStatus::Shared, is_root,
+            [this](PerftMove& move, Board& board, int depth)
+            {
+                FindNodeToContribute(move.node(), board, depth);
+                move.CheckSharedDone();
+            });
     }
 
     void Perft::SendResult()
@@ -203,12 +184,15 @@ namespace m8
     {
         mutex_.lock();
 
-        Board board = board_;
-        FindNodeToHelp(root_, board, depth_, true);
-
-        if (root_.done())
+        if (!root_.done())
         {
-            SendResult();
+            Board board = board_;
+            FindNodeToContribute(root_, board, depth_, true);
+
+            if (root_.done())
+            {
+                SendResult();
+            }
         }
 
         mutex_.unlock();
