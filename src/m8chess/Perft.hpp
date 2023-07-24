@@ -166,7 +166,7 @@ namespace m8
         inline void Abort()
         {
             abort_ = true;
-            // TODO : Join threads?
+            JoinThreads();
         }
 
     private:

@@ -3,9 +3,6 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
 
-// REMOVE
-#include <iostream>
-
 #include <algorithm>
 
 #include "../m8/options/Options.hpp"
