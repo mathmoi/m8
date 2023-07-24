@@ -3,24 +3,29 @@
 /// @date   May 2015
 /// @brief  Contains the class m8Intrf that implements m8's shell like interface.
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 
-#include "m8Intrf.hpp"
-#include "options/Options.hpp"
-#include "engine/InvalidMoveException.hpp"
-#include "engine/InvalidEngineCommandException.hpp"
 #include "../m8chess/SAN.hpp"
-#include "../m8common/stringHelpers.hpp"
+
 #include "../m8common/chronoHelpers.hpp"
-#include "../m8common/Utils.hpp"
-#include "../m8common/logging.hpp"
 #include "../m8common/console.hpp"
+#include "../m8common/logging.hpp"
+#include "../m8common/stringHelpers.hpp"
+#include "../m8common/Utils.hpp"
+
+#include "engine/InvalidEngineCommandException.hpp"
+#include "engine/InvalidMoveException.hpp"
+
+#include "options/Options.hpp"
+
+#include "m8Intrf.hpp"
+#include "version.hpp"
 
 // This macro can be used in the m8Intrf class to output both to std::cout and to the log system.
 #define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
@@ -39,6 +44,10 @@ namespace m8
 
     void m8Intrf::Execute()
     {
+        M8_OUT_LINE(<<"m8 " <<kM8Version);
+        M8_OUT_LINE(<<"Author: Mathieu Pagé <m@mathieupage.com>");
+        M8_OUT_LINE(<<"Url: https://www.mathieupage.com");
+
         shell_intrf_.Execute();
     }
 
