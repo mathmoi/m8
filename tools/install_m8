@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Create a temporary directory
+TEMP_DIR=$(mktemp -d)
+
+# Make sure the temp directory will be removed on exit.
+function finish {
+    rm -rf ${TEMP_DIR}
+}
+trap finish EXIT
+
+# Extract the code
+git clone https://github.com/mathmoi/m8.git ${TEMP_DIR}
+if ! git -C ${TEMP_DIR} checkout $1; then
+    exit 1    
+fi
+
+# Build m8
+BUILD_DIR="${TEMP_DIR}/build"
+mkdir ${BUILD_DIR}
+cmake -B${BUILD_DIR} -S${TEMP_DIR}/cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build ${BUILD_DIR} --parallel 16 --target m8
+
+# Install the engine
+BIN_DIR="${HOME}/bin"
+INSTALL_DIR="${BIN_DIR}/m8-$1"
+if ! mkdir ${INSTALL_DIR}; then
+    exit 2
+fi
+cp ${BUILD_DIR}/m8/m8      ${INSTALL_DIR}
+cp ${BUILD_DIR}/m8/m8.json ${INSTALL_DIR}
+
+# Create a launcher script
+VERSION="$1"
+LAUNCHER="${BIN_DIR}/m8-${VERSION:1}"
+echo "#!/usr/bin/env bash
+(cd ${INSTALL_DIR} && ./m8 \$@)" >> $LAUNCHER
+chmod +x $LAUNCHER
