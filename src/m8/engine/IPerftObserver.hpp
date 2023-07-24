@@ -20,13 +20,13 @@ namespace m8::engine {
         /// 
         /// @param move  The move for which the result is available 
         /// @param count The number of nodes
-        virtual void OnPartialPerftResult(const std::string& move, std::uint64_t count) = 0;
+        virtual void OnPartialPerftResult(const std::string& move, std::uint64_t count) {}
 
         /// Method called at the end of the perft test
         /// 
         /// @param count The number of nodes
         /// @param time  The time used to complete the test
-        virtual void OnPerftCompleted(std::uint64_t count, double time) = 0;
+        virtual void OnPerftCompleted(std::uint64_t count, double time) {}
     };
 }
 
