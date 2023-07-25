@@ -19,7 +19,7 @@
 namespace m8::engine {
 
     /// Class controlling the engine behavior in the thinking state.
-    class SearchState : public EngineState, public search::ISearchObserver<search::PV>
+    class SearchState : public EngineState, public search::ISearchObserver<search::PV, Move>
     {
     public:
 
@@ -43,6 +43,9 @@ namespace m8::engine {
 
         /// Stops the current operation.
         void Stop();
+
+        /// Method called when a new moved is searched at the root.
+        void OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move);
 
         /// Method called when a new best move is found at the root.
         void OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);

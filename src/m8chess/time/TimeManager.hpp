@@ -17,7 +17,7 @@ namespace m8::time
 {
     /// Base class for all time managers. Time manager are responsible for the engine's
     /// time management. They tell it when to stop searching.
-    class TimeManager : public search::ISearchObserver<search::PV>
+    class TimeManager : public search::ISearchObserver<search::PV, Move>
     {
     public:
 

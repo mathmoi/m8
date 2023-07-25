@@ -72,6 +72,12 @@ namespace m8::engine
         }
     }
 
+    void SearchState::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move)
+    {
+        std::string str_move = options::Options::get().use_san ? RenderSAN(move, engine_->board_) : RenderCoordinateNotation(move);
+        engine_->NotifySearchMoveAtRoot(depth, time, move_number, moves_number, nodes, str_move);
+    }
+
     void SearchState::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
         auto pv_str = RenderPVMoves(pv);

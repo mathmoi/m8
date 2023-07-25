@@ -66,7 +66,10 @@ namespace m8::search {
         // Evaluate all moves
         for (Move* next = first; next < last; ++next)
         {
-            EvalType value;
+            if (root)
+            {
+                NotifySearchMoveAtRoot(depth, 0, next - first + 1, last - first, stats_.nodes + stats_.qnodes, *next);
+            }
 
             UnmakeInfo unmake_info = board_.Make(*next);
 
@@ -78,6 +81,8 @@ namespace m8::search {
             }
             else
             {
+                EvalType value;
+
                 // If we are at depth > 1 we need to make a recursive call to the search
                 // function. If we are at depth 1 or in the qsearch we need to make a
                 // recursive call to the qsearch function.
@@ -120,7 +125,7 @@ namespace m8::search {
                     // If it is a new best move we notify the user.
                     if (root)
                     {
-                        NotifyNewBestMove(pv, alpha, depth, 0, stats_.nodes);
+                        NotifyNewBestMove(pv, alpha, depth, 0, stats_.nodes + stats_.qnodes);
                     }
                 }
             }

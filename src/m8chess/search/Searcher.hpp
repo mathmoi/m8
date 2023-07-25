@@ -36,7 +36,7 @@ namespace m8::search
     };
 
     /// Manage the seach for the engine.
-    class Searcher : public SearchSubject<PV>, public ISearchObserver<PV>
+    class Searcher : public SearchSubject<PV, Move>, public ISearchObserver<PV, Move>
     {
     public:
         
@@ -60,14 +60,17 @@ namespace m8::search
         /// Implementation of ISearchObserver
         //////////////////////////////////////////////////////////////////////////////////
 
+        /// Method called when a new moved is searched at the root.
+        void OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move);
+
         /// Method called when a new best move is found at the root.
-        inline void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+        void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
         /// Method called when an iteration is started.
-        inline void OnIterationStarted();
+        void OnIterationStarted();
 
         /// Method called when an iteration is completed.
-        inline void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+        void OnIterationCompleted(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
 
     private:
         bool destroying_; // Indicate if the object is being destroyed (to stop threads).
