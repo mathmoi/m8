@@ -96,7 +96,7 @@ namespace m8
                                             size_t max_width = std::numeric_limits<size_t>::max()) const;
       void DisplaySearchTableHeader() const;
       void DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) const;
-      void DisplaySearchTableFooter() const;
+      void DisplaySearchTableFooter(double time, const search::SearchStats& stats) const;
       void DisplaySearchOutputXboard(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
       std::string FormaterEval(int eval) const;
 

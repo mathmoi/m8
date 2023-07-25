@@ -61,7 +61,7 @@ namespace m8
     /// @param precision Number of decimal digit to use in output.
     inline std::string AddMetricSuffix(std::uint64_t number, int precision)
     {
-        static const std::array<std::string, 7> suffixes = { {"", "k", "M", "G", "T", "P", "E"} };
+        static const std::array<std::string, 7> suffixes = { {"", "K", "M", "G", "T", "P", "E"} };
         auto index = static_cast<std::size_t>((number > 0 ? std::log10(number) / 3 : 0));
 
         std::ostringstream out;

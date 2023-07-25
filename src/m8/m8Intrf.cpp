@@ -5,8 +5,9 @@
 
 #include <chrono>
 #include <cstdint>
-#include <iostream>
+#include <queue>
 #include <string>
+#include <sstream>
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
@@ -679,16 +680,42 @@ namespace m8
         }
     }
     
-    void m8Intrf::DisplaySearchTableFooter() const
+    void m8Intrf::DisplaySearchTableFooter(double time, const search::SearchStats& stats) const
     {
-        auto console_width = std::max<int>(GetConsoleWidth(), 80);
+        auto console_width = std::max<std::uint32_t>(GetConsoleWidth(), 80);
         auto footer_width = console_width - 1;
+        auto footer_content_width = footer_width - 4;
 
+        std::ostringstream oss;
+
+        oss <<"time=" <<std::setprecision(2) <<std::fixed <<time
+            <<" nodes=" <<AddMetricSuffix(stats.nodes, 3)
+            <<" qnodes=" <<AddMetricSuffix(stats.qnodes, 3)
+            <<" nps=" <<AddMetricSuffix((stats.nodes + stats.qnodes) / time, 3);
+
+        std::string stats_str = std::move(oss).str();
+        std::string_view stats_view { stats_str };
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') << std::endl);
+            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-'));
+
+            while (stats_view.size())
+            {
+                auto line = stats_view;
+                if (footer_content_width < line.size())
+                {
+                    auto pos_last_space = stats_view.substr(0, footer_content_width).rfind(' ');
+                    line = line.substr(0, pos_last_space);
+                }
+
+                M8_OUT_LINE(<< " | " <<std::left <<std::setw(footer_content_width) <<line <<std::setw(0) <<" |");
+
+                stats_view.remove_prefix(line.size());
+                stats_view.remove_prefix(std::min(stats_view.find_first_not_of(' '), stats_view.size()));
+            }
+
+            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') <<std::endl);
         }
-        
     }
 
     std::string m8Intrf::FormaterEval(int eval) const
@@ -794,7 +821,7 @@ namespace m8
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
-            DisplaySearchTableFooter();
+            DisplaySearchTableFooter(time, stats);
             M8_OUT_LINE(<< " m8 plays " << *pv.begin());
 
             if (options::Options::get().display_auto)

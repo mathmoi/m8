@@ -22,4 +22,4 @@ ucm_add_target(NAME m8-magic-finder
                TYPE EXECUTABLE
                SOURCES ${sources_files})
 
-set_property(TARGET m8-magic-finder PROPERTY CXX_STANDARD 17)
+set_property(TARGET m8-magic-finder PROPERTY CXX_STANDARD 20)
