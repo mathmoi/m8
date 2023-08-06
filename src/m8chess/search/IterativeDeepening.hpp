@@ -18,7 +18,7 @@
 
 namespace m8::search {
 
-    class IterativeDeepening : public SearchSubject<PV>, public ISearchObserver<PV>
+    class IterativeDeepening : public SearchSubject<PV, Move>, public ISearchObserver<PV, Move>
     {
     public:
         /// Constructor.
@@ -26,6 +26,9 @@ namespace m8::search {
 
         /// Start a search on a given position.
         SearchResult Start(std::shared_ptr<Search> search);
+
+        /// Method called when a new moved is searched at the root.
+        void OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move);
 
         /// Method called when a new best move is found at the root.
         void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);

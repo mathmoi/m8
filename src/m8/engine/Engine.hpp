@@ -30,7 +30,7 @@ namespace m8::engine
     class WaitingState;
 
     /// Encapsulate all m8 functionalities
-    class Engine : public search::SearchSubject<std::vector<std::string>>
+    class Engine : public search::SearchSubject<std::vector<std::string>, std::string>
     {
         // Allows the EngineState class to change the current state of the engine
         friend class EngineState;

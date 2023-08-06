@@ -1,4 +1,6 @@
-﻿build/
+﻿src/m8/version.hpp
+
+build/
 Build/
 *.pgn
 .vscode/

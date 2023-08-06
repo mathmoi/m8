@@ -25,7 +25,7 @@ namespace m8 {
     namespace search
     {
         /// Manage the seach for the engine.
-        class AlphaBeta : public SearchSubject<PV>
+        class AlphaBeta : public SearchSubject<PV, Move>
         {
         public:
             /// Constructor.

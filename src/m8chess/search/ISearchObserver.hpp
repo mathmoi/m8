@@ -14,9 +14,10 @@ namespace m8::search {
     /// Interface for classes that can observe the search
     ///
     /// @tparam TPV Type of move used to communicate with the ISearchObserver. This can be
-    ///         used to provide a strong type PV class like search::Pv or a weakly typed
-    ///         one (a vector of string).
-    template<typename TPV>
+    ///             used to provide a strong type PV class like search::Pv or a weakly 
+    ///             typed one (a vector of string).
+    /// @tparam TMove Similarly the TMove type is the type used to represent a move.
+    template<typename TPV, typename TMove>
     class ISearchObserver
     {
     public:
@@ -28,6 +29,9 @@ namespace m8::search {
 
         /// Method called when an iteration is started.
         inline virtual void OnIterationStarted() {};
+
+        /// Method called when a new moved is searched at the root.
+        inline virtual void OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, TMove move) {};
 
         /// Method called when an iteration is completed.
         inline virtual void OnIterationCompleted(const TPV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) {};

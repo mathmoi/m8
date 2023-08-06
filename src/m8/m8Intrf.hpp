@@ -16,7 +16,7 @@
 namespace m8
 {
    /// Class that implements m8's shell-like interface.
-   class m8Intrf : public search::ISearchObserver<std::vector<std::string>>,
+   class m8Intrf : public search::ISearchObserver<std::vector<std::string>, std::string>,
                    public engine::IPerftObserver
    {
    public:
@@ -28,6 +28,9 @@ namespace m8
 
       /// Method called when the search starts.
       void OnSearchStarted();
+
+      /// Method called when a new moved is searched at the root.
+      void OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, std::string move);
 
       /// Method called when a new best move is found at the root.
       void OnNewBestMove(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
@@ -96,9 +99,10 @@ namespace m8
                                             size_t max_width = std::numeric_limits<size_t>::max()) const;
       void DisplaySearchTableHeader() const;
       void DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) const;
-      void DisplaySearchTableFooter() const;
+      void DisplaySearchTableFooter(double time, const search::SearchStats& stats) const;
       void DisplaySearchOutputXboard(const std::vector<std::string> &pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const;
       std::string FormaterEval(int eval) const;
+      std::string FormatTime(double time) const;
 
       bool CallEngineCommand(std::function<void()> call, const std::string &command);
       template<typename T>

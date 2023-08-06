@@ -3,9 +3,6 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
 
-// REMOVE
-#include <iostream>
-
 #include <algorithm>
 
 #include "../m8/options/Options.hpp"
@@ -90,6 +87,17 @@ namespace m8
         return count;
     }
 
+    void Perft::PerftMoveRecursive(PerftMove& move, Board& board, int depth)
+    {
+        move.MakeSearching();
+
+        mutex_.unlock();
+        auto count = RecursivePerft(board, depth);
+        mutex_.lock();
+
+        move.MakeDone(count);
+    }
+
     void Perft::ParallelPerft(PerftNode& node,
                               Board& board,
                               int depth,
@@ -98,42 +106,41 @@ namespace m8
                               std::function<void(PerftMove&, Board&, int)> recurse)
     {
         auto moves = node | std::views::filter([node_type](const PerftMove& move){ return move.status() == node_type; });
-        for (auto& perft_move : moves)
+        for (auto& move : moves)
         {
-            UnmakeInfo unmake_info = board.Make(perft_move.move());
+            if (abort_)
+            {
+                break;
+            }
+
+            UnmakeInfo unmake_info = board.Make(move.move());
 
             if (!IsInCheck(OpposColor(board.side_to_move()), board))
             {
                 if (depth == 1)
                 {
-                    perft_move.MakeDone(1);
+                    move.MakeDone(1);
                 }
                 else if (kMinParallelDepth < depth)
                 {
-                    recurse(perft_move, board, depth - 1);
+                    recurse(move, board, depth - 1);
                 }
                 else
                 {
-                    perft_move.MakeSearching();
-
-                    mutex_.unlock();
-                    auto count = RecursivePerft(board, depth - 1);
-                    mutex_.lock();
-            
-                    perft_move.MakeDone(count);
+                    PerftMoveRecursive(move, board, depth - 1);
                 }
             }
             else
             {
-                perft_move.MakeDone(0);
+                move.MakeDone(0);
             }
 
-            board.Unmake(perft_move.move(), unmake_info);
+            board.Unmake(move.move(), unmake_info);
 
-            if (is_root && perft_move.status() == PerftMoveStatus::Done)
+            if (is_root && !abort_ && move.status() == PerftMoveStatus::Done)
             {
-                auto san_move = RenderSAN(perft_move.move(), board_);
-                observer_->OnPartialPerftResult(san_move, perft_move.count());
+                auto san_move = RenderSAN(move.move(), board_);
+                observer_->OnPartialPerftResult(san_move, move.count());
             }
         }
     }
@@ -143,11 +150,7 @@ namespace m8
         ParallelPerft(node, board, depth, PerftMoveStatus::New, false,
             [this](PerftMove& move, Board& board, int depth)
             {
-                move.MakeSearching();
-                mutex_.unlock();
-                auto count = RecursivePerft(board, depth);
-                mutex_.lock();
-                move.MakeDone(count);
+                PerftMoveRecursive(move, board, depth);
             });
     }
 
@@ -189,7 +192,7 @@ namespace m8
             Board board = board_;
             FindNodeToContribute(root_, board, depth_, true);
 
-            if (root_.done())
+            if (root_.done() && !abort_)
             {
                 SendResult();
             }

@@ -34,7 +34,7 @@ namespace m8::search {
                                          result.value().value_,
                                          current_depth,
                                          0,
-                                         result.value().stats_.nodes);
+                                         result.value().stats_.nodes + result.value().stats_.qnodes);
 
                 last_result = result;
             }
@@ -45,6 +45,11 @@ namespace m8::search {
         NotifySearchCompleted(last_result.value().pv_, 0, last_result.value().stats_);
 
         return last_result.value();
+    }
+
+    void IterativeDeepening::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move)
+    {
+        NotifySearchMoveAtRoot(depth, time, move_number, moves_number, nodes, move);
     }
 
     void IterativeDeepening::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)

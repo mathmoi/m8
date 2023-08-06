@@ -123,6 +123,11 @@ namespace m8 { namespace search
         return time_span.count();
     }
 
+    void Searcher::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move)
+    {
+        NotifySearchMoveAtRoot(depth, GetSearchTime(), move_number, moves_number, nodes, move);
+    }
+
     void Searcher::OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
         NotifyNewBestMove(pv, eval, depth, GetSearchTime(), nodes);

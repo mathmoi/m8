@@ -36,7 +36,7 @@ namespace m8::options
     struct PerftOptions
     {
         /// Numbers of parallel threads to use for the perft command.
-        std::int32_t threads = 8;
+        std::int32_t threads = 16;
 
         /// Minimum number of work item the perft load is separated in.
         std::int32_t min_works_items = 100;

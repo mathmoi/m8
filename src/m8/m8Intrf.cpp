@@ -3,27 +3,34 @@
 /// @date   May 2015
 /// @brief  Contains the class m8Intrf that implements m8's shell like interface.
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cstdint>
 #include <chrono>
+#include <cstdint>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 
-#include "m8Intrf.hpp"
-#include "options/Options.hpp"
-#include "engine/InvalidMoveException.hpp"
-#include "engine/InvalidEngineCommandException.hpp"
 #include "../m8chess/SAN.hpp"
-#include "../m8common/stringHelpers.hpp"
+
 #include "../m8common/chronoHelpers.hpp"
-#include "../m8common/Utils.hpp"
-#include "../m8common/logging.hpp"
 #include "../m8common/console.hpp"
+#include "../m8common/logging.hpp"
+#include "../m8common/stringHelpers.hpp"
+#include "../m8common/Utils.hpp"
+
+#include "engine/InvalidEngineCommandException.hpp"
+#include "engine/InvalidMoveException.hpp"
+
+#include "options/Options.hpp"
+
+#include "m8Intrf.hpp"
+#include "version.hpp"
 
 // This macro can be used in the m8Intrf class to output both to std::cout and to the log system.
-#define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
+#define M8_OUT_LINE(p)   std::cout p <<std::endl;        M8_OUTPUT p;
+#define M8_OUT(p)        std::cout p; std::cout.flush(); M8_OUTPUT p;
 #define M8_EMPTY_LINE()  std::cout   <<std::endl;
 
 namespace m8
@@ -39,6 +46,10 @@ namespace m8
 
     void m8Intrf::Execute()
     {
+        M8_OUT_LINE(<<"m8 " <<kM8Version);
+        M8_OUT_LINE(<<"Author: Mathieu Pagé <m@mathieupage.com>");
+        M8_OUT_LINE(<<"Url: https://www.mathieupage.com");
+
         shell_intrf_.Execute();
     }
 
@@ -545,7 +556,7 @@ namespace m8
 
     void m8Intrf::DisplaySearchTableHeader() const
     {
-        const std::string fixed_column_names(" | dpth |   time   | score | nodes  |");
+        const std::string fixed_column_names(" | dpth |   time   | score |  nodes  |");
 
         auto console_width = std::max<int>(GetConsoleWidth(), 80);
         auto fixed_columns_width = fixed_column_names.size();
@@ -613,7 +624,7 @@ namespace m8
 
             // Prepare the pv
             auto console_width = std::max<int>(GetConsoleWidth(), 80);
-            auto pv_width = console_width - 40;
+            auto pv_width = console_width - 41;
             auto pv_str = JoinsPVMoves(pv.begin(), pv.end(), pv_width - 2);
 
             // display depth
@@ -631,16 +642,13 @@ namespace m8
             out << " |";
 
             // display the time
-            auto minutes = static_cast<int>(time / 60);
-            auto seconds = time - minutes * 60;
-            out << setw(3) << minutes << ":"
-                << setw(5) << setfill('0') << fixed << setprecision(2) << seconds << setfill(' ') << " |";
+            out << std::setw(9) << FormatTime(time) << " |";
 
             // display evaluation
             out << setw(6) << FormaterEval(eval) << " | ";
 
             // Display nodes count
-            out << setw(6) << AddMetricSuffix(nodes, 1) << " |";
+            out << setw(7) << AddMetricSuffix(nodes, 2) << " |";
 
             // Display pv
             out << ' ' << setw(pv_width) << left << pv_str[0] << " |";
@@ -670,16 +678,42 @@ namespace m8
         }
     }
     
-    void m8Intrf::DisplaySearchTableFooter() const
+    void m8Intrf::DisplaySearchTableFooter(double time, const search::SearchStats& stats) const
     {
-        auto console_width = std::max<int>(GetConsoleWidth(), 80);
+        auto console_width = std::max<std::uint32_t>(GetConsoleWidth(), 80);
         auto footer_width = console_width - 1;
+        auto footer_content_width = footer_width - 4;
 
+        std::ostringstream oss;
+
+        oss <<"time=" <<FormatTime(time)
+            <<" nodes=" <<AddMetricSuffix(stats.nodes, 3)
+            <<" qnodes=" <<AddMetricSuffix(stats.qnodes, 3)
+            <<" nps=" <<AddMetricSuffix((stats.nodes + stats.qnodes) / time, 3);
+
+        std::string stats_str = std::move(oss).str();
+        std::string_view stats_view { stats_str };
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
-            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') << std::endl);
+            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-'));
+
+            while (stats_view.size())
+            {
+                auto line = stats_view;
+                if (footer_content_width < line.size())
+                {
+                    auto pos_last_space = stats_view.substr(0, footer_content_width).rfind(' ');
+                    line = line.substr(0, pos_last_space);
+                }
+
+                M8_OUT_LINE(<< " | " <<std::left <<std::setw(footer_content_width) <<line <<std::setw(0) <<" |");
+
+                stats_view.remove_prefix(line.size());
+                stats_view.remove_prefix(std::min(stats_view.find_first_not_of(' '), stats_view.size()));
+            }
+
+            M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') <<std::endl);
         }
-        
     }
 
     std::string m8Intrf::FormaterEval(int eval) const
@@ -695,6 +729,16 @@ namespace m8
         else
             out << setiosflags(ios::fixed) << setprecision(2) << eval / 100.0f;
 
+        return out.str();
+    }
+
+    std::string m8Intrf::FormatTime(double time) const
+    {
+        std::ostringstream out;
+        auto minutes = static_cast<int>(time / 60);
+        auto seconds = time - minutes * 60;
+        out << minutes << ":"
+            << std::setw(5) << std::setfill('0') << std::fixed << std::setprecision(2) << seconds;
         return out.str();
     }
 
@@ -750,6 +794,46 @@ namespace m8
         }
     }
 
+    void m8Intrf::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, std::string move)
+    {
+        if (xboard_
+            || depth < options::Options::get().min_display_depth
+            || time < 0.25)
+        {
+            return;
+        }
+        
+        std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+        std::ostringstream out;
+
+        ClearLine();
+
+        // Prepare the pv
+        auto console_width = std::max<int>(GetConsoleWidth(), 80);
+        auto pv_width = console_width - 41;
+
+        // display depth
+        out << " |" << std::setw(3) << depth <<"...|";
+
+        // display the time
+        out << std::setw(9) << FormatTime(time) << " |";
+
+        // display the move number instead of the evaluation
+        std::ostringstream oss;
+        oss <<move_number <<'/' <<moves_number;
+        out << std::setw(6) << oss.str() << " | ";
+
+        // Display nodes count
+        out << std::setw(7) << AddMetricSuffix(nodes, 2) << " |";
+
+        // Display the move and nps.
+        oss.str("");
+        oss <<move <<" (" <<AddMetricSuffix(nodes / time, 3) <<"nps)";
+        out << ' ' << std::setw(pv_width) << std::left << oss.str() << " |";
+
+        M8_OUT(<< out.str());
+    }
+
     void m8Intrf::OnNewBestMove(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
         if (xboard_)
@@ -784,8 +868,9 @@ namespace m8
         else
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
+            ClearLine();
 
-            DisplaySearchTableFooter();
+            DisplaySearchTableFooter(time, stats);
             M8_OUT_LINE(<< " m8 plays " << *pv.begin());
 
             if (options::Options::get().display_auto)

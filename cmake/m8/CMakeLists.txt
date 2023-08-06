@@ -41,3 +41,12 @@ target_link_libraries(m8 ${Boost_LIBRARIES}
                          ${CMAKE_THREAD_LIBS_INIT})
 
 set_property(TARGET m8 PROPERTY CXX_STANDARD 20)
+
+find_package(Git)
+add_custom_target(version
+  ${CMAKE_COMMAND} -D SRC=${CMAKE_SOURCE_DIR}/../src/m8/version.hpp.in
+                   -D DST=${CMAKE_BINARY_DIR}/../src/m8/version.hpp
+                   -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                   -P ${CMAKE_SOURCE_DIR}/GenerateVersionHeader.cmake
+  )
+add_dependencies(m8 version)
