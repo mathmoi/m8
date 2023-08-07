@@ -25,10 +25,6 @@ namespace m8::transposition
           mask_(data_.size() - 1),
           generation_(0)
         {
-            auto a = (UINT64_C(1) << GetMsb(std::max(size, kMinSizeTable)));
-            auto b = (UINT64_C(1) << GetMsb(std::max(size, kMinSizeTable))) / sizeof(TranspositionEntry);
-            auto c = data_.size();
-            auto d = data_.size() * 16 / 1024 / 1024;
             assert(16 == sizeof(TranspositionEntry));
             assert(1024 <= size);
         }
