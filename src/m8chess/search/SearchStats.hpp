@@ -44,6 +44,9 @@ namespace m8::search
 
         /// Number of hits that contains a lower bound
         std::uint64_t tt_hits_lower;
+        
+        /// Returns the sum of all nodes.
+        inline NodeCounterType all_nodes() const { return nodes + qnodes; };
     };
 }
 
