@@ -150,6 +150,11 @@ namespace m8::options
         {
             options.use_san = boost::lexical_cast<bool>(temp);
         }
+
+        if (TryReadOption<std::string>(tree, "tt-size", temp))
+        {
+            options.tt_size = boost::lexical_cast<size_t>(temp);
+        }
         
         ReadPerftOptions(tree, options.perft);
         ReadEvalOptions(tree, options.eval);
@@ -164,7 +169,9 @@ namespace m8::options
         desc.add_options()
             ("help", "produce help message")
             ("max-log-severity", po::value<m8::severity_level>(&options.max_log_severity),
-             "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).");
+             "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).")
+            ("tt-size", po::value<size_t>(&options.tt_size),
+             "Transposition table size in megabytes (must be a power of two).");
 
         return desc;
     }

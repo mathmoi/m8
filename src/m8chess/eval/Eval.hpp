@@ -17,8 +17,8 @@ namespace m8::eval
     const EvalType kMinEval = std::numeric_limits<EvalType>::min() + 100;
     const EvalType kMaxEval    = std::numeric_limits<EvalType>::max() - 100;
 
-    const EvalType kEvalNull   = 0;
-    const EvalType kEvalMat    = 100000;
+    const EvalType kEvalDraw   = 0;
+    const EvalType kEvalMat    = 30000;
     const EvalType kMaxMat     = 1000;
 
     /// Evaluate a position.
@@ -27,20 +27,44 @@ namespace m8::eval
         return (1 - 2 * static_cast<int>(board.side_to_move())) * board.material_value();
     }
 
-    /// Add a 1 depth to the score if the value is a mate score.
-    inline EvalType AddDepthToMate(EvalType value)
+    /// Remve the specified distance to the evaluation if the evaluation represents a mate
+    /// in N. This can be used before storing evaluations in the transposition table.
+    inline EvalType RemoveDistanceFromMate(EvalType eval, DepthType distance)
     {
-        if (value > kEvalMat - kMaxMat)
+        if (eval > kEvalMat - kMaxMat)
         {
-            return value - 1;
+            return eval + distance;
         }
 
-        if (value < -kEvalMat + kMaxMat)
+        if (eval < -kEvalMat + kMaxMat)
         {
-            return value + 1;
+            return eval - distance;
         }
         
-        return value;
+        return eval;
+    }
+
+    /// Add the specified distance to the evaluation if the evaluation represents a mate
+    /// in N. This can be used before retrieving evaluations from the transposition table.
+    inline EvalType AddDistanceToMate(EvalType eval, DepthType distance)
+    {
+        if (eval > kEvalMat - kMaxMat)
+        {
+            return eval - distance;
+        }
+
+        if (eval < -kEvalMat + kMaxMat)
+        {
+            return eval + distance;
+        }
+        
+        return eval;
+    }
+
+    /// Return the value of a mate position given the distance to the root of the search.
+    inline EvalType GetMateValue(DepthType distance)
+    {
+        return -kEvalMat + distance;
     }
 
     inline double GetEvaluationInPawns(EvalType value)

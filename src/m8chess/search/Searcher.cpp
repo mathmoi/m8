@@ -13,11 +13,12 @@
 
 namespace m8 { namespace search
 {
-    Searcher::Searcher()
+    Searcher::Searcher(transposition::TranspositionTable& transposition_table)
      : destroying_(false),
        search_thread_(&Searcher::RunSearchThread, this),   
        state_(SearchState::Ready),
-       iterative_deepening_()
+       transposition_table_(transposition_table),
+       iterative_deepening_(transposition_table)
     {
         iterative_deepening_.Attach(this);
     }
@@ -51,6 +52,8 @@ namespace m8 { namespace search
 
         {
             std::lock_guard lock(mutex_);
+
+            transposition_table_.IncrementGeneration();
 
             state_          = SearchState::Searching;
             current_search_ = search;

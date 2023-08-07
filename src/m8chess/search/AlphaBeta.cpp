@@ -16,15 +16,16 @@
 
 namespace m8::search {
 
-    AlphaBeta::AlphaBeta(std::shared_ptr<Search> search)
+    AlphaBeta::AlphaBeta(std::shared_ptr<Search> search, transposition::TranspositionTable& transposition_table)
         : board_(search->board()),
           continue_(true),
           nodes_count_next_time_check_(kNodesBeforeFirstCheck),
-          search_(search)
+          search_(search),
+          transposition_table_(transposition_table)
     {}
 
     template<bool root, bool qsearch>
-    EvalType AlphaBeta::AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, PV& pv)
+    EvalType AlphaBeta::AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, DepthType distance, PV& pv)
     {
         PV local_pv;
 
@@ -43,7 +44,45 @@ namespace m8::search {
             nodes_count_next_time_check_ = stats_.nodes + search_->time_manager().CalculateNodesBeforeNextCheck(stats_.nodes);
         }
 
+        // In internal search nodes (not root and not qsearch) we probe the
+        // transposition table. If we find an acceptable exact score or a lower 
+        // bound better than beta we might cut the search imediately. If we find
+        // a lower bound better than alpha but not better than beta we can immediately raise alpha
+        if (!qsearch && !root)
+        {
+            auto tt_entry = transposition_table_[board_.hash()];
+            ++stats_.tt_probes;
+            if (tt_entry != nullptr)
+            {
+                ++stats_.tt_hits;
+                if (depth <= tt_entry->depth())
+                {
+                    auto tt_eval = tt_entry->GetEval(distance);
+                    if (tt_entry->type() == transposition::EntryType::Exact)
+                    {
+                        ++stats_.tt_hits_exact;
+                        return tt_eval;
+                    }
+
+                    if (tt_entry->type() == transposition::EntryType::LowerBound
+                        && tt_eval >= beta)
+                    {
+                        ++stats_.tt_hits_lower;
+                        return beta;
+                    }
+
+                    if (tt_entry->type() == transposition::EntryType::UpperBound
+                        && tt_eval <= alpha)
+                    {
+                        ++stats_.tt_hits_upper;
+                        return alpha;
+                    }
+                }
+            }
+        }
+
         // If we are in the qsearch we must evaluate the stand path option.
+        auto original_alpha = alpha;
         if (qsearch)
         {
             EvalType stand_path = eval::Evaluate(board_);
@@ -64,6 +103,7 @@ namespace m8::search {
                              : GenerateAllMoves(board_, moves.data());
                 
         // Evaluate all moves
+        bool found_a_move = false;
         for (Move* next = first; next < last; ++next)
         {
             if (root)
@@ -81,6 +121,7 @@ namespace m8::search {
             }
             else
             {
+                found_a_move = true;
                 EvalType value;
 
                 // If we are at depth > 1 we need to make a recursive call to the search
@@ -89,14 +130,14 @@ namespace m8::search {
                 if (!qsearch && depth > 1)
                 {
                     // Recursive call to the search function
-                    value = -AlphaBetaSearch<false, false>(-beta, -alpha, depth - 1, local_pv);
+                    value = -AlphaBetaSearch<false, false>(-beta, -alpha, depth - 1, distance + 1, local_pv);
                 }
                 else
                 {
                     // Call to the qsearch
-                    value = -AlphaBetaSearch<false, true>(-beta, -alpha, 0, local_pv);
+                    value = -AlphaBetaSearch<false, true>(-beta, -alpha, 0, distance + 1, local_pv);
                 }
-                value = eval::AddDepthToMate(value);
+                
                 board_.Unmake(*next, unmake_info);
 
                 // If we are aborting the search we need to leave immediately.
@@ -109,6 +150,15 @@ namespace m8::search {
                 // abort the search at this node.
                 if (value >= beta)
                 {
+                    if (!qsearch)
+                    {
+                        transposition_table_.Insert(board_.hash(),
+                                                    *next,
+                                                    transposition::EntryType::LowerBound,
+                                                    depth,
+                                                    distance,
+                                                    value);
+                    }
                     return beta;
                 }
 
@@ -131,6 +181,33 @@ namespace m8::search {
             }
         }
 
+        // If we have not found any legal move during the search we are either checkmate 
+        // or stalemate. We need to return a value accordingly.
+        if (!qsearch && !found_a_move)
+        {
+            if (IsInCheck(board_.side_to_move(), board_))
+            {
+                assert(IsMat(board_));
+                return eval::GetMateValue(distance);
+            }
+
+            return eval::kEvalDraw;
+        }
+
+        // If we are not in the qsearch we store the current evaluation in the 
+        // transposition table. At this point it can be an upper bound (we did not improve 
+        // alpha) or an exact score.
+        if (!qsearch)
+        {
+            auto type_tt_entry = (alpha == original_alpha ? transposition::EntryType::UpperBound
+                                                          : transposition::EntryType::Exact);
+            transposition_table_.Insert(board_.hash(),
+                                        (pv.any() ? pv.first() : kNullMove),
+                                        type_tt_entry,
+                                        depth,
+                                        distance,
+                                        alpha);
+        }
         return alpha;
     }
 
@@ -140,7 +217,7 @@ namespace m8::search {
 
         NotifySearchStarted();
 
-        auto value = AlphaBetaSearch<true, false>(eval::kMinEval, eval::kMaxEval, depth, pv);
+        auto value = AlphaBetaSearch<true, false>(eval::kMinEval, eval::kMaxEval, depth, 0, pv);
         
         // If we are aborting the search we need to leave immediately.
         if (!continue_)

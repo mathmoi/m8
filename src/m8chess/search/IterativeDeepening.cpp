@@ -7,14 +7,13 @@
 
 namespace m8::search {
 
-    IterativeDeepening::IterativeDeepening()
-    {
-        
-    }
+    IterativeDeepening::IterativeDeepening(transposition::TranspositionTable& transposition_table)
+    : transposition_table_(transposition_table)
+    {}
 
     SearchResult IterativeDeepening::Start(std::shared_ptr<Search> search)
     {
-        AlphaBeta alpha_beta(search);
+        AlphaBeta alpha_beta(search, transposition_table_);
         alpha_beta.Attach(this);
 
         std::optional<SearchResult> result;

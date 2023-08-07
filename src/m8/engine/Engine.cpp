@@ -5,13 +5,15 @@
 
 #include <iostream>
 
+#include "../../m8chess/SAN.hpp"
+
 #include "../../m8common/logging.hpp"
+
+#include "../options/Options.hpp"
 
 #include "Engine.hpp"
 #include "EngineState.hpp"
 #include "ObservingState.hpp"
-
-#include "../../m8chess/SAN.hpp"
 
 namespace m8::engine
 {
@@ -21,7 +23,9 @@ namespace m8::engine
       engine_color_(kBlack),
       max_depth_(kMaxMaxDepth),
       time_control_(std::make_unique<time::TimePerMoveTimeControl>(std::chrono::seconds(1))),
-      clock_(time::ChessClock::CreateChessClock(*time_control_))
+      clock_(time::ChessClock::CreateChessClock(*time_control_)),
+      transposition_table_(options::Options::get().tt_size*1024*1024),
+      searcher_(transposition_table_)
     {
         state_ = std::make_unique<ObservingState>(this);
     }

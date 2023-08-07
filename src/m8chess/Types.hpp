@@ -11,13 +11,13 @@
 namespace m8
 {
     /// Type for the search depth
-    typedef std::int_fast16_t DepthType;
+    typedef std::uint16_t DepthType;
 
     /// Type to count nodes
     typedef std::uint64_t NodeCounterType;
 
     /// Type for evaluation values
-    typedef std::int32_t EvalType;
+    typedef std::int16_t EvalType;
 }
 
 #endif //M8_TYPES_HPP_

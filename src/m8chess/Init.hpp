@@ -1,14 +1,16 @@
 /// @file   Init.hpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   December 2015
 /// @brief  Contains initialization functionalities.
 
-#include "../m8common/m8common.hpp"
+#include <iostream>
 
 #include "Attacks.hpp"
 #include "Direction.hpp"
 
-#include <iostream>
+#include "transposition/Zobrist.hpp"
+
+#include "../m8common/m8common.hpp"
 
 namespace m8
 {
@@ -18,5 +20,6 @@ namespace m8
         InitializeAttacks();
         BbInitializePreCalc();
         InitializeDirection();
+        transposition::InitializeZobrist();
     }
 }

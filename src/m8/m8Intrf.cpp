@@ -689,7 +689,23 @@ namespace m8
         oss <<"time=" <<FormatTime(time)
             <<" nodes=" <<AddMetricSuffix(stats.nodes, 3)
             <<" qnodes=" <<AddMetricSuffix(stats.qnodes, 3)
-            <<" nps=" <<AddMetricSuffix((stats.nodes + stats.qnodes) / time, 3);
+            <<" nps=" <<AddMetricSuffix((stats.nodes + stats.qnodes) / time, 3)
+            <<" tt_probes=" <<AddMetricSuffix(stats.tt_probes, 3)
+            <<" tt_hits=" <<FormatPercentage(stats.tt_hits / static_cast<float>(stats.tt_probes), 1)
+            <<" tt_exact=" <<FormatPercentage(stats.tt_hits_exact 
+                                              / static_cast<float>(stats.tt_hits_exact
+                                                                   + stats.tt_hits_lower
+                                                                   + stats.tt_hits_upper), 1)
+            <<" tt_upper=" <<FormatPercentage(stats.tt_hits_upper 
+                                              / static_cast<float>(stats.tt_hits_exact
+                                                                   + stats.tt_hits_lower
+                                                                   + stats.tt_hits_upper), 1)
+            <<" tt_lower=" <<FormatPercentage(stats.tt_hits_lower 
+                                              / static_cast<float>(stats.tt_hits_exact
+                                                                   + stats.tt_hits_lower
+                                                                   + stats.tt_hits_upper), 1)
+            <<" tt_cut=" <<FormatPercentage((stats.tt_hits_exact + stats.tt_hits_lower + stats.tt_hits_upper)
+                                            / static_cast<float>(stats.tt_probes), 1);
 
         std::string stats_str = std::move(oss).str();
         std::string_view stats_view { stats_str };

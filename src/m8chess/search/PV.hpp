@@ -28,6 +28,9 @@ namespace m8::search
         /// return the number of elements actually in the PV.
         inline std::size_t count() const { return count_; }
 
+        /// Indicate if the PV contains any moves
+        inline bool any() const { return 0 < count_; }
+
         /// Replace the PV with a new one based a single move and another PV.
         inline void Replace(Move move, const PV& other)
         {

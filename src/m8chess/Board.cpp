@@ -16,7 +16,8 @@ namespace m8
     Board::Board(const std::string& fen,
                  eval::PieceSqTablePtr psqt)
         : psqt_(psqt),
-          material_value_(0)
+          material_value_(0),
+          hash_key_(0)
     {
         Clear();
 
@@ -165,7 +166,7 @@ namespace m8
         {
             if (*it != '-')
             {
-                colmn_enpas_ = (*it - 'a');
+                set_colmn_enpas(*it - 'a');
             }
 
             // Skip characters up to the end or a space
@@ -382,6 +383,8 @@ namespace m8
         colmn_enpas_ = kInvalColmn;
         half_move_clock_ = 0;
         full_move_clock_ = 0;
+        material_value_ = 0;
+        hash_key_ = 0;
     }
 
     void DisplayPiece(std::ostream& out, Piece piece)

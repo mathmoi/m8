@@ -136,7 +136,10 @@ namespace m8::options
         bool use_san;
 
         /// Options related to the evaluation function
-        EvalOptions eval;        
+        EvalOptions eval;
+
+        /// Transposition table size in megabytes.
+        size_t tt_size;
 
     private:
         /// Consctructor

@@ -17,6 +17,8 @@
 #include "../../m8chess/time/ChessClock.hpp"
 #include "../../m8chess/time/TimeControl.hpp"
 
+#include "../../m8chess/transposition/TranspositionTable.hpp"
+
 #include "../../m8chess/Types.hpp"
 
 #include "IPerftObserver.hpp"
@@ -122,6 +124,7 @@ namespace m8::engine
         //////////////////////////////////////////////////////////////////////////////////
         // Searching variables
         ////////////////////////////////////////////////////////////////////////////////// 
+        transposition::TranspositionTable transposition_table_;
         search::Searcher searcher_;
         bool searching_;
         std::mutex search_mutex_;

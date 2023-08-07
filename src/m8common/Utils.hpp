@@ -59,13 +59,20 @@ namespace m8
     ///
     /// @param number    Number to convert to a string.
     /// @param precision Number of decimal digit to use in output.
-    inline std::string AddMetricSuffix(std::uint64_t number, int precision)
+    inline std::string AddMetricSuffix(std::uint64_t number, std::uint32_t precision)
     {
         static const std::array<std::string, 7> suffixes = { {"", "K", "M", "G", "T", "P", "E"} };
         auto index = static_cast<std::size_t>((number > 0 ? std::log10(number) / 3 : 0));
 
         std::ostringstream out;
         out << std::setiosflags(std::ios::fixed) << std::setprecision(precision) << (number / std::pow(1000, index)) << suffixes[index];
+        return out.str();
+    }
+
+    inline std::string FormatPercentage(float percentage, std::uint32_t precision)
+    {
+        std::ostringstream out;
+        out << std::setiosflags(std::ios::fixed) << std::setprecision(precision) << (percentage * 100) <<'%';
         return out.str();
     }
 
@@ -79,6 +86,17 @@ namespace m8
     inline bool Contains(InputIterator first, InputIterator last, const T& val)
     {
         return std::find(first, last, val) != last;
+    }
+
+    /// Calculate a bitmask.
+    /// 
+    /// @tparam T       Type of the integer mask
+    /// @param position Position of the lease significant bit of the mask
+    /// @param size     Size of the mask
+    template<typename T>
+    inline constexpr T CalculateMask(T position, T size)
+    {
+        return ((static_cast<T>(1) << size) - 1) << position;
     }
 }
 

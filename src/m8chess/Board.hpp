@@ -13,11 +13,14 @@
 #include <string>
 
 #include "../m8common/m8common.hpp"
+
 #include "eval/PieceSqTable.hpp"
 
+#include "transposition/Zobrist.hpp"
+
+#include "Move.hpp"
 #include "Piece.hpp"
 #include "Sq.hpp"
-#include "Move.hpp"
 
 namespace m8
 {
@@ -79,6 +82,9 @@ namespace m8
         /// @returns The side to move next.
         inline Color side_to_move() const { return side_to_move_; };
 
+        /// Switch the side to move
+        inline void SwitchSideToMove();
+
         /// Mutator for the side to move.
         ///
         /// @param side_to_move the color of the new side to move.
@@ -136,7 +142,22 @@ namespace m8
         /// @param colmn_enpass Column of the piece that can be captured en 
         ///        passant or an invalid column if no piece can be captured en 
         ///        passant.
-        inline void set_colmn_enpas(Colmn colmn_enpas) { colmn_enpas_ = colmn_enpas; };
+        inline void set_colmn_enpas(Colmn colmn_enpas)
+        {
+            // We "remove" the en passant column from the hash key if it was set.
+            if (IsColmnOnBoard(colmn_enpas_))
+            {
+                hash_key_ ^= transposition::gZobristEnPassant[colmn_enpas_];
+            }
+
+            colmn_enpas_ = colmn_enpas;
+
+            // We add the en passant column to the hash key if it's set.
+            if (IsColmnOnBoard(colmn_enpas_))
+            {
+                hash_key_ ^= transposition::gZobristEnPassant[colmn_enpas_];
+            }
+        };
 
         /// Accessor for the half move clock.
         ///
@@ -167,6 +188,9 @@ namespace m8
 
         /// Returns a fen string representing the current position on the board.
         std::string fen() const;
+
+        /// Return the hash key of the current position
+        transposition::ZobristKey hash() const { return hash_key_; }
 
         /// Value of the material on the board. Based on the piece-square table values.
         inline int material_value() const { return material_value_; };
@@ -246,6 +270,8 @@ namespace m8
 
         /// Value of the material on the board.
         int material_value_;
+
+        transposition::ZobristKey hash_key_;
 
         /// Initialize the board with no pieces.
         void Clear();
@@ -395,10 +421,21 @@ namespace m8
         return board_[index];
     }
 
+    inline void Board::SwitchSideToMove()
+    {
+        hash_key_ ^= transposition::gZobristBlackToMove;
+        side_to_move_ = OpposColor(side_to_move_);
+    }
+
     inline void Board::set_side_to_move(Color side_to_move)
     {
         // A : The side to move is a valid color
         assert(IsColor(side_to_move));
+
+        if (side_to_move != side_to_move_)
+        {
+            hash_key_ ^= transposition::gZobristBlackToMove;
+        }
 
         side_to_move_ = side_to_move;
     }
@@ -439,8 +476,12 @@ namespace m8
         assert(IsColor(color));
         assert(casle_right == kQueenSideCastle || casle_right == kKingSideCastle);
 
+        hash_key_ ^= transposition::gZobristCastling[casle_flag_];
+
         std::uint8_t mask = casle_right << color << color;
         casle_flag_ ^= (-static_cast<std::uint8_t>(value) ^ casle_flag_) & mask;
+
+        hash_key_ ^= transposition::gZobristCastling[casle_flag_];
     }
 
     inline Colmn Board::casle_colmn(CastleType castle_type) const
@@ -467,6 +508,8 @@ namespace m8
         SetBit(bb_color_[color], sq);
 
         material_value_ += (*psqt_)[piece][sq];
+
+        hash_key_ ^= transposition::gZobristTable[piece][sq];
     }
 
     inline void Board::RemovePiece(Sq sq)
@@ -483,6 +526,8 @@ namespace m8
         UnsetBit(bb_piece_[piece], sq);
 
         material_value_ -= (*psqt_)[piece][sq];
+
+        hash_key_ ^= transposition::gZobristTable[piece][sq];
 
         board_[sq] = kNoPiece;
     }
@@ -506,6 +551,9 @@ namespace m8
         bb_piece_[piece] ^= diff;
 
         material_value_ += (*psqt_)[piece][to] - (*psqt_)[piece][from];
+
+        hash_key_ ^= transposition::gZobristTable[piece][to] 
+                  ^  transposition::gZobristTable[piece][from] ;
     }
 
     inline void Board::MovePiece(Sq from, Sq to)
@@ -564,7 +612,7 @@ namespace m8
         // If the move is a two square move we need to set the en-passant column.
         if (std::abs(to - from) == 16)
         {
-            colmn_enpas_ = GetColmn(to);
+            set_colmn_enpas(GetColmn(to));
         }
     }
 
@@ -655,7 +703,7 @@ namespace m8
         full_move_clock_ += side_to_move_;
 
         ++half_move_clock_;
-        colmn_enpas_ = kInvalColmn;
+        set_colmn_enpas(kInvalColmn);
 
         switch (piece_type)
         {
@@ -684,7 +732,7 @@ namespace m8
 
         RemoveCastlingRookCaptured(taken, to);
 
-        side_to_move_ = OpposColor(side_to_move_);
+        SwitchSideToMove();
 
         return unmake_info;
     }
@@ -767,7 +815,7 @@ namespace m8
         PieceType piece_type = GetPieceType(piece);
 
         half_move_clock_ = unmake_info & 0xFFFFF;
-        colmn_enpas_ = unmake_info >> 24;
+        set_colmn_enpas(unmake_info >> 24);
 
         switch (piece_type)
         {
@@ -790,9 +838,11 @@ namespace m8
             break;
         }
 
-        side_to_move_ = OpposColor(side_to_move_);
+        SwitchSideToMove();
 
+        hash_key_ ^= transposition::gZobristCastling[casle_flag_];
         casle_flag_ = (unmake_info >> 20) & 0xF;
+        hash_key_ ^= transposition::gZobristCastling[casle_flag_];
 
         // If the side to move is black decrement the move number.
         full_move_clock_ -= side_to_move_;

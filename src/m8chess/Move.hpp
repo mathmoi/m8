@@ -25,19 +25,19 @@ namespace m8
     /// @name Move constants
     /// Constants used to pack and unpack moves.
     /// @{
-    const int kFromPos = 0;
-    const int kToPos = 8;
-    const int kCastlingPos = 14;
-    const int kPiecePos = 16;
-    const int kPromoteToPos = 20;
-    const int kPieceTakenPos = 25;
-    
     const int kFromSize = 6;
     const int kToSize = 6;
     const int kCastlingSize = 2;
     const int kPieceSize = 4;
     const int kPieceTakenSize = 4;
     const int kPromoteToSize = 4;
+
+    const int kFromPos       = 0;
+    const int kToPos         = kFromPos + kFromSize;
+    const int kCastlingPos   = kToPos + kToSize;
+    const int kPiecePos      = kCastlingPos + kCastlingSize;
+    const int kPromoteToPos  = kPiecePos + kPieceSize;
+    const int kPieceTakenPos = kPromoteToPos + kPromoteToSize;
     /// @}
 
     /// Create a new move. This method pack all the informations of a move into a single

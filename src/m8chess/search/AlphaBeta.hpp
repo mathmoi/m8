@@ -12,6 +12,8 @@
 
 #include "../../m8chess/time/TimeManager.hpp"
 
+#include "../transposition/TranspositionTable.hpp"
+
 #include "../Board.hpp"
 #include "../Types.hpp"
 
@@ -29,7 +31,7 @@ namespace m8 {
         {
         public:
             /// Constructor.
-            AlphaBeta(std::shared_ptr<Search> search);
+            AlphaBeta(std::shared_ptr<Search> search, transposition::TranspositionTable& transposition_table);
 
             /// Start a search on a given position.
             std::optional<SearchResult> Start(DepthType depth);
@@ -42,9 +44,10 @@ namespace m8 {
             SearchStats stats_;
             NodeCounterType nodes_count_next_time_check_;
             std::shared_ptr<Search> search_;
+            transposition::TranspositionTable& transposition_table_;
 
             template<bool root, bool qsearch>
-            EvalType AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, PV& pv);
+            EvalType AlphaBetaSearch(EvalType alpha, EvalType beta, DepthType depth, DepthType distance, PV& pv);
         };
 
     }

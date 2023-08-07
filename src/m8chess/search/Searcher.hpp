@@ -18,6 +18,8 @@
 
 #include "../time/TimeManager.hpp"
 
+#include "../transposition/TranspositionTable.hpp"
+
 #include "../Board.hpp"
 
 #include "IterativeDeepening.hpp"
@@ -41,7 +43,7 @@ namespace m8::search
     public:
         
         /// Constructor
-        Searcher();
+        Searcher(transposition::TranspositionTable& transposition_table);
 
         /// Destructor
         ~Searcher();
@@ -79,6 +81,7 @@ namespace m8::search
         std::mutex mutex_;
         
         SearchState state_;
+        transposition::TranspositionTable& transposition_table_;
         IterativeDeepening iterative_deepening_;
 
         std::shared_ptr<Search> current_search_;

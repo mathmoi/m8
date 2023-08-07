@@ -8,6 +8,8 @@
 
 #include "../time/TimeManager.hpp"
 
+#include "../transposition/TranspositionTable.hpp"
+
 #include "../Board.hpp"
 #include "../Types.hpp"
 
@@ -22,7 +24,7 @@ namespace m8::search {
     {
     public:
         /// Constructor.
-        IterativeDeepening();
+        IterativeDeepening(transposition::TranspositionTable& transposition_table);
 
         /// Start a search on a given position.
         SearchResult Start(std::shared_ptr<Search> search);
@@ -32,6 +34,9 @@ namespace m8::search {
 
         /// Method called when a new best move is found at the root.
         void OnNewBestMove(const PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes);
+    
+    private:
+        transposition::TranspositionTable& transposition_table_;
     };
 }
 

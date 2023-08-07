@@ -617,3 +617,35 @@ TEST_CASE("Unmake__pawn_promotion__board_is_restored")
     REQUIRE(board.side_to_move() == kBlack);
 }
 
+TEST_CASE("Test that hash value is correct after modifications to the position")
+{
+    Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    std::string expected_fen;
+
+    SECTION("Simple move by a piece")
+    {
+        auto move = NewMove(kF3, kF4, kWhiteQueen);
+        board.Make(move);
+        expected_fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2PQ2/2N4p/PPPBBPPP/R3K2R b KQkq -";
+    }
+
+    SECTION("Make and unmake ")
+    {
+        auto move = NewMove(kF3, kF4, kWhiteQueen);
+        auto unmake_info = board.Make(move);
+        board.Unmake(move, unmake_info);
+        expected_fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    }
+
+    SECTION("Piece captured")
+    {
+        auto move = NewMove(kE2, kA6, kWhiteBishop, kBlackBishop);
+        board.Make(move);
+        expected_fen = "r3k2r/p1ppqpb1/Bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPB1PPP/R3K2R b KQkq - 0 1";
+    }
+
+
+    Board expected(expected_fen);
+    REQUIRE(expected.hash() == board.hash());
+}
+
