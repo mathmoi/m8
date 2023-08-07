@@ -33,14 +33,14 @@ namespace m8::search {
         qsearch ? stats_.qnodes++ : stats_.nodes++;
 
         // We check if we need to abort the search because of time constraint
-        if (!qsearch && nodes_count_next_time_check_ <= stats_.nodes)
+        if (nodes_count_next_time_check_ <= stats_.all_nodes())
         {
             continue_ = !search_->is_aborted() && search_->time_manager().can_continue();
             if (!continue_)
             {
                 return 0;
             }
-            nodes_count_next_time_check_ = stats_.nodes + search_->time_manager().CalculateNodesBeforeNextCheck(stats_.nodes);
+            nodes_count_next_time_check_ = stats_.all_nodes() + search_->time_manager().CalculateNodesBeforeNextCheck(stats_.all_nodes());
         }
 
         // If we are in the qsearch we must evaluate the stand path option.

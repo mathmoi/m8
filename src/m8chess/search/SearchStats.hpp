@@ -23,7 +23,10 @@ namespace m8::search
         NodeCounterType nodes;
 
         /// Number of quiescence nodes searched
-        NodeCounterType qnodes;    
+        NodeCounterType qnodes;
+
+        /// Returns the sum of all nodes.
+        inline NodeCounterType all_nodes() const { return nodes + qnodes; };
     };
 }
 

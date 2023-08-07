@@ -35,7 +35,7 @@ namespace m8 {
             std::optional<SearchResult> Start(DepthType depth);
 
         private:
-            const NodeCounterType kNodesBeforeFirstCheck = 20000;
+            const NodeCounterType kNodesBeforeFirstCheck = 100000;
 
             Board board_;
             bool continue_;
