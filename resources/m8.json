@@ -8,7 +8,7 @@
   "display-auto": 1,
   "min-display-depth": 1,
   "use-san": 1,
-  "tt-size": 8192,
+  "tt-size": 256,
   "eval" : {
       "pawn" : 100,
       "knight" : 320,

@@ -110,7 +110,7 @@ namespace m8::engine
         friend SearchState;
         friend WaitingState;
 
-        const DepthType kMaxMaxDepth = 1000;
+        const DepthType kMaxMaxDepth = 256;
 
         std::unique_ptr<EngineState> state_;
 
