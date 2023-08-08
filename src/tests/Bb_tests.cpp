@@ -180,3 +180,19 @@ TEST_CASE("BbBetween__g6_to_c1__kEmptyBb_returned")
 
     REQUIRE(between == kEmptyBb);
 }
+
+TEST_CASE("BbBetween__e3_to_g1__f2_returned")
+{
+    using namespace std;
+    Bb between = BbBetween(kE3, kG1);
+
+    REQUIRE(between == BB_C(0x0000000000002000));
+}
+
+TEST_CASE("BbBetween__g1_to_e3__f2_returned")
+{
+    using namespace std;
+    Bb between = BbBetween(kG1, kE3);
+
+    REQUIRE(between == BB_C(0x0000000000002000));
+}
