@@ -739,7 +739,7 @@ namespace m8
         ostringstream out;
 
         if (eval < -eval::kEvalMat + eval::kMaxMat)
-            out << "-MAT-" << eval - eval::kEvalMat;
+            out << "-MAT-" << eval + eval::kEvalMat;
         else if (eval > eval::kEvalMat - eval::kMaxMat)
             out << "MAT-" << eval::kEvalMat - eval;
         else

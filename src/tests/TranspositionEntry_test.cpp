@@ -23,15 +23,15 @@ TEST_CASE("TranspositionEntry_StoreData_RetrieveCorrectData")
     DepthType distance      = 3;
     EvalType eval           = 100;
 
-    SECTION ("Min generation") { generation = 0; }
-    SECTION ("Max generation") { generation = 255; }
-    SECTION ("Type Exact")     { type = EntryType::Exact; }
-    SECTION ("Type LowerBound")     { type = EntryType::LowerBound; }
-    SECTION ("Type UpperBound")      { type = EntryType::UpperBound; }
-    SECTION ("Min depth")      { depth = 0; }
-    SECTION ("Max depth")      { depth = 4095; }
-    SECTION ("Min eval")       { eval = -kEvalMat; }
-    SECTION ("Max eval")       { eval = +kEvalMat; }
+    SECTION ("Min generation")  { generation = 0; }
+    SECTION ("Max generation")  { generation = 255; }
+    SECTION ("Type Exact")      { type = EntryType::Exact; }
+    SECTION ("Type LowerBound") { type = EntryType::LowerBound; }
+    SECTION ("Type UpperBound") { type = EntryType::UpperBound; }
+    SECTION ("Min depth")       { depth = 0; }
+    SECTION ("Max depth")       { depth = 4095; }
+    SECTION ("Min eval")        { eval = -kEvalMat; }
+    SECTION ("Max eval")        { eval = +kEvalMat; }
 
     TranspositionEntry sut(key, move, generation, type, depth, distance, eval);
 
