@@ -6,7 +6,7 @@
 #ifndef M8_CHECKMATE_HPP_
 #define M8_CHECKMATE_HPP_
 
-#include "MoveGen.hpp"
+#include "movegen/MoveGeneration.hpp"
 
 namespace m8
 {   
@@ -18,7 +18,7 @@ namespace m8
         Piece king = NewPiece(kKing, color);
         Bb bb_king = board.bb_piece(king);
         Sq king_position = GetLsb(bb_king);
-        Bb attackers = AttacksTo(board, king_position);
+        Bb attackers = movegen::AttacksTo(board, king_position);
         Bb opponent_pieces = board.bb_color(OpposColor(color));
         return (attackers & opponent_pieces) != kEmptyBb;
     }
@@ -39,7 +39,7 @@ namespace m8
 
         MoveList moves;
         Move* end = moves.data();
-        end = GenerateAllMoves(board, end);
+        end = movegen::GenerateAllMoves(board, end);
 
         // We look for a move that doesn't leave the side to move in check.
         bool found = false;

@@ -7,11 +7,12 @@
 #include <exception>
 #include <sstream>
 
+#include "movegen/MoveGeneration.hpp"
+
 #include "SAN.hpp"
 #include "Board.hpp"
 #include "Direction.hpp"
 #include "Checkmate.hpp"
-#include "MoveGen.hpp"
 
 namespace m8
 {
@@ -170,7 +171,7 @@ namespace m8
     /// and it's king. This way the piece still protects it's king.
     Bb RemovePinnedCandidates(Bb candidates, Color color, Sq to, const Board& board)
     {
-        Bb pinned_candidates = candidates & GetPinnedPieces(board, color);
+        Bb pinned_candidates = candidates & movegen::GetPinnedPieces(board, color);
         if (pinned_candidates)
         {
             Sq king_sq = board.king_sq(color);
@@ -199,7 +200,7 @@ namespace m8
         }
         else
         {
-            candidates = GenerateAttacksTo(board, info.piece, info.to);
+            candidates = movegen::GenerateAttacksTo(board, info.piece, info.to);
         }
 
         candidates &= info.from_filter;
@@ -384,7 +385,7 @@ namespace m8
             Colmn colmn = GetColmn(from);
             Row row = GetRow(from);
 
-            Bb candidates = GenerateAttacksTo(board, piece, to);
+            Bb candidates = movegen::GenerateAttacksTo(board, piece, to);
             candidates = RemovePinnedCandidates(candidates, color, to, board);
 
             if (GetPopct(candidates) > 1)

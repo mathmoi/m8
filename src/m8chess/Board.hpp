@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <string>
 
-#include "../m8common/m8common.hpp"
+#include "../m8common/Bb.hpp"
 
 #include "eval/PieceSqTable.hpp"
 

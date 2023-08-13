@@ -9,10 +9,10 @@
 #include <algorithm>
 #include <cstdint>
 #include <mutex>
+#include <numeric>
 #include <ranges>
 #include <thread>
 #include <vector>
-
 
 #include "../m8/engine/IPerftObserver.hpp"
 

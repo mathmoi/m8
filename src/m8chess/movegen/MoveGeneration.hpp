@@ -1,24 +1,26 @@
-/// @file   MoveGen.hpp
+/// @file   MoveGeneration.hpp
 /// @author Mathieu Pagé
 /// @date   December 2015
 /// @brief  Contains the definition of types and utilities to generate moves
 
+#ifndef M8_CHESS_MOVEGEN_MOVE_GENERATION_HPP_
+#define M8_CHESS_MOVEGEN_MOVE_GENERATION_HPP_
+
 #include <cstdint>
 #include <stdexcept>
 
-#include "../m8common/m8common.hpp"
-#include "Const.hpp"
-#include "Sq.hpp"
-#include "Piece.hpp"
-#include "Move.hpp"
-#include "Board.hpp"
+#include "../../m8common/Bb.hpp"
+
+#include "../Board.hpp"
+#include "../Const.hpp"
+#include "../Move.hpp"
+#include "../Piece.hpp"
+#include "../Sq.hpp"
+#include "../XRay.hpp"
+
 #include "Attacks.hpp"
-#include "XRay.hpp"
 
-#ifndef M8_MOVE_GEN_HPP_
-#define M8_MOVE_GEN_HPP_
-
-namespace m8
+namespace m8::movegen
 {
     /// Generate a bitboard of all the squares that attacks a given square.
     ///
@@ -568,6 +570,19 @@ namespace m8
         return next_move;
     }
 
+    /// Generate all quiet moves for the current side on move.
+    ///
+    /// @param next_move Pointer into an array where we can add moves.
+    /// @return A pointer to the position afther the last move inserted into the array.
+    inline Move* GenerateAllQuietMoves(const Board& board, Move* next_move)
+    {
+        Color color = board.side_to_move();
+
+        next_move = GenerateQuietMoves(board, color, next_move);
+
+        return next_move;
+    }
+
     /// Generate all captures for the current side on move.
     ///
     /// @param next_move Pointer into an array where we can add moves.
@@ -608,4 +623,4 @@ namespace m8
     }
 }
 
-#endif
+#endif // M8_CHESS_MOVEGEN_MOVE_GENERATION_HPP_

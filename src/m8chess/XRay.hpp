@@ -10,8 +10,9 @@
 
 #include "../m8common/Bb.hpp"
 
+#include "movegen/Attacks.hpp"
+
 #include "Sq.hpp"
-#include "Attacks.hpp"
 
 #ifndef M8_X_RAY_HPP_
 #define M8_X_RAY_HPP_
@@ -47,7 +48,7 @@ namespace m8
     /// @param sq        Postion of the bishop.
     inline Bb GenerateRookXRay(Bb occ, Bb blockers, Sq sq)
     {
-        return GeneratePieceXRay<GenerateRookAttacks>(occ, blockers, sq);
+        return GeneratePieceXRay<movegen::GenerateRookAttacks>(occ, blockers, sq);
     }
 
     /// Given a board occupancy, returns the x-ray attacks of a bishop on a given 
@@ -60,7 +61,7 @@ namespace m8
     /// @param sq        Postion of the bishop.
     inline Bb GenerateBishopXRay(Bb occ, Bb blockers, Sq sq)
     {
-        return GeneratePieceXRay<GenerateBishopAttacks>(occ, blockers, sq);
+        return GeneratePieceXRay<movegen::GenerateBishopAttacks>(occ, blockers, sq);
     }    
 }
 

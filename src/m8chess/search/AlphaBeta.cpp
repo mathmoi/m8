@@ -8,11 +8,12 @@
 
 #include "../eval/Eval.hpp"
 
-#include "../MoveGen.hpp"
+#include "../movegen/MoveGenerator.hpp"
+
 #include "../Checkmate.hpp"
 
-#include "Search.hpp"
 #include "AlphaBeta.hpp"
+#include "Search.hpp"
 
 namespace m8::search {
 
@@ -96,28 +97,27 @@ namespace m8::search {
             }
         }
 
-        // Generate all the moves
-        MoveList moves; // TODO : MoveList should be a class. Test for performance.
-        Move* first = moves.data();
-        Move* last = qsearch ? GenerateAllCaptures(board_, moves.data())
-                             : GenerateAllMoves(board_, moves.data());
-                
         // Evaluate all moves
         bool found_a_move = false;
-        for (Move* next = first; next < last; ++next)
+        movegen::MoveGenerator generator(board_, qsearch);
+        std::uint16_t move_count = 0;
+        for (auto move : generator)
         {
+            ++move_count;
+
             if (root)
             {
-                NotifySearchMoveAtRoot(depth, 0, next - first + 1, last - first, stats_.nodes + stats_.qnodes, *next);
+                // TODO : At root we must generate all moves first to get a number of moves, searche the best move first and keep the order between iteration.
+                NotifySearchMoveAtRoot(depth, 0, move_count, 0, stats_.nodes + stats_.qnodes, move);
             }
 
-            UnmakeInfo unmake_info = board_.Make(*next);
+            UnmakeInfo unmake_info = board_.Make(move);
 
             // If the position is invalid because the side to move is in check we must 
             // undo the current move and continue with the next one.
             if (IsInvalidCheckPosition(board_))
             {
-                board_.Unmake(*next, unmake_info);
+                board_.Unmake(move, unmake_info);
             }
             else
             {
@@ -138,7 +138,7 @@ namespace m8::search {
                     value = -AlphaBetaSearch<false, true>(-beta, -alpha, 0, distance + 1, local_pv);
                 }
                 
-                board_.Unmake(*next, unmake_info);
+                board_.Unmake(move, unmake_info);
 
                 // If we are aborting the search we need to leave immediately.
                 if (!continue_)
@@ -153,7 +153,7 @@ namespace m8::search {
                     if (!qsearch)
                     {
                         transposition_table_.Insert(board_.hash(),
-                                                    *next,
+                                                    move,
                                                     transposition::EntryType::LowerBound,
                                                     depth,
                                                     distance,
@@ -169,7 +169,7 @@ namespace m8::search {
                     alpha = value;
                     if (!qsearch)
                     {
-                        pv.Replace(*next, local_pv);
+                        pv.Replace(move, local_pv);
                     }
 
                     // If it is a new best move we notify the user.

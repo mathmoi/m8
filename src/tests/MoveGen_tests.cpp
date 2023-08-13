@@ -7,12 +7,14 @@
 
 #include "catch.hpp"
 
+#include "../m8chess/movegen/MoveGeneration.hpp"
+
 #include "../m8chess/Board.hpp"
-#include "../m8chess/MoveGen.hpp"
 #include "../m8chess/Move.hpp"
 #include "../m8common/Utils.hpp"
 
 using namespace m8;
+using namespace m8::movegen;
 
 TEST_CASE("GenerateKnighMoves_NoKnightOfTheColor_ZeroMovesReturned")
 {

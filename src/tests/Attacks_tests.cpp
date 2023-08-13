@@ -5,9 +5,10 @@
 
 #include "catch.hpp"
 
-#include "../m8chess/Attacks.hpp"
+#include "../m8chess/movegen/Attacks.hpp"
 
 using namespace m8;
+using namespace m8::movegen;
 
 TEST_CASE("GenerateRookAttacks_called_ReturnExpectedValue")
 {

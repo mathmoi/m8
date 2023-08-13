@@ -3,16 +3,16 @@
 /// @date   Janurary 2018
 /// @brief  Contains methods and array used to generate attacks bitboards.
 
+#ifndef M8_CHESS_MOVEGEN_ATTACKS_HPP_
+#define M8_CHESS_MOVEGEN_ATTACKS_HPP_
+
 #include <cstdint>
 
-#include "../m8common/m8common.hpp"
-#include "Sq.hpp"
+#include "../../m8common/Bb.hpp"
 
-#ifndef M8_ATTACKS_HPP_
-#define M8_ATTACKS_HPP_
+#include "../Sq.hpp"
 
-
-namespace m8
+namespace m8::movegen
 {
     /// Structure that hold all the parameters required to do the move generation of a 
     /// rook or bishop on a given square.
@@ -87,4 +87,4 @@ namespace m8
     }    
 }
 
-#endif // M8_ATTACKS_HPP_
+#endif // M8_CHESS_MOVEGEN_ATTACKS_HPP_

@@ -7,8 +7,9 @@
 
 #include "../m8/options/Options.hpp"
 
+#include "movegen/MoveGeneration.hpp"
+
 #include "Checkmate.hpp"
-#include "MoveGen.hpp"
 #include "SAN.hpp"
 
 #include "Perft.hpp"
@@ -34,7 +35,7 @@ namespace m8
     void PerftNode::GenerateMoves(Board& board)
     {
         MoveList moves;
-        Move* last = GenerateAllMoves(board, moves.data());
+        Move* last = movegen::GenerateAllMoves(board, moves.data());
 
         for (Move* next = moves.data(); next < last; ++next)
         {
@@ -70,7 +71,7 @@ namespace m8
         std::uint64_t count = 0;
 
         MoveList moves;
-        Move* last = GenerateAllMoves(board, moves.data());
+        Move* last = movegen::GenerateAllMoves(board, moves.data());
 
         for (Move* next = moves.data(); next < last && !abort_; ++next)
         {

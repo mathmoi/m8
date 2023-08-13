@@ -9,8 +9,7 @@
 #include "catch.hpp"
 #pragma GCC diagnostic pop
 
-#include "../m8common/m8common.hpp"
-#include "../m8chess/m8chess.hpp"
+#include "../m8chess/Init.hpp"
 
 int main(int argc, char* argv[])
 {
