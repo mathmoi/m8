@@ -17,8 +17,13 @@
 
 namespace m8::search {
 
-    AlphaBeta::AlphaBeta(std::shared_ptr<Search> search, transposition::TranspositionTable& transposition_table)
+    AlphaBeta::AlphaBeta(std::shared_ptr<Search> search,
+                         transposition::TranspositionTable& transposition_table,
+                         Move* first_root_move,
+                         Move* last_root_move)
         : board_(search->board()),
+          first_root_move_(first_root_move),
+          last_root_move_(last_root_move),
           continue_(true),
           nodes_count_next_time_check_(kNodesBeforeFirstCheck),
           search_(search),
@@ -98,8 +103,9 @@ namespace m8::search {
         }
 
         // Evaluate all moves
+        movegen::MoveGenerator generator = root ? movegen::MoveGenerator<root, qsearch>(first_root_move_, last_root_move_)
+                                                : movegen::MoveGenerator<root, qsearch>(board_);
         bool found_a_move = false;
-        movegen::MoveGenerator generator(board_, qsearch);
         std::uint16_t move_count = 0;
         for (auto move : generator)
         {
@@ -107,8 +113,7 @@ namespace m8::search {
 
             if (root)
             {
-                // TODO : At root we must generate all moves first to get a number of moves, searche the best move first and keep the order between iteration.
-                NotifySearchMoveAtRoot(depth, 0, move_count, 0, stats_.nodes + stats_.qnodes, move);
+                NotifySearchMoveAtRoot(depth, 0, move_count, last_root_move_ - first_root_move_, stats_.nodes + stats_.qnodes, move);
             }
 
             UnmakeInfo unmake_info = board_.Make(move);

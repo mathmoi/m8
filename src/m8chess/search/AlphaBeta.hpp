@@ -31,7 +31,10 @@ namespace m8 {
         {
         public:
             /// Constructor.
-            AlphaBeta(std::shared_ptr<Search> search, transposition::TranspositionTable& transposition_table);
+            AlphaBeta(std::shared_ptr<Search> search,
+                      transposition::TranspositionTable& transposition_table,
+                      Move* first_root_move,
+                      Move* last_root_move);
 
             /// Start a search on a given position.
             std::optional<SearchResult> Start(DepthType depth);
@@ -40,6 +43,8 @@ namespace m8 {
             const NodeCounterType kNodesBeforeFirstCheck = 100000;
 
             Board board_;
+            Move* first_root_move_;
+            Move* last_root_move_;
             bool continue_;
             SearchStats stats_;
             NodeCounterType nodes_count_next_time_check_;

@@ -3,6 +3,8 @@
 /// @date   Janvier 2020
 /// @brief  Contains the Iterative Deepening algorithm.
 
+#include "../movegen/MoveGenerator.hpp"
+
 #include "IterativeDeepening.hpp"
 
 namespace m8::search {
@@ -11,9 +13,25 @@ namespace m8::search {
     : transposition_table_(transposition_table)
     {}
 
+    inline Move* IterativeDeepening::GetRootMoves(Board board, Move* first)
+    {
+        movegen::MoveGenerator<false, false> generator(board);
+        Move* last = first;
+        for (Move move : generator)
+        {
+            *(last++) = move;
+        }
+        return last;
+    }
+
     SearchResult IterativeDeepening::Start(std::shared_ptr<Search> search)
     {
-        AlphaBeta alpha_beta(search, transposition_table_);
+        // Generate the root moves
+        MoveList root_moves;
+        Move* first_root_move = root_moves.data();
+        Move* last_root_move = GetRootMoves(search->board(), first_root_move);
+
+        AlphaBeta alpha_beta(search, transposition_table_, first_root_move, last_root_move);
         alpha_beta.Attach(this);
 
         std::optional<SearchResult> result;

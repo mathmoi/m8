@@ -17,7 +17,7 @@ namespace m8
     typedef std::uint32_t Move;
 
     /// Move list.
-    typedef std::array<Move, 256> MoveList;
+    typedef std::array<Move, 256> MoveList; // TODO : This should be a class
 
     /// Null move to identify the end of lists
     const Move kNullMove = 0;

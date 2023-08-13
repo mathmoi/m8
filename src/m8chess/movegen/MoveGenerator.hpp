@@ -16,7 +16,8 @@
 
 namespace m8::movegen
 {
-    /// Class responsible to generate moves 
+    /// Class responsible to generate moves
+    template<bool root, bool qsearch>
     class MoveGenerator
     {
     public:
@@ -46,6 +47,16 @@ namespace m8::movegen
             : generator_(&generator),
               current_step_(GenerationStep::GenerateCaptures)
             {
+                if (root)
+                {
+                    first_ = generator_->list.first_;
+                    last_  = generator_->list.last_;
+                    current_step_ = (first_ < last_ ? GenerationStep::DistributeListMoves
+                                                    : GenerationStep::Done);
+                    return;
+                }
+                
+                // !root 
                 GetNextMove();
             }
 
@@ -104,7 +115,7 @@ namespace m8::movegen
                 {
                 case GenerationStep::GenerateCaptures:
                     first_ = moves_.data();
-                    last_ = movegen::GenerateAllCaptures(generator_->board_, first_);
+                    last_ = movegen::GenerateAllCaptures(*(generator_->board_), first_);
                     current_step_ = GenerationStep::DistributeCaptures;
                     if (first_ < last_)
                     {
@@ -121,7 +132,7 @@ namespace m8::movegen
 
                     // At this point there is no more captures to distribute. If we are
                     // in a qsearch we are done.
-                    if (generator_->qsearch_)
+                    if (qsearch)
                     {
                         current_step_ = GenerationStep::Done;
                         return;
@@ -132,7 +143,7 @@ namespace m8::movegen
 
                 case GenerationStep::GenerateQuietMoves:
                     first_ = moves_.data();
-                    last_ = movegen::GenerateAllQuietMoves(generator_->board_, first_);
+                    last_ = movegen::GenerateAllQuietMoves(*(generator_->board_), first_);
                     current_step_ = GenerationStep::DistributeQuietMoves;
                     if (first_ < last_)
                     {
@@ -147,6 +158,17 @@ namespace m8::movegen
                         return;
                     }
                     current_step_ = GenerationStep::Done;
+                    return;
+                    /* Intentionally ommited break */
+
+                case GenerationStep::DistributeListMoves:
+                    ++first_;
+                    if (first_ < last_)
+                    {
+                        return;
+                    }
+                    current_step_ = GenerationStep::Done;
+                    return;
                     /* Intentionally ommited break */
 
                 case GenerationStep::Done:
@@ -161,6 +183,7 @@ namespace m8::movegen
                 DistributeCaptures,
                 GenerateQuietMoves,
                 DistributeQuietMoves,
+                DistributeListMoves,
                 Done
             };
 
@@ -174,10 +197,24 @@ namespace m8::movegen
         /// Constructor
         /// 
         /// @param board Position for which to generate moves.
-        inline MoveGenerator(Board& board, bool qsearch)
-        : board_(board),
-          qsearch_(qsearch)
-        {}
+        inline MoveGenerator(Board& board)
+        : board_(&board)
+        {
+            assert(!root);
+        }
+
+        /// Constructor from a pre-generated list. Can be use at the root of the search to
+        /// use the pre-generated list provided by the iterative-deepening algorithm.
+        /// 
+        /// @param first fist move a pre-generatad list
+        /// @param last  last move of a pre-generated list
+        inline MoveGenerator(Move* first, Move* last)
+        {
+            assert(root);
+
+            list.first_ = first;
+            list.last_ = last;
+        }
 
         /// Returns an iterator that can generate all moves
         inline Iterator begin() const
@@ -193,12 +230,20 @@ namespace m8::movegen
         }
         
     private:
-        Board& board_;
-        bool qsearch_;
-    
+        union
+        {
+            Board* board_;
+            struct
+            {
+                Move* first_;
+                Move* last_;
+            } list;
+        };
     };
 
-    static_assert(std::input_iterator<MoveGenerator::Iterator>);
+    static_assert(std::input_iterator<MoveGenerator<true, false>::Iterator>);
+    static_assert(std::input_iterator<MoveGenerator<false, false>::Iterator>);
+    static_assert(std::input_iterator<MoveGenerator<false, true>::Iterator>);
 }
 
 #endif // M8_CHESS_MOVE_GENERATOR_HPP_
