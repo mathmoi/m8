@@ -3,6 +3,8 @@
 /// @date   Janvier 2020
 /// @brief  Contains the Iterative Deepening algorithm.
 
+#include <algorithm>
+
 #include "../movegen/MoveGenerator.hpp"
 
 #include "IterativeDeepening.hpp"
@@ -52,8 +54,20 @@ namespace m8::search {
                                          current_depth,
                                          0,
                                          result.value().stats_.nodes + result.value().stats_.qnodes);
-
                 last_result = result;
+
+                // If the best move found at the root is not at the top of the root moves
+                // list we pull it to the front. This way the best move from a previous
+                // iteration is always searched first. This has two benifits. First we can
+                // use the result of a partial search. If a new good move is found it can
+                // be used even if all moved have not beeen searched. Second it reduce the
+                // number a new best move is found at the root.
+                auto best_move = result.value().pv_.first();
+                if (*first_root_move != best_move)
+                {
+                    auto pos_best = std::find(first_root_move, last_root_move, best_move);
+                    std::rotate(first_root_move, pos_best, pos_best + 1);
+                }
             }
 
             ++current_depth;

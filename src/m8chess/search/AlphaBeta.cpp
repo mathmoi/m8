@@ -178,7 +178,7 @@ namespace m8::search {
                     }
 
                     // If it is a new best move we notify the user.
-                    if (root)
+                    if (root && 1 < move_count)
                     {
                         NotifyNewBestMove(pv, alpha, depth, 0, stats_.nodes + stats_.qnodes);
                     }
