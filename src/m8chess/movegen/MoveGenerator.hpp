@@ -54,14 +54,10 @@ namespace m8::movegen
             {
                 if (root)
                 {
-                    first_ = generator_->list.first_;
-                    last_  = generator_->list.last_;
-                    current_step_ = (first_ < last_ ? GenerationStep::DistributeListMoves
-                                                    : GenerationStep::Done);
-                    return;
+                    moves_ = *(generator_->moves_);
+                    current_step_ = GenerationStep::DistributeRemainingMoves;
                 }
                 
-                // !root 
                 GetNextMove();
             }
 
@@ -103,8 +99,8 @@ namespace m8::movegen
             /// Returns the current move the iterator references.
             Move operator*() const
             {
-                assert(first_ < last_);
-                return *first_;
+                assert(current_step_ != GenerationStep::Done);
+                return current_move_;
             }
         
         private:
@@ -120,53 +116,47 @@ namespace m8::movegen
                 {
                 case GenerationStep::GenerateCaptures:
                     // Generate all captures
-                    first_ = moves_.data();
-                    last_ = movegen::GenerateAllCaptures(*(generator_->board_), first_);
+                    movegen::GenerateAllCaptures(*(generator_->board_), moves_);
                     
-                    // Score all captures using MVV/LVA, keep track of the best one and 
-                    // move it to the front.
-                    if (first_ < last_)
+                    // Score all captures using MVV/LVA, keep track of the best one and
+                    // make it the current move.
+                    if (moves_.size() > 1)
                     {
                         size_t indx_best = -1;
                         EvalType best_eval = eval::kMinEval;
-                        for (ptrdiff_t x = 0; x < (last_ - first_); ++x)
+                        for (size_t x = 0; x < moves_.size(); ++x)
                         {
-                            evals_[x] = GetMvvLvaValue(moves_[x]);
-                            if (best_eval < evals_[x])
+                            moves_[x].eval = GetMvvLvaValue(moves_[x].move);
+                            if (best_eval < moves_[x].eval)
                             {
-                                best_eval = evals_[x];
+                                best_eval =moves_[x].eval;
                                 indx_best = x;
                             }
                         }
-                        std::swap(moves_[0], moves_[indx_best]);
-                        std::swap(evals_[0], evals_[indx_best]);
+                        current_move_ = moves_[indx_best].move;
+                        moves_.Erase(indx_best);
                         current_step_ = GenerationStep::DistributeCaptures;
                         return;
                     }
+                    current_step_ = GenerationStep::DistributeCaptures;
                     /* Intentionally ommited break */
 
                 case GenerationStep::DistributeCaptures:
-                    // Ignoring the current move at the front of the list. Find the best
-                    // captures remaining. Bring the best captures to the front of the 
-                    // list and shorten the list by one element.
-                    if (first_ < last_ - 1)
+                    // Find the bast capture and make it the current move
+                    if (moves_.any())
                     {
-                        size_t indx_best = 1; // TODO : Check performance if we skip when 1 move remaining.
+                        size_t indx_best = 0;
                         EvalType best_eval = eval::kMinEval;
-                        for (ptrdiff_t x = 1; x < (last_ - first_); ++x)
+                        for (size_t x = 0; x < moves_.size(); ++x)
                         {
-                            if (best_eval < evals_[x])
+                            if (best_eval < moves_[x].eval)
                             {
-                                best_eval = evals_[x];
+                                best_eval = moves_[x].eval;
                                 indx_best = x;
                             }
                         }
-                        auto indx_last = last_ - first_ - 1;
-                        moves_[0] = moves_[indx_best];
-                        evals_[0] = evals_[indx_best];
-                        moves_[indx_best] = moves_[indx_last];
-                        evals_[indx_best] = evals_[indx_last];
-                        --last_;
+                        current_move_ = moves_[indx_best].move;
+                        moves_.Erase(indx_best);
                         return;
                     }
 
@@ -182,33 +172,17 @@ namespace m8::movegen
                     /* Intentionally ommited break */
 
                 case GenerationStep::GenerateQuietMoves:
-                    first_ = moves_.data();
-                    last_ = movegen::GenerateAllQuietMoves(*(generator_->board_), first_);
-                    current_step_ = GenerationStep::DistributeQuietMoves;
-                    if (first_ < last_)
-                    {
-                        return;
-                    }
+                    movegen::GenerateAllQuietMoves(*(generator_->board_), moves_);
+                    current_step_ = GenerationStep::DistributeRemainingMoves;
                     /* Intentionally ommited break */
 
-                case GenerationStep::DistributeQuietMoves:
-                    ++first_;
-                    if (first_ < last_)
+                case GenerationStep::DistributeRemainingMoves:
+                    if (moves_.any())
                     {
+                        current_move_ = moves_.Pop();
                         return;
                     }
                     current_step_ = GenerationStep::Done;
-                    return;
-                    /* Intentionally ommited break */
-
-                case GenerationStep::DistributeListMoves:
-                    ++first_;
-                    if (first_ < last_)
-                    {
-                        return;
-                    }
-                    current_step_ = GenerationStep::Done;
-                    return;
                     /* Intentionally ommited break */
 
                 case GenerationStep::Done:
@@ -222,17 +196,14 @@ namespace m8::movegen
                 GenerateCaptures,
                 DistributeCaptures,
                 GenerateQuietMoves,
-                DistributeQuietMoves,
-                DistributeListMoves,
+                DistributeRemainingMoves,
                 Done
             };
 
             const MoveGenerator* generator_;
             GenerationStep current_step_;
             MoveList moves_;
-            std::array<EvalType, kNumberOfMovesInMoveList> evals_;
-            Move* first_;
-            Move* last_;
+            Move current_move_;
         };
 
         /// Constructor
@@ -249,12 +220,10 @@ namespace m8::movegen
         /// 
         /// @param first fist move a pre-generatad list
         /// @param last  last move of a pre-generated list
-        inline MoveGenerator(Move* first, Move* last)
+        inline MoveGenerator(const MoveList& moves)
         {
             assert(root);
-
-            list.first_ = first;
-            list.last_ = last;
+            moves_ = &moves;
         }
 
         /// Returns an iterator that can generate all moves
@@ -274,11 +243,7 @@ namespace m8::movegen
         union
         {
             Board* board_;
-            struct
-            {
-                Move* first_;
-                Move* last_;
-            } list;
+            const MoveList* moves_;
         };
     };
 

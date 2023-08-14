@@ -35,18 +35,18 @@ namespace m8
     void PerftNode::GenerateMoves(Board& board)
     {
         MoveList moves;
-        Move* last = movegen::GenerateAllMoves(board, moves.data());
+        movegen::GenerateAllMoves(board, moves);
 
-        for (Move* next = moves.data(); next < last; ++next)
+        for (auto move : moves)
         {
-            UnmakeInfo unmake_info = board.Make(*next);
+            UnmakeInfo unmake_info = board.Make(move.move);
 
             if (!IsInCheck(OpposColor(board.side_to_move()), board))
             {
-                moves_.emplace_back(*next);
+                moves_.emplace_back(move.move);
             }
 
-            board.Unmake(*next, unmake_info);
+            board.Unmake(move.move, unmake_info);
         }
     }
 
@@ -71,18 +71,18 @@ namespace m8
         std::uint64_t count = 0;
 
         MoveList moves;
-        Move* last = movegen::GenerateAllMoves(board, moves.data());
+        movegen::GenerateAllMoves(board, moves);
 
-        for (Move* next = moves.data(); next < last && !abort_; ++next)
+        for (auto next = moves.begin(); next < moves.end() && !abort_; ++next)
         {
-            UnmakeInfo unmake_info = board.Make(*next);
+            UnmakeInfo unmake_info = board.Make(next->move);
 
             if (!IsInCheck(OpposColor(board.side_to_move()), board))
             {
                 count += (depth == 1 ? 1 : RecursivePerft(board, depth - 1));
             }
 
-            board.Unmake(*next, unmake_info);
+            board.Unmake(next->move, unmake_info);
         }
 
         return count;

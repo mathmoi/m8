@@ -15,6 +15,7 @@
 #include "../transposition/TranspositionTable.hpp"
 
 #include "../Board.hpp"
+#include "../MoveList.hpp"
 #include "../Types.hpp"
 
 #include "PV.hpp"
@@ -33,18 +34,16 @@ namespace m8 {
             /// Constructor.
             AlphaBeta(std::shared_ptr<Search> search,
                       transposition::TranspositionTable& transposition_table,
-                      Move* first_root_move,
-                      Move* last_root_move);
+                      const MoveList& root_moves);
 
             /// Start a search on a given position.
-            std::optional<SearchResult> Start(DepthType depth);
+            SearchResult Start(DepthType depth);
 
         private:
             const NodeCounterType kNodesBeforeFirstCheck = 100000;
 
             Board board_;
-            Move* first_root_move_;
-            Move* last_root_move_;
+            const MoveList& root_moves_;
             bool continue_;
             SearchStats stats_;
             NodeCounterType nodes_count_next_time_check_;

@@ -19,11 +19,9 @@ namespace m8::search {
 
     AlphaBeta::AlphaBeta(std::shared_ptr<Search> search,
                          transposition::TranspositionTable& transposition_table,
-                         Move* first_root_move,
-                         Move* last_root_move)
+                         const MoveList& root_moves)
         : board_(search->board()),
-          first_root_move_(first_root_move),
-          last_root_move_(last_root_move),
+          root_moves_(root_moves),
           continue_(true),
           nodes_count_next_time_check_(kNodesBeforeFirstCheck),
           search_(search),
@@ -103,7 +101,7 @@ namespace m8::search {
         }
 
         // Evaluate all moves
-        movegen::MoveGenerator generator = root ? movegen::MoveGenerator<root, qsearch>(first_root_move_, last_root_move_)
+        movegen::MoveGenerator generator = root ? movegen::MoveGenerator<root, qsearch>(root_moves_)
                                                 : movegen::MoveGenerator<root, qsearch>(board_);
         bool found_a_move = false;
         std::uint16_t move_count = 0;
@@ -113,7 +111,7 @@ namespace m8::search {
 
             if (root)
             {
-                NotifySearchMoveAtRoot(depth, 0, move_count, last_root_move_ - first_root_move_, stats_.nodes + stats_.qnodes, move);
+                NotifySearchMoveAtRoot(depth, 0, move_count, root_moves_.size(), stats_.nodes + stats_.qnodes, move);
             }
 
             UnmakeInfo unmake_info = board_.Make(move);
@@ -216,22 +214,18 @@ namespace m8::search {
         return alpha;
     }
 
-    std::optional<SearchResult> AlphaBeta::Start(DepthType depth)
+    SearchResult AlphaBeta::Start(DepthType depth)
     {
         PV pv;
 
         NotifySearchStarted();
 
         auto value = AlphaBetaSearch<true, false>(eval::kMinEval, eval::kMaxEval, depth, 0, pv);
-        
-        // If we are aborting the search we need to leave immediately.
-        if (!continue_)
-        {
-            // TODO : If we make sure that we always search the previous best move first, we could still use the result of a partial search.
-            return std::nullopt;
-        }
 
-        auto result = SearchResult(pv, value, stats_);
+        auto result_type = continue_ ? ResultType::Complete
+                                     : (pv.any() ? ResultType::Partial
+                                                 : ResultType::None);        
+        auto result = SearchResult(result_type, pv, value, stats_);
 
         NotifySearchCompleted(pv, 0, stats_);
 

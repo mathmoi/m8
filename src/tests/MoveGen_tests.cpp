@@ -16,33 +16,47 @@
 using namespace m8;
 using namespace m8::movegen;
 
+inline bool Contains(Move expected, const MoveList& actual_moves)
+{
+    return actual_moves.end() != std::find_if(actual_moves.begin(),
+                                              actual_moves.end(),
+                                              [expected](const MoveEvalPair& pair){return pair.move == expected;});
+}
+
+inline void RequireSameMoves(const std::vector<Move>& expected_moves, const MoveList& actual_moves)
+{
+    REQUIRE (expected_moves.size() == actual_moves.size());
+
+    for (auto expected_move : expected_moves)
+    {
+        REQUIRE(Contains(expected_move, actual_moves));
+    }
+}
+
 TEST_CASE("GenerateKnighMoves_NoKnightOfTheColor_ZeroMovesReturned")
 {
     Board board("8/8/8/4N3/8/8/8/8 w - - 1 1 ");
     MoveList moves;
-    Move* next_move = moves.data();
+    
+    GenerateKnightMoves(board, kBlack, false, moves);
 
-    next_move = GenerateKnightMoves(board, kBlack, false, next_move);
-
-    REQUIRE((next_move - moves.data()) == 0);
+    REQUIRE(!moves.any());
 }
 
 TEST_CASE("GenerateKnighMoves_NoPossibleMoves_ZeroMovesReturned")
 {
     Board board("4k3/8/8/8/8/6R1/5R2/4K2N b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
-    next_move = GenerateKnightMoves(board, kWhite, false, next_move);
+    GenerateKnightMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 0);
+    REQUIRE(!moves.any());
 }
 
 TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoard_EightMovesReturned")
 {
     Board board("8/8/8/4N3/8/8/8/8 w - - 1 1 ");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = {NewMove(kE5, kF7, kWhiteKnight),
                                         NewMove(kE5, kG6, kWhiteKnight),
@@ -53,20 +67,15 @@ TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoard_EightMovesReturned")
                                         NewMove(kE5, kC6, kWhiteKnight),
                                         NewMove(kE5, kD7, kWhiteKnight)};
 
-    next_move = GenerateKnightMoves(board, kWhite, false, next_move);
+    GenerateKnightMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 8);
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoardOneMoveObstructed_SevenMovesReturned")
 {
     Board board("8/8/8/4N3/8/5p2/8/8 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnight),
                                          NewMove(kE5, kG6, kWhiteKnight),
@@ -76,32 +85,27 @@ TEST_CASE("GenerateKnighMoves_SingleKnightMidleOfBoardOneMoveObstructed_SevenMov
                                          NewMove(kE5, kC6, kWhiteKnight),
                                          NewMove(kE5, kD7, kWhiteKnight) };
 
-    next_move = GenerateKnightMoves(board, kWhite, false, next_move);
+    GenerateKnightMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 7);
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateKnighCaptures_SingleKnightMidleOfBoardOnePawnToCapture_OneMoveReturned")
 {
     Board board("8/8/8/4N3/8/5p2/8/8 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
-    next_move = GenerateKnightMoves(board, kWhite, true, next_move);
+    std::vector<Move> expected_moves = { NewMove(kE5, kF3, kWhiteKnight, kBlackPawn) };
 
-    REQUIRE((next_move - moves.data()) == 1);
-    REQUIRE(moves[0] == NewMove(kE5, kF3, kWhiteKnight, kBlackPawn));
+    GenerateKnightMoves(board, kWhite, true, moves);
+
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoard_EightMovesReturned")
 {
     Board board("8/8/8/4N3/8/5p2/8/6N1 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = { NewMove(kE5, kF7, kWhiteKnight),
                                          NewMove(kE5, kG6, kWhiteKnight),
@@ -113,60 +117,48 @@ TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoard_EightMovesReturned")
                                          NewMove(kG1, kE2, kWhiteKnight),
                                          NewMove(kG1, kH3, kWhiteKnight)};
 
-    next_move = GenerateKnightMoves(board, kWhite, false, next_move);
+    GenerateKnightMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 9);
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateKnighMoves_TwoKnightsOnBoardAbleToCaptureSinglePawn_TwoCapturesReturned")
 {
     Board board("8/8/8/4N3/8/5p2/8/6N1 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = { NewMove(kE5, kF3, kWhiteKnight, kBlackPawn),
                                          NewMove(kG1, kF3, kWhiteKnight, kBlackPawn) };
 
-    next_move = GenerateKnightMoves(board, kWhite, true, next_move);
+    GenerateKnightMoves(board, kWhite, true, moves);
 
-    REQUIRE((next_move - moves.data()) == 2);
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateKingMoves_NoKing_ZeroMovesReturned")
 {
     Board board("8/8/8/8/8/K7/8/8 w - - 1 1 ");
     MoveList moves;
-    Move* next_move = moves.data();
 
-    next_move = GenerateKingMoves(board, kBlack, false, next_move);
+    GenerateKingMoves(board, kBlack, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 0);
+    REQUIRE(!moves.any());
 }
 
 TEST_CASE("GenerateKingMoves_AllMovesBlockedByOwnPiece_ZeroMovesReturned")
 {
     Board board("4k3/8/8/8/8/8/3RRR2/3RKR2 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
-    next_move = GenerateKingMoves(board, kWhite, false, next_move);
+    GenerateKingMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 0);
+    REQUIRE(!moves.any());
 }
 
 TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SevenMovesReturned")
 {
     Board board("4k3/8/8/8/8/4Kp2/8/8 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = 
       { NewMove(kE3, kE4, kWhiteKing),
@@ -177,55 +169,40 @@ TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SevenMovesReturned
         NewMove(kE3, kD3, kWhiteKing),
         NewMove(kE3, kD4, kWhiteKing)};
 
-    next_move = GenerateKingMoves(board, kWhite, false, next_move);
+    GenerateKingMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 7);
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateKingMoves_KingMidleBoardOneCapturePossible_SingleCaptureReturned")
 {
     Board board("4k3/8/8/8/8/4Kp2/8/8 b - - 1 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     { NewMove(kE3, kF3, kWhiteKing, kBlackPawn)};
 
-    next_move = GenerateKingMoves(board, kWhite, true, next_move);
+    GenerateKingMoves(board, kWhite, true, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnMoves_NoPawnsOfTheRequestedColor_NoMoves")
 {
     Board board("3k4/3p4/8/8/8/8/8/3K4 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = {};
 
-    next_move = GeneratePawnMoves(board, kWhite, next_move);
+    GeneratePawnMoves(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnMoves_TwoPawnsThatCanMoveForward_TwoMoves")
 {
     Board board("4k3/8/8/8/5P2/3P4/8/4K3 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = 
     {
@@ -233,33 +210,27 @@ TEST_CASE("GeneratePawnMoves_TwoPawnsThatCanMoveForward_TwoMoves")
         NewMove(kF4, kF5, kWhitePawn)
     };
 
-    next_move = GeneratePawnMoves(board, kWhite, next_move);
+    GeneratePawnMoves(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnMoves_BlockedPawn_NoMoves")
 {
     Board board("4k3/8/8/8/3R4/3P4/8/4K3 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = {};
 
-    next_move = GeneratePawnMoves(board, kWhite, next_move);
+    GeneratePawnMoves(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnMoves_PawnOnStartingRow_TwoMoves")
 {
     Board board("4k3/3p4/8/8/8/8/8/4K3 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -267,108 +238,82 @@ TEST_CASE("GeneratePawnMoves_PawnOnStartingRow_TwoMoves")
         NewMove(kD7, kD5, kBlackPawn)
     };
 
-    next_move = GeneratePawnMoves(board, kBlack, next_move);
+    GeneratePawnMoves(board, kBlack, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnMoves_PawnOnStartingRowDoubleMoveBlocked_OneMoves")
 {
     Board board("4k3/3p4/8/3n4/8/8/8/4K3 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
         NewMove(kD7, kD6, kBlackPawn)
     };
 
-    next_move = GeneratePawnMoves(board, kBlack, next_move);
+    GeneratePawnMoves(board, kBlack, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnMoves_PawnOnStartingRowBlocked_NoMoves")
 {
     Board board("4k3/3p4/3n4/8/8/8/8/4K3 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves = {};
 
-    next_move = GeneratePawnMoves(board, kBlack, next_move);
+    GeneratePawnMoves(board, kBlack, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnCaptures_NoPawnOfTheRequestedColor_NoMoves")
 {
     Board board("4k3/8/8/3n4/8/8/8/4K3 b - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
-    next_move = GeneratePawnCaptures(board, kBlack, next_move);
+    GeneratePawnCaptures(board, kBlack, moves);
 
-    REQUIRE((next_move - moves.data()) == 0);
+    REQUIRE(!moves.any());
 }
 
 TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnLeft_OneMovesReturned")
 {
     Board board("4k3/8/8/3n4/4P3/8/8/4K3 w - - 0 1 ");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
         NewMove(kE4, kD5, kWhitePawn, kBlackKnight)
     };
 
-    next_move = GeneratePawnCaptures(board, kWhite, next_move);
+    GeneratePawnCaptures(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnCaptures_OneCapturesAvailableOnRight_OneMovesReturned")
 {
     Board board("4k3/8/8/5n2/4P3/8/8/4K3 w - - 0 1 ");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
         NewMove(kE4, kF5, kWhitePawn, kBlackKnight)
     };
 
-    next_move = GeneratePawnCaptures(board, kWhite, next_move);
+    GeneratePawnCaptures(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToPromote_FourMovesReturned")
 {
     Board board("4k3/1P6/8/8/8/8/8/4K3 w - - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -378,20 +323,15 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToPromote_FourMovesReturned")
         NewMove(kB7, kB8, kWhitePawn, kNoPiece, kWhiteBishop)
     };
 
-    next_move = GeneratePawnCaptures(board, kWhite, next_move);
+    GeneratePawnCaptures(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesReturned")
 {
     Board board("1Rr1k3/1P6/8/8/8/8/8/4K3 w - - 0 1 ");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -401,34 +341,27 @@ TEST_CASE("GeneratePawnCaptures_OnePawnInPositionToCaptureAndPromote_FourMovesRe
         NewMove(kB7, kC8, kWhitePawn, kBlackRook, kWhiteBishop)
     };
 
-    next_move = GeneratePawnCaptures(board, kWhite, next_move);
+    GeneratePawnCaptures(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GeneratePawnCaptures_PriseEnPassantPossible_PriseEnPassantReturned")
 {
     Board board("rnbqkbnr/p2ppppp/8/1Pp5/8/8/1PPPPPPP/RNBQKBNR w KQkq c6 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     Move expected = NewMove(kB5, kC6, kWhitePawn, kBlackPawn);
 
-    next_move = GeneratePawnCaptures(board, kWhite, next_move);
+    GeneratePawnCaptures(board, kWhite, moves);
 
-    REQUIRE((next_move - moves.data()) == 1);
-    REQUIRE(Contains(moves.data(), next_move, expected));
+    REQUIRE(Contains(expected, moves));
 }
 
 TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_rook_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -443,20 +376,15 @@ TEST_CASE("GenerateRookMoves__called_for_non_captures__return_all_non_captures_r
         NewMove(kH8, kH4, kBlackRook),
     };
 
-    next_move = GenerateRookMoves(board, kBlack, false, next_move);
+    GenerateRookMoves(board, kBlack, false, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateRookMoves__called_for_captures__return_all_captures_rook_moves")
 {
     Board board("r3k2r/Q1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q2/PPPBBPPP/R3K2R w KQkq - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -464,20 +392,15 @@ TEST_CASE("GenerateRookMoves__called_for_captures__return_all_captures_rook_move
         NewMove(kH8, kH2, kBlackRook, kWhitePawn),
     };
 
-    next_move = GenerateRookMoves(board, kBlack, true, next_move);
+    GenerateRookMoves(board, kBlack, true, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateBishopMoves__called_for_non_captures__return_all_non_captures_bishop_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -490,53 +413,42 @@ TEST_CASE("GenerateBishopMoves__called_for_non_captures__return_all_non_captures
         NewMove(kG7, kH6, kBlackBishop)
     };
 
-    next_move = GenerateBishopMoves(board, kBlack, false, next_move);
+    GenerateBishopMoves(board, kBlack, false, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateBishopMoves__CaptureOnTheCornerOfBoard__CaptureInCornerReturned")
 {
     Board board("rnbqkbnr/1ppppp1p/p5p1/8/8/1P6/PBPPPPPP/RN1QKBNR w KQkq - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     Move expected_move = NewMove(kB2, kH8, kWhiteBishop, kBlackRook);
 
-    next_move = GenerateBishopMoves(board, kWhite, true, next_move);
+    GenerateBishopMoves(board, kWhite, true, moves);
 
-    REQUIRE(Contains(moves.data(), next_move, expected_move));
+    REQUIRE(Contains(expected_move, moves));
 }
 
 TEST_CASE("GenerateBishopMoves__called_for_captures__return_all_captures_bishop_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
         NewMove(kA6, kE2, kBlackBishop, kWhiteBishop)
     };
 
-    next_move = GenerateBishopMoves(board, kBlack, true, next_move);
+    GenerateBishopMoves(board, kBlack, true, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateQueenMoves__called_for_non_captures__return_all_non_captures_queen_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -549,20 +461,15 @@ TEST_CASE("GenerateQueenMoves__called_for_non_captures__return_all_non_captures_
         NewMove(kF3, kH5, kWhiteQueen),
     };
 
-    next_move = GenerateQueenMoves(board, kWhite, false, next_move);
+    GenerateQueenMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateQueenMoves__called_for_captures__return_all_captures_queen_moves")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -570,13 +477,9 @@ TEST_CASE("GenerateQueenMoves__called_for_captures__return_all_captures_queen_mo
         NewMove(kF3, kH3, kWhiteQueen, kBlackPawn)
     };
 
-    next_move = GenerateQueenMoves(board, kWhite, true, next_move);
+    GenerateQueenMoves(board, kWhite, true, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("AttacksTo__lots_of_squares_attack_e5__all_attacks_identified")
@@ -610,7 +513,6 @@ TEST_CASE("GenerateCastlingMoves__chess960_position__correct_moves_including_cas
 {
     Board board("rk2r3/8/8/8/8/8/4P3/RK2R3 w KQkq - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     std::vector<Move> expected_moves =
     {
@@ -622,52 +524,45 @@ TEST_CASE("GenerateCastlingMoves__chess960_position__correct_moves_including_cas
         NewCastlingMove(kB1, kC1, kWhiteKing, kQueenSideCastle)
     };
 
-    next_move = GenerateKingMoves(board, kWhite, false, next_move);
+    GenerateKingMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == static_cast<std::ptrdiff_t>(expected_moves.size()));
-    for (auto expected : expected_moves)
-    {
-        REQUIRE(Contains(moves.data(), next_move, expected));
-    }
+    RequireSameMoves(expected_moves, moves);
 }
 
 TEST_CASE("GenerateCastlingMoves__position_traversed_by_rook_attacked__castling_possible")
 {
     Board board("1k6/8/1r6/8/8/8/8/R3K3 w Q - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     Move expected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
-    next_move = GenerateKingMoves(board, kWhite, false, next_move);
+    GenerateKingMoves(board, kWhite, false, moves);
 
-    REQUIRE(Contains(moves.data(), next_move, expected_move));
+    REQUIRE(Contains(expected_move, moves));
 }
 
 TEST_CASE("GenerateCastlingMoves__position_traversed_by_king_attacked__castling_impossible")
 {
     Board board("1k6/8/3r4/8/8/8/8/R3K3 w Q - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
-    next_move = GenerateKingMoves(board, kWhite, false, next_move);
+    GenerateKingMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 5);
-    REQUIRE(!Contains(moves.data(), next_move, unexpected_move));
+    REQUIRE(5 == moves.size());
+    REQUIRE(!Contains(unexpected_move, moves));
 }
 
 TEST_CASE("GenerateCastlingMoves__positions_traveled_by_rook_occupied__castling_impossible")
 {
     Board board("1k6/8/8/8/8/8/8/RB2K3 w Q - 0 1");
     MoveList moves;
-    Move* next_move = moves.data();
 
     Move unexpected_move = NewCastlingMove(kE1, kC1, kWhiteKing, kQueenSideCastle);
 
-    next_move = GenerateKingMoves(board, kWhite, false, next_move);
+    GenerateKingMoves(board, kWhite, false, moves);
 
-    REQUIRE((next_move - moves.data()) == 5);
-    REQUIRE(!Contains(moves.data(), next_move, unexpected_move));
+    REQUIRE(5 == moves.size());
+    REQUIRE(!Contains(unexpected_move, moves));
 }

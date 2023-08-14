@@ -38,17 +38,16 @@ namespace m8
         Color side_to_move = board.side_to_move();
 
         MoveList moves;
-        Move* end = moves.data();
-        end = movegen::GenerateAllMoves(board, end);
+        movegen::GenerateAllMoves(board, moves);
 
         // We look for a move that doesn't leave the side to move in check.
         bool found = false;
-        Move* next = moves.data();
-        while (!found && next < end)
+        auto next = moves.begin();
+        while (!found && next < moves.end())
         {
-            UnmakeInfo unmake_info = board.Make(*next);
+            UnmakeInfo unmake_info = board.Make(next->move);
             found = !IsInCheck(side_to_move, board);
-            board.Unmake(*next, unmake_info);
+            board.Unmake(next->move, unmake_info);
 
             ++next;
         }

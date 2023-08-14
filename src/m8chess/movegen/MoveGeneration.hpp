@@ -14,6 +14,7 @@
 #include "../Board.hpp"
 #include "../Const.hpp"
 #include "../Move.hpp"
+#include "../MoveList.hpp"
 #include "../Piece.hpp"
 #include "../Sq.hpp"
 #include "../XRay.hpp"
@@ -129,14 +130,15 @@ namespace m8::movegen
     /// @param attack_array Attack array for the type of piece for which to generate 
     ///                     moves.
     /// @param next_move    Pointer into an array of move where we can add moves.
+    /// @param move_list    List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateSimpleMoves(const Board& board,
-                                     Color color,
-                                     bool is_captures,
-                                     Piece piece,
-                                     Bb bb_pieces,
-                                     AttackArray attack_array,
-                                     Move* next_move)
+    inline void GenerateSimpleMoves(const Board& board,
+                                    Color color,
+                                    bool is_captures,
+                                    Piece piece,
+                                    Bb bb_pieces,
+                                    AttackArray attack_array,
+                                    MoveList& move_list)
     {
         Bb targets = GetTargets(board, color, is_captures);
 
@@ -148,11 +150,9 @@ namespace m8::movegen
             while (destinations)
             {
                 Sq to = RemoveLsb(destinations);
-                *(next_move++) = NewMove(from, to, piece, board[to]);
+                move_list.Push(NewMove(from, to, piece, board[to]));
             }
         }
-
-        return next_move;
     }
 
     /// Generate the moves of the knight. The moves are added to an array specified by
@@ -162,18 +162,21 @@ namespace m8::movegen
     /// @param color       Color of the knight to generate the moves for.
     /// @param is_captures Indicate if we should generate captures or non captures 
     ///                    moves.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateKnightMoves(const Board& board, Color color, bool is_captures, Move* next_move)
+    inline void GenerateKnightMoves(const Board& board, 
+                                     Color color,
+                                     bool is_captures,
+                                     MoveList& move_list)
     {
         Piece piece = NewPiece(kKnight, color);
-        return GenerateSimpleMoves(board,
-                                   color,
-                                   is_captures,
-                                   piece,
-                                   board.bb_piece(piece),
-                                   knight_attack_bb,
-                                   next_move);
+        GenerateSimpleMoves(board,
+                            color,
+                            is_captures,
+                            piece,
+                            board.bb_piece(piece),
+                            knight_attack_bb,
+                            move_list);
     }
 
     /// Generate a castling move, king side or queen side depending on the parameters
@@ -185,15 +188,15 @@ namespace m8::movegen
     /// @param rook_original_column Column of the rook before the castling. Because of
     ///                             the Chess960 rules this might be any column.
     /// @param rook_final_column    Column of the rook afther the castling move.
-    /// @param next_move            Pointer into an array where we can add moves.
+    /// @param move_list            List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateCastlingMoves(const Board& board,
-        Color color,
-        std::uint8_t castling_side,
-        Colmn king_final_column,
-        Colmn rook_original_column,
-        Colmn rook_final_column,
-        Move* next_move)
+    inline void GenerateCastlingMoves(const Board& board,
+                                      Color color,
+                                      std::uint8_t castling_side,
+                                      Colmn king_final_column,
+                                      Colmn rook_original_column,
+                                      Colmn rook_final_column,
+                                      MoveList& move_list)
     {
         if (board.casle(color, castling_side))
         {
@@ -229,25 +232,24 @@ namespace m8::movegen
 
                 if (!attacked)
                 {
-                    *(next_move++) = NewCastlingMove(king_position, king_final_position, king, castling_side);
+                    move_list.Push(NewCastlingMove(king_position,
+                                                       king_final_position,
+                                                       king,
+                                                       castling_side));
                 }
             }
         }
-
-        return next_move;
     }
 
     /// Generate castling moves.
     ///
     /// @param color         Color of the king to generate the castling moves for.
-    /// @param next_move     Pointer into an array where we can add moves.
+    /// @param move_list     List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateCastlingMoves(const Board& board, Color color, Move* next_move)
+    inline void GenerateCastlingMoves(const Board& board, Color color, MoveList& move_list)
     {
-        next_move = GenerateCastlingMoves(board, color, kKingSideCastle, kColmnG, board.casle_colmn(kKingSideCastle), kColmnF, next_move);
-        next_move = GenerateCastlingMoves(board, color, kQueenSideCastle, kColmnC, board.casle_colmn(kQueenSideCastle), kColmnD, next_move);
-
-        return next_move;
+        GenerateCastlingMoves(board, color, kKingSideCastle, kColmnG, board.casle_colmn(kKingSideCastle), kColmnF, move_list);
+        GenerateCastlingMoves(board, color, kQueenSideCastle, kColmnC, board.casle_colmn(kQueenSideCastle), kColmnD, move_list);
     }
 
     /// Generate the moves of the king. The moves are added to an array specified by
@@ -256,25 +258,24 @@ namespace m8::movegen
     /// @param color       Color of the king to generate the moves for.
     /// @param is_captures Indicate if we should generate captures or non captures 
     ///                    moves.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateKingMoves(const Board& board, Color color, bool is_captures, Move* next_move)
+    inline void GenerateKingMoves(const Board& board, Color color, 
+                                  bool is_captures, MoveList& move_list)
     {
         Piece piece = NewPiece(kKing, color);
-        next_move = GenerateSimpleMoves(board,
-                                        color,
-                                        is_captures,
-                                        piece,
-                                        board.bb_piece(piece),
-                                        king_attack_bb,
-                                        next_move);
+       GenerateSimpleMoves(board,
+                           color,
+                           is_captures,
+                           piece,
+                           board.bb_piece(piece),
+                           king_attack_bb,
+                           move_list);
 
         if (!is_captures)
         {
-            next_move = GenerateCastlingMoves(board, color, next_move);
+            GenerateCastlingMoves(board, color, move_list);
         }
-
-        return next_move;
     }
 
     /// Generate pawn moves from a bitboard representing destinations squares.
@@ -282,9 +283,9 @@ namespace m8::movegen
     /// @param color       Color of the pawn to generate the moves for.
     /// @param target      Bitboard representing the destinations.
     /// @param from_delta  Delta to apply to the destination to get the origin.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* UnpackPawnMoves(const Board& board, Color color, Bb target, int from_delta, Move* next_move)
+    inline void UnpackPawnMoves(const Board& board, Color color, Bb target, int from_delta, MoveList& move_list)
     {
         Piece piece = NewPiece(kPawn, color);
         Row eighth_row = 7 - 7 * color;
@@ -295,18 +296,16 @@ namespace m8::movegen
             Sq from = to + from_delta;
             if (GetRow(to) != eighth_row)
             {
-                *(next_move++) = NewMove(from, to, piece, board[to]);
+                move_list.Push(NewMove(from, to, piece, board[to]));
             }
             else
             {
-                *(next_move++) = NewMove(from, to, piece, board[to], NewPiece(kQueen, color));
-                *(next_move++) = NewMove(from, to, piece, board[to], NewPiece(kRook, color));
-                *(next_move++) = NewMove(from, to, piece, board[to], NewPiece(kKnight, color));
-                *(next_move++) = NewMove(from, to, piece, board[to], NewPiece(kBishop, color));
+                move_list.Push(NewMove(from, to, piece, board[to], NewPiece(kQueen, color)));
+                move_list.Push(NewMove(from, to, piece, board[to], NewPiece(kRook, color)));
+                move_list.Push(NewMove(from, to, piece, board[to], NewPiece(kKnight, color)));
+                move_list.Push(NewMove(from, to, piece, board[to], NewPiece(kBishop, color)));
             }
         }
-
-        return next_move;
     }
 
     /// Generate pawn side captures.
@@ -314,26 +313,28 @@ namespace m8::movegen
     /// @param color         Color of the pawn to generate the moves for.
     /// @param ignored_colmn Column that should be ignored.
     /// @param delta         Delta applied between the from and to squares.
-    /// @param next_move     Pointer into an array where we can add moves.
+    /// @param move_list     List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GeneratePawnSideCaptures(const Board& board, Color color, Colmn ignored_colmn, int delta, Move* next_move)
+    inline void GeneratePawnSideCaptures(const Board& board,
+                                         Color color,
+                                         Colmn ignored_colmn,
+                                         int delta,
+                                         MoveList& move_list)
     {
         Piece piece = NewPiece(kPawn, color);
 
         Bb target = board.bb_piece(piece) & ~kBbColmn[ignored_colmn];
         Shift(target, delta);
         target &= board.bb_color(OpposColor(color));
-        next_move = UnpackPawnMoves(board, color, target, -delta, next_move);
-
-        return next_move;
+        UnpackPawnMoves(board, color, target, -delta, move_list);
     }
 
     /// Generate the en-passant capture
     ///
-    /// @param color         Color of the pawn to generate the moves for.
-    /// @param next_move     Pointer into an array where we can add moves.
+    /// @param color     Color of the pawn to generate the moves for.
+    /// @param move_list List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GeneratePriseEnPassant(const Board& board, Color color, Move* next_move)
+    inline void GeneratePriseEnPassant(const Board& board, Color color, MoveList& move_list)
     {
         Colmn enpas = board.colmn_enpas();
         if (IsColmnOnBoard(enpas))
@@ -348,7 +349,7 @@ namespace m8::movegen
                 {
                     Sq to = NewSq(enpas, GetColorWiseRow(color, kRow6));
                     Piece captured = NewPiece(kPawn, OpposColor(color));
-                    *(next_move++) = NewMove(from, to, pawn, captured);
+                    move_list.Push(NewMove(from, to, pawn, captured));
                 }
             }
 
@@ -359,20 +360,18 @@ namespace m8::movegen
                 {
                     Sq to = NewSq(enpas, GetColorWiseRow(color, kRow6));
                     Piece captured = NewPiece(kPawn, OpposColor(color));
-                    *(next_move++) = NewMove(from, to, pawn, captured);
+                    move_list.Push(NewMove(from, to, pawn, captured));
                 }
             }
         }
-
-        return next_move;
     }
 
     /// Generate pawn promotions
     ///
     /// @param color         Color of the pawn to generate the moves for.
-    /// @param next_move     Pointer into an array where we can add moves.
+    /// @param move_list     List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GeneratePawnPromotions(const Board& board, Color color, Move* next_move)
+    inline void GeneratePawnPromotions(const Board& board, Color color, MoveList& move_list)
     {
         Piece piece = NewPiece(kPawn, color);
         Row seventh_row = kRow7 - 5 * color;
@@ -381,18 +380,16 @@ namespace m8::movegen
         Bb target = board.bb_piece(piece) & kBbRow[seventh_row];
         Shift(target, forward_move);
         target &= ~board.bb_occupied();
-        next_move = UnpackPawnMoves(board, color, target, -forward_move, next_move);
-
-        return next_move;
+        UnpackPawnMoves(board, color, target, -forward_move, move_list);
     }
 
     /// Generate the moves of the pawns. The moves are added to an array specified by
     /// the parameter next_move.
     ///
     /// @param color       Color of the pawn to generate the moves for.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GeneratePawnMoves(const Board& board, Color color, Move* next_move)
+    inline void GeneratePawnMoves(const Board& board, Color color, MoveList& move_list)
     {
         Piece piece = NewPiece(kPawn, color);
         Row third_row = kRow3 + 3 * color;
@@ -410,10 +407,8 @@ namespace m8::movegen
         Shift(target_dbl, forward_move);
         target_dbl &= ~board.bb_occupied();
 
-        next_move = UnpackPawnMoves(board, color, target, -forward_move, next_move);
-        next_move = UnpackPawnMoves(board, color, target_dbl, -forward_move * 2, next_move);
-
-        return next_move;
+        UnpackPawnMoves(board, color, target, -forward_move, move_list);
+        UnpackPawnMoves(board, color, target_dbl, -forward_move * 2, move_list);
     }
 
     /// Generate the pawn's captures. The moves are added to an array specified by
@@ -421,19 +416,17 @@ namespace m8::movegen
     /// by this method.
     ///
     /// @param color       Color of the pawn to generate the captures for.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GeneratePawnCaptures(const Board& board, Color color, Move* next_move)
+    inline void GeneratePawnCaptures(const Board& board, Color color, MoveList& move_list)
     {
         int forward_left = 7 - 16 * color;
         int forward_right = 9 - 16 * color;
 
-        next_move = GeneratePawnSideCaptures(board, color, kColmnA, forward_left, next_move);
-        next_move = GeneratePawnSideCaptures(board, color, kColmnH, forward_right, next_move);
-        next_move = GeneratePriseEnPassant(board, color, next_move);
-        next_move = GeneratePawnPromotions(board, color, next_move);
-
-        return next_move;
+        GeneratePawnSideCaptures(board, color, kColmnA, forward_left, move_list);
+        GeneratePawnSideCaptures(board, color, kColmnH, forward_right, move_list);
+        GeneratePriseEnPassant(board, color, move_list);
+        GeneratePawnPromotions(board, color, move_list);
     }
 
     /// Generate moves of slider pieces.
@@ -446,9 +439,15 @@ namespace m8::movegen
     /// @param slide_like_rook   Indicate if the piece can move horizontaly and 
     ///                          verticaly.
     /// @param slide_like_bishop Indicate if the piece can move diagonaly.
-    /// @param next_move         Pointer into an array where we can add moves.
+    /// @param move_list         List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateSliderMove(const Board& board, Piece piece, Color color, Bb targets, bool slide_like_rook, bool slide_like_bishop, Move* next_move)
+    inline void GenerateSliderMove(const Board& board,
+                                   Piece piece,
+                                   Color color,
+                                   Bb targets,
+                                   bool slide_like_rook,
+                                   bool slide_like_bishop,
+                                   MoveList& move_list)
     {
         Bb bb_from = board.bb_piece(piece);
 
@@ -467,11 +466,9 @@ namespace m8::movegen
             {
                 Sq to = RemoveLsb(bb_to);
 
-                *(next_move++) = NewMove(from, to, piece, board[to]);
+                move_list.Push(NewMove(from, to, piece, board[to]));
             }
         }
-
-        return next_move;
     }
 
     /// Generate the moves of the rooks. The moves are added to an array specified by
@@ -480,14 +477,14 @@ namespace m8::movegen
     /// @param color       Color of the piece to generate the moves for.
     /// @param is_captures Indicate if we should generate captures or non captures 
     ///                    moves.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateRookMoves(const Board& board, Color color, bool is_captures, Move* next_move)
+    inline void GenerateRookMoves(const Board& board, Color color, bool is_captures, MoveList& move_list)
     {
         Piece piece = NewPiece(kRook, color);
         Bb targets = GetTargets(board, color, is_captures);
 
-        return GenerateSliderMove(board, piece, color, targets, true, false, next_move);
+        GenerateSliderMove(board, piece, color, targets, true, false, move_list);
     }
 
     /// Generate the moves of the bishops. The moves are added to an array specified by
@@ -496,14 +493,14 @@ namespace m8::movegen
     /// @param color       Color of the piece to generate the moves for.
     /// @param is_captures Indicate if we should generate captures or non captures 
     ///                    moves.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateBishopMoves(const Board& board, Color color, bool is_captures, Move* next_move)
+    inline void GenerateBishopMoves(const Board& board, Color color, bool is_captures, MoveList& move_list)
     {
         Piece piece = NewPiece(kBishop, color);
         Bb targets = GetTargets(board, color, is_captures);
 
-        return GenerateSliderMove(board, piece, color, targets, false, true, next_move);
+        GenerateSliderMove(board, piece, color, targets, false, true, move_list);
     }
 
     /// Generate the moves of the queens. The moves are added to an array specified by
@@ -512,88 +509,78 @@ namespace m8::movegen
     /// @param color       Color of the piece to generate the moves for.
     /// @param is_captures Indicate if we should generate captures or non captures 
     ///                    moves.
-    /// @param next_move   Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position after the last move inserted into the array.
-    inline Move* GenerateQueenMoves(const Board& board, Color color, bool is_captures, Move* next_move)
+    inline void GenerateQueenMoves(const Board& board, Color color, bool is_captures, MoveList& move_list)
     {
         Piece piece = NewPiece(kQueen, color);
         Bb targets = GetTargets(board, color, is_captures);
 
-        return GenerateSliderMove(board, piece, color, targets, true, true, next_move);
+        GenerateSliderMove(board, piece, color, targets, true, true, move_list);
     }
 
     /// Generate all captures and promotion moves.
     ///
     /// @param color     Color of the pieces to generate the moves for.
-    /// @param next_move Pointer into an array where we can add moves.
+    /// @param move_list List in which to add moves.
     /// @return A pointer to the position afther the last move inserted into the array.
-    inline Move* GenerateCaptures(const Board& board, Color color, Move* next_move)
+    inline void GenerateCaptures(const Board& board, Color color, MoveList& move_list)
     {
-        next_move = GeneratePawnCaptures(board, color, next_move);
-        next_move = GenerateKnightMoves(board, color, true, next_move);
-        next_move = GenerateBishopMoves(board, color, true, next_move);
-        next_move = GenerateRookMoves(board, color, true, next_move);
-        next_move = GenerateQueenMoves(board, color, true, next_move);
-        next_move = GenerateKingMoves(board, color, true, next_move);
-
-        return next_move;
+        GeneratePawnCaptures(board, color, move_list);
+        GenerateKnightMoves (board, color, true, move_list);
+        GenerateBishopMoves (board, color, true, move_list);
+        GenerateRookMoves   (board, color, true, move_list);
+        GenerateQueenMoves  (board, color, true, move_list);
+        GenerateKingMoves   (board, color, true, move_list);
     }
 
     /// Generate all quiet moves.
     ///
     /// @param color     Color of the pieces to generate the moves for.
-    /// @param next_move Pointer into an array where we can add moves.
+    /// @param move_list List in which to add moves.
     /// @return A pointer to the position afther the last move inserted into the array.
-    inline Move* GenerateQuietMoves(const Board& board, Color color, Move* next_move)
+    inline void GenerateQuietMoves(const Board& board, Color color, MoveList& move_list)
     {
-        next_move = GeneratePawnMoves(board, color, next_move);
-        next_move = GenerateKnightMoves(board, color, false, next_move);
-        next_move = GenerateBishopMoves(board, color, false, next_move);
-        next_move = GenerateRookMoves(board, color, false, next_move);
-        next_move = GenerateQueenMoves(board, color, false, next_move);
-        next_move = GenerateKingMoves(board, color, false, next_move);
-
-        return next_move;
+        GeneratePawnMoves(board, color, move_list);
+        GenerateKnightMoves(board, color, false, move_list);
+        GenerateBishopMoves(board, color, false, move_list);
+        GenerateRookMoves(board, color, false, move_list);
+        GenerateQueenMoves(board, color, false, move_list);
+        GenerateKingMoves(board, color, false, move_list);
     }
 
     /// Generate all moves for the current side on move.
     ///
-    /// @param next_move Pointer into an array where we can add moves.
+    /// @param move_list   List in which to add moves.
     /// @return A pointer to the position afther the last move inserted into the array.
-    inline Move* GenerateAllMoves(const Board& board, Move* next_move)
+    inline void GenerateAllMoves(const Board& board, MoveList& move_list)
     {        
         Color color = board.side_to_move();
 
-        next_move = GenerateCaptures(board, color, next_move);
-        next_move = GenerateQuietMoves(board, color, next_move);
-        
-        return next_move;
+        GenerateCaptures(board, color, move_list);
+        GenerateQuietMoves(board, color, move_list);
     }
 
     /// Generate all quiet moves for the current side on move.
     ///
-    /// @param next_move Pointer into an array where we can add moves.
+    /// @param move_list List in which to add moves.
     /// @return A pointer to the position afther the last move inserted into the array.
-    inline Move* GenerateAllQuietMoves(const Board& board, Move* next_move)
+    inline void GenerateAllQuietMoves(const Board& board, MoveList& move_list)
     {
         Color color = board.side_to_move();
 
-        next_move = GenerateQuietMoves(board, color, next_move);
-
-        return next_move;
+        GenerateQuietMoves(board, color, move_list);
     }
 
     /// Generate all captures for the current side on move.
     ///
-    /// @param next_move Pointer into an array where we can add moves.
+    /// @param move_list List in which to add moves.
     /// @return A pointer to the position afther the last move inserted into the array.
-    inline Move* GenerateAllCaptures(const Board& board, Move* next_move)
+    inline void GenerateAllCaptures(const Board& board, MoveList& move_list)
     {
         Color color = board.side_to_move();
 
-        next_move = GenerateCaptures(board, color, next_move);
-
-        return next_move;
+        GenerateCaptures(board, color, move_list);
     }
 
     /// Returns a bitboard of the pinned pieces of a give color.

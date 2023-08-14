@@ -65,7 +65,7 @@ namespace m8::eval
         
         return eval;
     }
-
+    
     /// Return the value of a mate position given the distance to the root of the search.
     inline EvalType GetMateValue(DepthType distance)
     {

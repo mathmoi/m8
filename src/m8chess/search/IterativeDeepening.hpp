@@ -38,7 +38,7 @@ namespace m8::search {
     private:
         transposition::TranspositionTable& transposition_table_;
 
-        Move* GetRootMoves(Board board, Move* first);
+        void GetRootMoves(Board board, MoveList& move_list);
     };
 }
 
