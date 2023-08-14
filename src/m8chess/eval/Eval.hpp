@@ -21,6 +21,11 @@ namespace m8::eval
     const EvalType kEvalMat  = 30000;
     const EvalType kMaxMat   = 1000;
 
+    extern std::array<EvalType, kMaxPieceType + 1> kPieceTypeValues;
+
+    /// Initialize evaluation globales variables.
+    void InitializeEval();
+
     /// Evaluate a position.
     inline EvalType Evaluate(const Board& board)
     {

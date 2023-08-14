@@ -16,8 +16,11 @@ namespace m8
     /// Type tha represent a move.
     typedef std::uint32_t Move;
 
+    /// Maximum number of moves in a MoveList
+    const size_t kNumberOfMovesInMoveList = 256;
+
     /// Move list.
-    typedef std::array<Move, 256> MoveList; // TODO : This should be a class
+    typedef std::array<Move, kNumberOfMovesInMoveList> MoveList; // TODO : This should be a class
 
     /// Null move to identify the end of lists
     const Move kNullMove = 0;

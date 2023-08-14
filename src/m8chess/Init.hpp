@@ -7,7 +7,10 @@
 
 #include "../m8common/Bb.hpp"
 
+#include "eval/Eval.hpp"
+
 #include "movegen/Attacks.hpp"
+#include "movegen/MvvLva.hpp"
 
 #include "transposition/Zobrist.hpp"
 
@@ -18,7 +21,9 @@ namespace m8
     /// Initialize all the precalculation for all class of m8.
     inline void InitializePreCalc()
     {
+        eval::InitializeEval();
         movegen::InitializeAttacks();
+        movegen::InitializeMvvLva();
         BbInitializePreCalc();
         InitializeDirection();
         transposition::InitializeZobrist();

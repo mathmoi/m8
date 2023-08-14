@@ -283,9 +283,6 @@ namespace m8
    /// @returns The PieceType of the Piece passed in parameters.
    inline PieceType GetPieceType(Piece piece)
    {
-      // A : The piece is valid
-      assert(IsPiece(piece));
-
       return piece & 7;
    }
 
@@ -296,7 +293,7 @@ namespace m8
    inline Color GetColor(Piece piece)
    {
       // A : The piece is valid
-      assert(IsPiece(piece));
+       assert(IsPiece(piece));
 
       return piece >> 3;
    }

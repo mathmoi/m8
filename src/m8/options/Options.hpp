@@ -87,6 +87,11 @@ namespace m8::options
             case kQueen:
                 value = queen;
                 break;
+            case kKing:
+                // King does not really have a value, but sometimes it's necessary to 
+                // attribute it a value (ex. in MVV/LVA) so we use the value of two queens.
+                value = queen * 2;
+                break;
             default:
                 value = 0;
                 break;

@@ -6,13 +6,18 @@
 #ifndef M8_CHESS_MOVE_GENERATOR_HPP_
 #define M8_CHESS_MOVE_GENERATOR_HPP_
 
+#include <algorithm>
 #include <iterator>
 #include <functional>
 
+#include "../eval/Eval.hpp"
+
 #include "../Board.hpp"
 #include "../Move.hpp"
+#include "../Types.hpp"
 
 #include "MoveGeneration.hpp"
+#include "MvvLva.hpp"
 
 namespace m8::movegen
 {
@@ -114,19 +119,54 @@ namespace m8::movegen
                 switch (current_step_)
                 {
                 case GenerationStep::GenerateCaptures:
+                    // Generate all captures
                     first_ = moves_.data();
                     last_ = movegen::GenerateAllCaptures(*(generator_->board_), first_);
-                    current_step_ = GenerationStep::DistributeCaptures;
+                    
+                    // Score all captures using MVV/LVA, keep track of the best one and 
+                    // move it to the front.
                     if (first_ < last_)
                     {
+                        size_t indx_best = -1;
+                        EvalType best_eval = eval::kMinEval;
+                        for (ptrdiff_t x = 0; x < (last_ - first_); ++x)
+                        {
+                            evals_[x] = GetMvvLvaValue(moves_[x]);
+                            if (best_eval < evals_[x])
+                            {
+                                best_eval = evals_[x];
+                                indx_best = x;
+                            }
+                        }
+                        std::swap(moves_[0], moves_[indx_best]);
+                        std::swap(evals_[0], evals_[indx_best]);
+                        current_step_ = GenerationStep::DistributeCaptures;
                         return;
                     }
                     /* Intentionally ommited break */
 
                 case GenerationStep::DistributeCaptures:
-                    ++first_;
-                    if (first_ < last_)
+                    // Ignoring the current move at the front of the list. Find the best
+                    // captures remaining. Bring the best captures to the front of the 
+                    // list and shorten the list by one element.
+                    if (first_ < last_ - 1)
                     {
+                        size_t indx_best = 1; // TODO : Check performance if we skip when 1 move remaining.
+                        EvalType best_eval = eval::kMinEval;
+                        for (ptrdiff_t x = 1; x < (last_ - first_); ++x)
+                        {
+                            if (best_eval < evals_[x])
+                            {
+                                best_eval = evals_[x];
+                                indx_best = x;
+                            }
+                        }
+                        auto indx_last = last_ - first_ - 1;
+                        moves_[0] = moves_[indx_best];
+                        evals_[0] = evals_[indx_best];
+                        moves_[indx_best] = moves_[indx_last];
+                        evals_[indx_best] = evals_[indx_last];
+                        --last_;
                         return;
                     }
 
@@ -190,6 +230,7 @@ namespace m8::movegen
             const MoveGenerator* generator_;
             GenerationStep current_step_;
             MoveList moves_;
+            std::array<EvalType, kNumberOfMovesInMoveList> evals_;
             Move* first_;
             Move* last_;
         };
