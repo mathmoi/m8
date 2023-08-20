@@ -46,6 +46,48 @@ namespace m8::movegen
         return attackers;
     }
 
+    /// Generate a bitboard of all square that a given square attacks.
+    inline Bb AttacksFrom(const Board& board, Sq sq)
+    {
+        switch (board[sq])
+        {
+        case kNoPieceType:
+            return kEmptyBb;
+
+        case kWhitePawn:
+            return ((GetSingleBitBb(sq) & ~GetColmnBb(kColmnA)) << 7)
+                 | ((GetSingleBitBb(sq) & ~GetColmnBb(kColmnH)) << 9);
+
+        case kBlackPawn:
+            return ((GetSingleBitBb(sq) & ~GetColmnBb(kColmnA)) >> 9)
+                 | ((GetSingleBitBb(sq) & ~GetColmnBb(kColmnH)) >> 7);
+
+        case kWhiteKnight:
+        case kBlackKnight:
+            return knight_attack_bb[sq];
+
+        case kWhiteKing:
+        case kBlackKing:
+            return king_attack_bb[sq];
+
+        case kWhiteQueen:
+        case kBlackQueen:
+            return GenerateBishopAttacks(board.bb_occupied(), sq)
+                 | GenerateRookAttacks(board.bb_occupied(), sq);
+
+        case kWhiteBishop:
+        case kBlackBishop:
+            return GenerateBishopAttacks(board.bb_occupied(), sq);
+
+        case kWhiteRook:
+        case kBlackRook:
+            return GenerateRookAttacks(board.bb_occupied(), sq);
+        }
+
+        assert(false && "Execution should never reach here");
+        return kEmptyBb;
+    }
+
     /// Generate a bitboard of the pawns attacking a given square.
     inline Bb GeneratePawnAttacksTo(Color color, Sq sq)
     {

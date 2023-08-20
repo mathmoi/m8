@@ -97,7 +97,7 @@ namespace m8
    /// @param color Color
    /// @param row   Index of the row (0 to 7).
    /// @return 
-   inline Row GetColorWiseRow(Color color, Row row) { 
+   inline constexpr Row GetColorWiseRow(Color color, Row row) { 
        return (row * OpposColor(color)) + ((7 - row) * color);
    }
    

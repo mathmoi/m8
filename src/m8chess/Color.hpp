@@ -24,13 +24,13 @@ namespace m8
     ///
     /// @param color The value to evaluate
     /// @return True if the value is a valid color (0 or 1)
-    inline bool IsColor(Color color) { return color <= kBlack; }
+    inline constexpr bool IsColor(Color color) { return color <= kBlack; }
 
     /// Return the opposite color than the one it is passed in parameter.
     ///
     /// @param color Color for wich we want the opposite.
     /// @return kWhite if kBlack was passed in parameterm otherwise kBlack.
-    inline Color OpposColor(Color color)
+    inline constexpr Color OpposColor(Color color)
     {
         // A : color is valid
         assert(IsColor(color));
