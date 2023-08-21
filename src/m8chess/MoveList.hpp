@@ -46,6 +46,13 @@ namespace m8
             return moves_[--size_].move;
         }
 
+        /// Returns the last element of the list without removing it from the list.
+        inline Move back() const
+        {
+            assert(0 < size_);
+            return moves_[size_ - 1].move;
+        }
+
         /// Pull a specified move to the front of the list.
         /// 
         /// Internally the move is put at the end of the list because we pop elements from

@@ -52,6 +52,7 @@ namespace m8::search {
         // transposition table. If we find an acceptable exact score or a lower 
         // bound better than beta we might cut the search imediately. If we find
         // a lower bound better than alpha but not better than beta we can immediately raise alpha
+        Move tt_move = kNullMove;
         if (!qsearch && !root)
         {
             auto tt_entry = transposition_table_[board_.hash()];
@@ -82,6 +83,7 @@ namespace m8::search {
                         return alpha;
                     }
                 }
+                tt_move = tt_entry->move();
             }
         }
 
@@ -101,8 +103,9 @@ namespace m8::search {
         }
 
         // Evaluate all moves
-        movegen::MoveGenerator generator = root ? movegen::MoveGenerator<root, qsearch>(root_moves_)
-                                                : movegen::MoveGenerator<root, qsearch>(board_);
+        movegen::MoveGenerator generator = root     ? movegen::MoveGenerator<root, qsearch>(root_moves_)
+                                         : qsearch  ? movegen::MoveGenerator<root, qsearch>(board_)
+                                         : /* else */ movegen::MoveGenerator<root, qsearch>(board_, tt_move);
         bool found_a_move = false;
         std::uint16_t move_count = 0;
         for (auto move : generator)

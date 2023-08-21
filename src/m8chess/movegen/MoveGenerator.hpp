@@ -14,6 +14,7 @@
 
 #include "../Board.hpp"
 #include "../Move.hpp"
+#include "../MoveLegality.hpp"
 #include "../Types.hpp"
 
 #include "MoveGeneration.hpp"
@@ -50,12 +51,12 @@ namespace m8::movegen
             /// @param generator Generator associated with the new iterator
             inline Iterator(const MoveGenerator& generator)
             : generator_(&generator),
-              current_step_(GenerationStep::GenerateCaptures)
+              current_step_(GenerationStep::UseTranspositionMove)
             {
                 if (root)
                 {
                     moves_ = *(generator_->moves_);
-                    current_step_ = GenerationStep::DistributeRemainingMoves;
+                    current_step_ = GenerationStep::OnlyDistributeMoves;
                 }
                 
                 GetNextMove();
@@ -114,35 +115,55 @@ namespace m8::movegen
                 // the next move is found.
                 switch (current_step_)
                 {
+                case GenerationStep::UseTranspositionMove:
+                    if (IsPseudoLegal(*(generator_->data_.board_), generator_->data_.tt_move_))
+                    {
+                        current_move_ = generator_->data_.tt_move_;
+                        current_step_ = GenerationStep::GenerateCaptures;
+                        return;
+                    }
+                    current_step_ = GenerationStep::GenerateCaptures;
+                    /* Intentionally ommited break */
+
                 case GenerationStep::GenerateCaptures:
                     // Generate all captures
-                    movegen::GenerateAllCaptures(*(generator_->board_), moves_);
+                    movegen::GenerateAllCaptures(*(generator_->data_.board_), moves_);
                     
                     // Score all captures using MVV/LVA, keep track of the best one and
                     // make it the current move.
-                    if (moves_.size() > 1)
                     {
                         size_t indx_best = -1;
                         EvalType best_eval = eval::kMinEval;
-                        for (size_t x = 0; x < moves_.size(); ++x)
+                        for (size_t x = moves_.size() -1; x < moves_.size(); --x)
                         {
-                            moves_[x].eval = GetMvvLvaValue(moves_[x].move);
-                            if (best_eval < moves_[x].eval)
+                            if (generator_->data_.tt_move_ == moves_[x].move)
                             {
-                                best_eval =moves_[x].eval;
-                                indx_best = x;
+                                moves_.Erase(x);
+                            }
+                            else
+                            {
+                                moves_[x].eval = GetMvvLvaValue(moves_[x].move);
+                                if (best_eval < moves_[x].eval)
+                                {
+                                    best_eval = moves_[x].eval;
+                                    indx_best = x;
+                                }
                             }
                         }
-                        current_move_ = moves_[indx_best].move;
-                        moves_.Erase(indx_best);
-                        current_step_ = GenerationStep::DistributeCaptures;
-                        return;
+                        if (best_eval != eval::kMinEval)
+                        {
+                            current_move_ = moves_[indx_best].move;
+                            moves_.Erase(indx_best);
+                            current_step_ = GenerationStep::DistributeCaptures;
+                            return;
+                        }
                     }
+
                     current_step_ = GenerationStep::DistributeCaptures;
                     /* Intentionally ommited break */
 
                 case GenerationStep::DistributeCaptures:
-                    // Find the bast capture and make it the current move
+                    // Find the best capture and make it the current move
                     if (moves_.any())
                     {
                         size_t indx_best = 0;
@@ -172,18 +193,34 @@ namespace m8::movegen
                     /* Intentionally ommited break */
 
                 case GenerationStep::GenerateQuietMoves:
-                    movegen::GenerateAllQuietMoves(*(generator_->board_), moves_);
+                    movegen::GenerateAllQuietMoves(*(generator_->data_.board_), moves_);
                     current_step_ = GenerationStep::DistributeRemainingMoves;
                     /* Intentionally ommited break */
 
                 case GenerationStep::DistributeRemainingMoves:
+                    // Remove the TT move if it's the next move
+                    if (moves_.any() && generator_->data_.tt_move_ == moves_.back())
+                    {
+                        moves_.Pop();
+                    }
+
                     if (moves_.any())
                     {
                         current_move_ = moves_.Pop();
                         return;
                     }
                     current_step_ = GenerationStep::Done;
+                    return;
                     /* Intentionally ommited break */
+
+                case GenerationStep::OnlyDistributeMoves:
+                    if (moves_.any())
+                    {
+                        current_move_ = moves_.Pop();
+                        return;
+                    }
+                    current_step_ = GenerationStep::Done;
+                    return;
 
                 case GenerationStep::Done:
                     /* Nothing to do */
@@ -193,10 +230,12 @@ namespace m8::movegen
 
             /// Enumerations of the differents steps of move generation
             enum class GenerationStep {
+                UseTranspositionMove,
                 GenerateCaptures,
                 DistributeCaptures,
                 GenerateQuietMoves,
                 DistributeRemainingMoves,
+                OnlyDistributeMoves,
                 Done
             };
 
@@ -208,11 +247,14 @@ namespace m8::movegen
 
         /// Constructor
         /// 
-        /// @param board Position for which to generate moves.
-        inline MoveGenerator(Board& board)
-        : board_(&board)
+        /// @param board   Position for which to generate moves.
+        /// @param tt_move Best move from the transposition table if one is available
+        inline MoveGenerator(Board& board,
+                             Move tt_move = kNullMove)
         {
             assert(!root);
+            data_.board_ = &board;
+            data_.tt_move_ = tt_move;
         }
 
         /// Constructor from a pre-generated list. Can be use at the root of the search to
@@ -242,7 +284,10 @@ namespace m8::movegen
     private:
         union
         {
-            Board* board_;
+            struct {
+                Board* board_;
+                Move tt_move_;
+            } data_;
             const MoveList* moves_;
         };
     };

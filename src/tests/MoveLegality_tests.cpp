@@ -9,8 +9,6 @@
 
 using namespace m8;
 
-
-
 TEST_CASE("IsPseudoLegal_WrongSideOnMove_ReturnsFalse")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
@@ -69,7 +67,7 @@ TEST_CASE("IsPseudoLegal_WrongPieceOnTarget_ReturnsFalse")
 TEST_CASE("IsPseudoLegal_IllegalCastling_ReturnsFalse")
 {
     Board board(kStartingPositionFEN);
-    Move move;
+    Move move = kNullMove;
     bool expected = false;
 
     SECTION ("White to move")
@@ -181,17 +179,6 @@ TEST_CASE("IsPseudoLegal_PriseEnPassantWhenNotAllowed_ReturnsFalse")
     REQUIRE(expected == actual);
 }
 
-
-
-
-
-
-
-
-
-
-
-
 TEST_CASE("IsPseudoLegal_SimpleLegalMove_ReturnsTrue")
 {
     Board board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
@@ -283,7 +270,7 @@ TEST_CASE("IsPseudoLegal_PriseEnPassant_ReturnsTrue")
 TEST_CASE("IsPseudoLegal_LegalCastling_ReturnsTrue")
 {
     Board board(kStartingPositionFEN);
-    Move move;
+    Move move = kNullMove;
     bool expected = true;
 
     SECTION ("White to move")
@@ -310,7 +297,7 @@ TEST_CASE("IsPseudoLegal_LegalCastling_ReturnsTrue")
 TEST_CASE("IsPseudoLegal_LegalFischerCastling_ReturnsTrue")
 {
     Board board(kStartingPositionFEN);
-    Move move;
+    Move move = kNullMove;
     bool expected = true;
 
     SECTION ("White to move")
