@@ -116,7 +116,8 @@ namespace m8::movegen
                 switch (current_step_)
                 {
                 case GenerationStep::UseTranspositionMove:
-                    if (IsPseudoLegal(*(generator_->data_.board_), generator_->data_.tt_move_))
+                    if (generator_->data_.tt_move_ != kNullMove 
+                        && IsPseudoLegal(*(generator_->data_.board_), generator_->data_.tt_move_))
                     {
                         current_move_ = generator_->data_.tt_move_;
                         current_step_ = GenerationStep::GenerateCaptures;
@@ -134,11 +135,11 @@ namespace m8::movegen
                     {
                         size_t indx_best = -1;
                         EvalType best_eval = eval::kMinEval;
-                        for (size_t x = moves_.size() -1; x < moves_.size(); --x)
+                        for (size_t x = 0; x < moves_.size(); ++x)
                         {
                             if (generator_->data_.tt_move_ == moves_[x].move)
                             {
-                                moves_.Erase(x);
+                                moves_.Erase(x--);
                             }
                             else
                             {
