@@ -20,7 +20,6 @@ find_package(Boost REQUIRED COMPONENTS program_options
                                        log
                                        filesystem)
 include_directories(${Boost_INCLUDE_DIRS})
-add_compile_definitions(BOOST_BIND_GLOBAL_PLACEHOLDERS)
      
 ucm_add_dirs(../../src/m8common
              ../../src/m8chess
