@@ -6,19 +6,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS -DBOOST_USE_WINAPI_VERSION=0x600")
 endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -DM8_MAX_LOG_SEVERITY=M8_SEVERITY_TRACE")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DM8_MAX_LOG_SEVERITY=M8_SEVERITY_INPUT")
 
 # We add boost
-set(Boost_USE_STATIC_LIBS        ON)
-set(Boost_USE_MULTITHREADED      ON)    
+set(Boost_USE_STATIC_LIBS         ON)
+set(Boost_USE_MULTITHREADED       ON)
 #set(Boost_USE_STATIC_RUNTIME     ON)
 find_package(Boost REQUIRED COMPONENTS program_options
-                                       log
-                                       filesystem)
+                                       filesystem
+                                       log)
 include_directories(${Boost_INCLUDE_DIRS})
      
 ucm_add_dirs(../../src/m8common

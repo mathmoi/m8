@@ -725,7 +725,7 @@ namespace m8
                 M8_OUT_LINE(<< " | " <<std::left <<std::setw(footer_content_width) <<line <<std::setw(0) <<" |");
 
                 stats_view.remove_prefix(line.size());
-                stats_view.remove_prefix(std::min(stats_view.find_first_not_of(' '), stats_view.size()));
+                stats_view.remove_prefix((std::min)(stats_view.find_first_not_of(' '), stats_view.size()));
             }
 
             M8_OUT_LINE(<< ' ' << std::string(footer_width, '-') <<std::endl);

@@ -25,6 +25,10 @@ namespace m8
     class MoveList
     {
     public:
+        static const size_t kNumberOfMovesInMoveList = 256;
+
+        typedef std::array<MoveEvalPair, kNumberOfMovesInMoveList>::const_iterator const_iterator;
+
         /// Constructor
         inline MoveList()
         : size_(0)
@@ -80,10 +84,10 @@ namespace m8
         inline size_t size() const { return size_; }
 
         /// Returns an iterator to the begining
-        inline const MoveEvalPair* begin() const { return moves_.begin(); }
+        inline const_iterator begin() const { return moves_.begin(); }
 
         /// Returns an iterator to the end
-        inline const MoveEvalPair* end() const { return moves_.begin() + size_; }
+        inline const_iterator end() const { return moves_.begin() + size_; }
 
         /// Returns a reference to an element of the list
         inline MoveEvalPair& operator[](size_t pos)
@@ -93,8 +97,6 @@ namespace m8
         }
         
     private:
-        static const size_t kNumberOfMovesInMoveList = 256;
-
         std::array<MoveEvalPair, kNumberOfMovesInMoveList> moves_;
         size_t size_;
     };

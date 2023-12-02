@@ -21,7 +21,7 @@ namespace m8::transposition
     {
     public:
         TranspositionTable(size_t size)
-        : data_((UINT64_C(1) << GetMsb(std::max(size, kMinSizeTable))) / sizeof(TranspositionEntry)),
+        : data_((UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(TranspositionEntry)),
           mask_(data_.size() - 1),
           generation_(0)
         {

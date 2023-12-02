@@ -14,8 +14,8 @@
 
 namespace m8::eval
 {   
-    const EvalType kMinEval  = std::numeric_limits<EvalType>::min() + 100;
-    const EvalType kMaxEval  = std::numeric_limits<EvalType>::max() - 100;
+    const EvalType kMinEval  = (std::numeric_limits<EvalType>::min)() + 100;
+    const EvalType kMaxEval  = (std::numeric_limits<EvalType>::max)() - 100;
 
     const EvalType kEvalDraw = 0;
     const EvalType kEvalMat  = 30000;

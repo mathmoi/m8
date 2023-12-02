@@ -96,7 +96,7 @@ namespace m8
 
       std::vector<std::string> JoinsPVMoves(std::vector<std::string>::const_iterator first,
                                             std::vector<std::string>::const_iterator last,
-                                            size_t max_width = std::numeric_limits<size_t>::max()) const;
+                                            size_t max_width = (std::numeric_limits<size_t>::max)()) const;
       void DisplaySearchTableHeader() const;
       void DisplaySearchTableLine(bool is_iteration_complete, const std::vector<std::string> &pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes) const;
       void DisplaySearchTableFooter(double time, const search::SearchStats& stats) const;
