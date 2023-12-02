@@ -6,6 +6,8 @@
 #ifndef M8_UTILS_HPP_
 #define M8_UTILS_HPP_
 
+#include <array>
+#include <cstdint>
 #include <exception>
 #include <string>
 #include <sstream>

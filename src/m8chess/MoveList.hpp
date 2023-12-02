@@ -6,6 +6,7 @@
 #ifndef M8_CHESS_MOVE_LIST_HPP_
 #define M8_CHESS_MOVE_LIST_HPP_
 
+#include <algorithm>
 #include <array>
 
 #include "Move.hpp"
