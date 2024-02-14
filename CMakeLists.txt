@@ -13,6 +13,17 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/W4 /D_SCL_SECURE_NO_WARNINGS /DBOOST_USE_WINAPI_VERSION=0x600)
 endif()
 
+# We find boost
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost REQUIRED COMPONENTS program_options filesystem log)
+include_directories(${Boost_INCLUDE_DIRS})
+
+# If we are usging g++ we find Threads
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    find_package(Threads REQUIRED)
+endif()
+
 add_subdirectory(src)
 add_subdirectory(apps)
 add_subdirectory(tests)

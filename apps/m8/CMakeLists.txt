@@ -1,14 +1,3 @@
-# We find boost
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost REQUIRED COMPONENTS program_options filesystem log)
-include_directories(${Boost_INCLUDE_DIRS})
-
-# If we are usging g++ we find Threads
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    find_package(Threads REQUIRED)
-endif()
-
 # Create the target
 file(GLOB_RECURSE M8_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_executable(m8 ${M8_SOURCES})
