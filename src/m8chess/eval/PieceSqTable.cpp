@@ -1,4 +1,4 @@
-/// @file   PieceSquareTable.cpp
+/// @file   PieceSqTable.cpp
 /// @author Mathieu Pagé
 /// @date   Feburary 2018
 /// @brief  Contains functionalities about the piece-square table evaluation features.

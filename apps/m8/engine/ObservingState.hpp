@@ -50,7 +50,7 @@ namespace m8::engine {
 
         /// Set the time control to a fixed number of seconds per move
         /// 
-        /// @param seconds_per_move Number of seconds to use per move
+        /// @param time_per_move Number of seconds to use per move
         void SetTimeControl(time::ChessClock::Duration time_per_move);
 
         /// Set the time control to a conventional one.

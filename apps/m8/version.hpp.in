@@ -1,4 +1,4 @@
-/// @file version.h.in
+/// @file version.hpp
 /// @author Mathieu Pagé (m@mathieupage.com)
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
