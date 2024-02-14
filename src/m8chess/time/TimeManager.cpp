@@ -3,11 +3,11 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
 
-#include "TimeManager.hpp"
+#include "m8chess/time/TimeManager.hpp"
 
-#include "TimePerMoveTimeManager.hpp"
-#include "ConventionalTimeManager.hpp"
-#include "IncrementalTimeManager.hpp"
+#include "m8chess/time/TimePerMoveTimeManager.hpp"
+#include "m8chess/time/ConventionalTimeManager.hpp"
+#include "m8chess/time/IncrementalTimeManager.hpp"
 
 namespace m8::time
 {

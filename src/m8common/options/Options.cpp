@@ -11,10 +11,10 @@
 
 #include <boost/program_options.hpp>
 
-#include "../../m8common/logging.hpp"
-#include "../../m8common/Utils.hpp"
+#include "m8common/logging.hpp"
+#include "m8common/Utils.hpp"
 
-#include "Options.hpp"
+#include "m8common/options/Options.hpp"
 
 namespace po = boost::program_options;
 namespace pt = boost::property_tree;

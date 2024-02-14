@@ -9,19 +9,19 @@
 #include <memory>
 #include <string>
 
-#include "../../m8chess/eval/Eval.hpp"
+#include "m8chess/eval/Eval.hpp"
 
-#include "../../m8chess/search/Searcher.hpp"
-#include "../../m8chess/search/SearchSubject.hpp"
+#include "m8chess/search/Searcher.hpp"
+#include "m8chess/search/SearchSubject.hpp"
 
-#include "../../m8chess/time/ChessClock.hpp"
-#include "../../m8chess/time/TimeControl.hpp"
+#include "m8chess/time/ChessClock.hpp"
+#include "m8chess/time/TimeControl.hpp"
 
-#include "../../m8chess/transposition/TranspositionTable.hpp"
+#include "m8chess/transposition/TranspositionTable.hpp"
 
-#include "../../m8chess/Types.hpp"
+#include "m8chess/Types.hpp"
 
-#include "IPerftObserver.hpp"
+#include "m8chess/IPerftObserver.hpp"
 
 namespace m8::engine
 {

@@ -11,17 +11,17 @@
 #include <stdexcept>
 #include <string>
 
-#include "../../m8/engine/Engine.hpp"
-#include "../../m8/engine/IPerftObserver.hpp"
+#include "Engine.hpp"
+#include "m8chess/IPerftObserver.hpp"
 
-#include "../../m8chess/Perft.hpp"
-#include "../../m8chess/Color.hpp"
-#include "../../m8chess/Board.hpp"
-#include "../../m8chess/search/SearchSubject.hpp"
+#include "m8chess/Perft.hpp"
+#include "m8chess/Color.hpp"
+#include "m8chess/Board.hpp"
+#include "m8chess/search/SearchSubject.hpp"
 
-#include "../../m8chess/time/ChessClock.hpp"
-#include "../../m8chess/time/TimeControl.hpp"
-#include "../../m8chess/time/TimePerMoveTimeControl.hpp"
+#include "m8chess/time/ChessClock.hpp"
+#include "m8chess/time/TimeControl.hpp"
+#include "m8chess/time/TimePerMoveTimeControl.hpp"
 
 #include "InvalidEngineCommandException.hpp"
 

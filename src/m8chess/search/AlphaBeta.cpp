@@ -6,14 +6,14 @@
 
 #include <chrono>
 
-#include "../eval/Eval.hpp"
+#include "m8chess/eval/Eval.hpp"
 
-#include "../movegen/MoveGenerator.hpp"
+#include "m8chess/movegen/MoveGenerator.hpp"
 
-#include "../Checkmate.hpp"
+#include "m8chess/Checkmate.hpp"
 
-#include "AlphaBeta.hpp"
-#include "Search.hpp"
+#include "m8chess/search/AlphaBeta.hpp"
+#include "m8chess/search/Search.hpp"
 
 namespace m8::search {
 

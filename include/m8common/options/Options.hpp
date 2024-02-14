@@ -11,10 +11,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../m8chess/Piece.hpp"
+#include "m8chess/Piece.hpp"
 #include "../../m8common/Bb.hpp"
 #include "../../m8common/logging.hpp"
-#include "../../m8chess/Types.hpp"
+#include "m8chess/Types.hpp"
 
 #include "ModifiableOption.hpp"
 

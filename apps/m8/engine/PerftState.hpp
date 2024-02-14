@@ -9,11 +9,11 @@
 
 #include <functional>
 
-#include "../../m8chess/Perft.hpp"
-#include "../../m8chess/SAN.hpp"
+#include "m8chess/Perft.hpp"
+#include "m8chess/SAN.hpp"
 
 #include "EngineState.hpp"
-#include "IPerftObserver.hpp"
+#include "m8chess/IPerftObserver.hpp"
 
 namespace m8::engine {
 

@@ -3,10 +3,10 @@
 /// @date   Janurary 2018
 /// @brief  Contains tests of the types and functionalities in Attacks.hpp.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/movegen/Attacks.hpp"
-#include "../m8chess/movegen/MoveGeneration.hpp"
+#include "m8chess/movegen/Attacks.hpp"
+#include "m8chess/movegen/MoveGeneration.hpp"
 
 using namespace m8;
 using namespace m8::movegen;

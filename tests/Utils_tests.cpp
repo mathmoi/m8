@@ -3,9 +3,9 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8common/Utils.hpp"
+#include "m8common/Utils.hpp"
 
 TEST_CASE("CalculateMask_Pos2Size3_CorrecMaskedReturned")
 {

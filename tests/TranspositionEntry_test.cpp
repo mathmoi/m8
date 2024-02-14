@@ -3,11 +3,11 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/eval/Eval.hpp"
+#include "m8chess/eval/Eval.hpp"
 
-#include "../m8chess/transposition/TranspositionEntry.hpp"
+#include "m8chess/transposition/TranspositionEntry.hpp"
 
 using namespace m8;
 using namespace m8::eval;

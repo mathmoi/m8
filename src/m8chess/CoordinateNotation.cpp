@@ -7,7 +7,7 @@
 #include <cmath>
 #include <sstream>
 
-#include "CoordinateNotation.hpp"
+#include "m8chess/CoordinateNotation.hpp"
 
 namespace m8
 {

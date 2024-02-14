@@ -107,6 +107,9 @@ namespace m8::movegen
         private:
             inline void GetNextMove()
             {
+                #pragma GCC diagnostic push
+                #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+
                 // This switch statement implements a finite state machine that distribute
                 // the moves in differents steps. The switch statement allow the iterator
                 // to jump to the current step. When a step can no longer generates moves
@@ -227,6 +230,8 @@ namespace m8::movegen
                     /* Nothing to do */
                     break;
                 };
+
+                #pragma GCC diagnostic pop
             }
 
             /// Enumerations of the differents steps of move generation

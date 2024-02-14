@@ -5,11 +5,11 @@
 
 #include <iostream>
 
-#include "../../m8chess/SAN.hpp"
+#include "m8chess/SAN.hpp"
 
-#include "../../m8common/logging.hpp"
+#include "m8common/logging.hpp"
 
-#include "../options/Options.hpp"
+#include "m8common/options/Options.hpp"
 
 #include "Engine.hpp"
 #include "EngineState.hpp"

@@ -5,9 +5,9 @@
 
 #include <algorithm>
 
-#include "../movegen/MoveGenerator.hpp"
+#include "m8chess/movegen/MoveGenerator.hpp"
 
-#include "IterativeDeepening.hpp"
+#include "m8chess/search/IterativeDeepening.hpp"
 
 namespace m8::search {
 

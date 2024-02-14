@@ -3,10 +3,10 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date July 2023
 
-#include "ChessClock.hpp"
-#include "ConventionalChessClock.hpp"
-#include "IncrementalChessClock.hpp"
-#include "TimePerMoveChessClock.hpp"
+#include "m8chess/time/ChessClock.hpp"
+#include "m8chess/time/ConventionalChessClock.hpp"
+#include "m8chess/time/IncrementalChessClock.hpp"
+#include "m8chess/time/TimePerMoveChessClock.hpp"
 
 namespace m8::time
 {

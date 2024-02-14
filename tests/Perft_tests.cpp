@@ -6,13 +6,13 @@
 #include <condition_variable>
 #include <optional>
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/Perft.hpp"
+#include "m8chess/Perft.hpp"
 
 using namespace m8;
 
-class TestPerftObserver : public engine::IPerftObserver
+class TestPerftObserver : public IPerftObserver
 {
 public:
     TestPerftObserver()

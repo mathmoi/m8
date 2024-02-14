@@ -3,11 +3,11 @@
 /// @date   Janurary 2018
 /// @brief  Contains tests for the methods located in checkmate.hpp.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include <cstdint>
 
-#include "../m8chess/Checkmate.hpp"
+#include "m8chess/Checkmate.hpp"
 
 using namespace m8;
 

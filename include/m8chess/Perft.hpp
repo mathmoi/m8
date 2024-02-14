@@ -8,13 +8,14 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <functional>
 #include <mutex>
 #include <numeric>
 #include <ranges>
 #include <thread>
 #include <vector>
 
-#include "../m8/engine/IPerftObserver.hpp"
+#include "IPerftObserver.hpp"
 
 #include "Board.hpp"
 
@@ -149,7 +150,7 @@ namespace m8
     {
     public:
         /// Constructor
-        inline Perft(int depth, const Board& board, engine::IPerftObserver* observer)
+        inline Perft(int depth, const Board& board, IPerftObserver* observer)
             : depth_(depth),
               abort_(false),
               board_(board),
@@ -184,7 +185,7 @@ namespace m8
         std::vector<std::thread> threads_;
         std::mutex mutex_;
 
-        engine::IPerftObserver* observer_;
+        IPerftObserver* observer_;
 
         std::uint64_t RecursivePerft(Board& board, int depth);
         void ContributeAtSharedNode(PerftNode& node, Board& board, int depth);

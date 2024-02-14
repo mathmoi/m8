@@ -3,10 +3,10 @@
 /// @date   Feburary 2015
 /// @brief  Contains tests of the types and functionalities in Piece.hpp.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #include <cassert>
 
-#include "../m8chess/Piece.hpp"
+#include "m8chess/Piece.hpp"
 
 using namespace m8;
 

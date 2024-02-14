@@ -3,9 +3,9 @@
 /// @date   Janurary 2018
 /// @brief  Contains tests of the types and functionalities in XRay.hpp.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/XRay.hpp"
+#include "m8chess/XRay.hpp"
 
 using namespace m8;
 

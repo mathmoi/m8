@@ -2,14 +2,14 @@
 /// @author Mathieu Pagé
 /// @date   January 2020
 
-#ifndef M8_ENGINE_IPERFT_OBSERVER_HPP_
-#define M8_ENGINE_IPERFT_OBSERVER_HPP_
+#ifndef M8_IPERFT_OBSERVER_HPP_
+#define M8_IPERFT_OBSERVER_HPP_
 
 #include <string>
 
-#include "../../m8chess/Types.hpp"
+#include "Types.hpp"
 
-namespace m8::engine {
+namespace m8 {
 
     /// Contains a list of callbacks used by the engine class and the different
     /// engine states classes.
@@ -30,4 +30,4 @@ namespace m8::engine {
     };
 }
 
-#endif // M8_ENGINE_IPERFT_OBSERVER_HPP_
+#endif // M8_IPERFT_OBSERVER_HPP_

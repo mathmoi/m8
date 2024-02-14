@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <array>
 
-#include "../m8common/0x88.hpp"
+#include "m8common/0x88.hpp"
 
 #include "Sq.hpp"
 

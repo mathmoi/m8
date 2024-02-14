@@ -4,17 +4,17 @@
 /// @brief  Contains the WaitingState class. Controlling the engine behavior when it's 
 ///         waiting for the user to play.
 
-#include "../../m8common/logging.hpp"
+#include "m8common/logging.hpp"
 
-#include "../options/Options.hpp"
-#include "../../m8chess/CoordinateNotation.hpp"
-#include "../../m8chess/SAN.hpp"
-#include "../../m8chess/Checkmate.hpp"
-#include "../../m8chess/time/ConventionalTimeControl.hpp"
-#include "../../m8chess/time/IncrementalTimeControl.hpp"
-#include "../../m8chess/time/TimePerMoveChessClock.hpp"
-#include "../../m8chess/time/ConventionalChessClock.hpp"
-#include "../../m8chess/time/IncrementalChessClock.hpp"
+#include "m8common/options/Options.hpp"
+#include "m8chess/CoordinateNotation.hpp"
+#include "m8chess/SAN.hpp"
+#include "m8chess/Checkmate.hpp"
+#include "m8chess/time/ConventionalTimeControl.hpp"
+#include "m8chess/time/IncrementalTimeControl.hpp"
+#include "m8chess/time/TimePerMoveChessClock.hpp"
+#include "m8chess/time/ConventionalChessClock.hpp"
+#include "m8chess/time/IncrementalChessClock.hpp"
 
 #include "InvalidMoveException.hpp"
 #include "SearchState.hpp"

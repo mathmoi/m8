@@ -3,8 +3,8 @@
 /// @date   Janurary 2018
 /// @brief  Contains types and method about directions on a chess board.
 
-#include "Direction.hpp"
-#include "Sq.hpp"
+#include "m8chess/Direction.hpp"
+#include "m8chess/Sq.hpp"
 
 namespace m8
 {

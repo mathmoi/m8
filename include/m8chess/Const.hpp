@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-#include "../m8common/Bb.hpp"
+#include "m8common/Bb.hpp"
 
 #include "Sq.hpp"
 

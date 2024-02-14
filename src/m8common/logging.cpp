@@ -27,10 +27,8 @@
 
 #pragma warning (pop)
 
-#include "../m8/options/Options.hpp"
-
-#include "logging.hpp"
-#include "Utils.hpp"
+#include "m8common/logging.hpp"
+#include "m8common/Utils.hpp"
 
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
@@ -69,7 +67,8 @@ namespace m8
 
     bool FilterLogRecord(logging::value_ref< severity_level, tag::severity > const& level)
     {
-        return level <= options::Options::get().max_log_severity;
+        // TODO : Make this level configurable from the command line or the config file
+        return level <= m8::severity_level::error;
     }
 
     void FormatLogRecord(logging::record_view const& rec, logging::formatting_ostream& strm)

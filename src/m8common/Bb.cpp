@@ -6,7 +6,7 @@
 ///         Bitboards are 64 bits integers that represents a state of the board 
 ///         one bit per square. 
 
-#include "Bb.hpp"
+#include "m8common/Bb.hpp"
 
 namespace m8
 {

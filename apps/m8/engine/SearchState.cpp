@@ -6,11 +6,11 @@
 
 #include <stack>
 
-#include "../../m8common/logging.hpp"
-#include "../options/Options.hpp"
-#include "../../m8chess/SAN.hpp"
-#include "../../m8chess/CoordinateNotation.hpp"
-#include "../../m8chess/time/TimeManager.hpp"
+#include "m8common/logging.hpp"
+#include "m8common/options/Options.hpp"
+#include "m8chess/SAN.hpp"
+#include "m8chess/CoordinateNotation.hpp"
+#include "m8chess/time/TimeManager.hpp"
 
 #include "WaitingState.hpp"
 #include "SearchState.hpp"

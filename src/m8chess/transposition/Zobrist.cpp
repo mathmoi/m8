@@ -6,10 +6,10 @@
 #include <limits>
 #include <random>
 
-#include "../Piece.hpp"
-#include "../Sq.hpp"
+#include "m8chess/Piece.hpp"
+#include "m8chess/Sq.hpp"
 
-#include "Zobrist.hpp"
+#include "m8chess/transposition/Zobrist.hpp"
 
 namespace m8::transposition
 {

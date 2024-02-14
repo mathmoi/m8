@@ -7,9 +7,9 @@
 
 #include <thread>
 
-#include "Searcher.hpp"
-#include "../eval/Eval.hpp"
-#include "../../m8common/logging.hpp"
+#include "m8chess/search/Searcher.hpp"
+#include "m8chess/eval/Eval.hpp"
+#include "m8common/logging.hpp"
 
 namespace m8 { namespace search
 {

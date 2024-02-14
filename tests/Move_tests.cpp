@@ -3,11 +3,11 @@
 /// @date   December 2015
 /// @brief  Contains tests of the types and functionalities in Move.hpp.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/Move.hpp"
-#include "../m8chess/Sq.hpp"
-#include "../m8chess/Piece.hpp"
+#include "m8chess/Move.hpp"
+#include "m8chess/Sq.hpp"
+#include "m8chess/Piece.hpp"
 
 using namespace m8;
 

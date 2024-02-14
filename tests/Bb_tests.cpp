@@ -1,14 +1,15 @@
 /// @file   Bb_tests.cpp
-/// @author Mathieu Pag�
+/// @author Mathieu Pagé
 /// @date   Feburary 2015
 /// @brief  Contains tests of the types and functionalities in square.hpp.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
+
 
 #include <cstdint>
 
-#include "../m8common/Bb.hpp"
-#include "../m8chess/Sq.hpp"
+#include "m8common/Bb.hpp"
+#include "m8chess/Sq.hpp"
 
 using namespace m8;
 using namespace std;

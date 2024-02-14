@@ -6,10 +6,10 @@
 
 #include <sstream>
 
-#include "../m8common/Utils.hpp"
+#include "m8common/Utils.hpp"
 
-#include "Board.hpp"
-#include "Const.hpp"
+#include "m8chess/Board.hpp"
+#include "m8chess/Const.hpp"
 
 namespace m8
 {

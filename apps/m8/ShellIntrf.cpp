@@ -9,7 +9,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "ShellIntrf.hpp"
-#include "../m8common/logging.hpp"
+#include "m8common/logging.hpp"
 
 #define M8_OUT_LINE(p)   std::cout p <<std::endl; M8_OUTPUT p;
 

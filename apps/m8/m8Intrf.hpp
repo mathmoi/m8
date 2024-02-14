@@ -10,14 +10,14 @@
 
 #include "ShellIntrf.hpp"
 #include "engine/Engine.hpp"
-#include "engine/IPerftObserver.hpp"
-#include "options/Options.hpp"
+#include "m8chess/IPerftObserver.hpp"
+#include "m8common/options/Options.hpp"
 
 namespace m8
 {
    /// Class that implements m8's shell-like interface.
    class m8Intrf : public search::ISearchObserver<std::vector<std::string>, std::string>,
-                   public engine::IPerftObserver
+                   public IPerftObserver
    {
    public:
       /// Default constructor.

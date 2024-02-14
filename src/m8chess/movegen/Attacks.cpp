@@ -3,7 +3,7 @@
 /// @date   Janurary 2018
 /// @brief  Contains methods and array used to generate attacks bitboards.
 
-#include "Attacks.hpp"
+#include "m8chess/movegen/Attacks.hpp"
 
 namespace m8::movegen
 {

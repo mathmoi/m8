@@ -6,13 +6,13 @@
 
 #include <memory>
 
-#include "../options/Options.hpp"
-#include "../../m8chess/CoordinateNotation.hpp"
-#include "../../m8chess/time/ConventionalTimeControl.hpp"
-#include "../../m8chess/time/IncrementalTimeControl.hpp"
-#include "../../m8chess/time/TimePerMoveChessClock.hpp"
-#include "../../m8chess/time/ConventionalChessClock.hpp"
-#include "../../m8chess/time/IncrementalChessClock.hpp"
+#include "m8common/options/Options.hpp"
+#include "m8chess/CoordinateNotation.hpp"
+#include "m8chess/time/ConventionalTimeControl.hpp"
+#include "m8chess/time/IncrementalTimeControl.hpp"
+#include "m8chess/time/TimePerMoveChessClock.hpp"
+#include "m8chess/time/ConventionalChessClock.hpp"
+#include "m8chess/time/IncrementalChessClock.hpp"
 
 #include "ObservingState.hpp"
 #include "WaitingState.hpp"

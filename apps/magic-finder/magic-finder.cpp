@@ -12,9 +12,8 @@
 
 #include <boost/io/ios_state.hpp>
 
-#include "../m8chess/Sq.hpp"
-
-#include "../m8common/Bb.hpp"
+#include "m8common/Bb.hpp"
+#include "m8chess/Sq.hpp"
 
 namespace m8 {
 

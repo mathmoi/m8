@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-#include "../m8common/Bb.hpp"
+#include "m8common/Bb.hpp"
 
 #include "movegen/Attacks.hpp"
 

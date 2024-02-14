@@ -9,10 +9,10 @@
 
 #include <thread>
 
-#include "../../m8chess/search/Search.hpp"
-#include "../../m8chess/search/Searcher.hpp"
+#include "m8chess/search/Search.hpp"
+#include "m8chess/search/Searcher.hpp"
 
-#include "../../m8chess/Types.hpp"
+#include "m8chess/Types.hpp"
 
 #include "EngineState.hpp"
 

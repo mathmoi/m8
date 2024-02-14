@@ -6,10 +6,10 @@
 #define CATCH_CONFIG_RUNNER
 
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 #pragma GCC diagnostic pop
 
-#include "../m8chess/Init.hpp"
+#include "m8chess/Init.hpp"
 
 int main(int argc, char* argv[])
 {

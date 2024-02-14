@@ -7,12 +7,12 @@
 #include <exception>
 #include <sstream>
 
-#include "movegen/MoveGeneration.hpp"
+#include "m8chess/movegen/MoveGeneration.hpp"
 
-#include "SAN.hpp"
-#include "Board.hpp"
-#include "Direction.hpp"
-#include "Checkmate.hpp"
+#include "m8chess/SAN.hpp"
+#include "m8chess/Board.hpp"
+#include "m8chess/Direction.hpp"
+#include "m8chess/Checkmate.hpp"
 
 namespace m8
 {

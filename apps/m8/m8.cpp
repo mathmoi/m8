@@ -8,11 +8,11 @@
 
 #include <boost/filesystem.hpp>
 
-#include "../m8chess/Init.hpp"
+#include "m8chess/Init.hpp"
 
-#include "../m8common/logging.hpp"
+#include "m8common/logging.hpp"
 
-#include "options/Options.hpp"
+#include "m8common/options/Options.hpp"
 
 #include "m8Intrf.hpp"
 

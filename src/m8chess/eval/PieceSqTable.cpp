@@ -3,9 +3,9 @@
 /// @date   Feburary 2018
 /// @brief  Contains functionalities about the piece-square table evaluation features.
 
-#include "PieceSqTable.hpp"
-#include "../Board.hpp"
-#include "../../m8/options/Options.hpp"
+#include "m8chess/eval/PieceSqTable.hpp"
+#include "m8chess/Board.hpp"
+#include "m8common/options/Options.hpp"
 
 namespace m8::eval {
 

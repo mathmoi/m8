@@ -3,12 +3,12 @@
 /// @date   Feburary 2015
 /// @brief  Contains tests of the Board type and functionalities.
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
 #include <cstdint>
 
-#include "../m8chess/Board.hpp"
-#include "../m8chess/Move.hpp"
+#include "m8chess/Board.hpp"
+#include "m8chess/Move.hpp"
 
 using namespace m8;
 using namespace std;

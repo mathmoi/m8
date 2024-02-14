@@ -5,14 +5,12 @@
 
 #include <algorithm>
 
-#include "../m8/options/Options.hpp"
+#include "m8chess/movegen/MoveGeneration.hpp"
 
-#include "movegen/MoveGeneration.hpp"
+#include "m8chess/Checkmate.hpp"
+#include "m8chess/SAN.hpp"
 
-#include "Checkmate.hpp"
-#include "SAN.hpp"
-
-#include "Perft.hpp"
+#include "m8chess/Perft.hpp"
 
 namespace m8
 {
@@ -52,7 +50,8 @@ namespace m8
 
     void Perft::StartThreads()
     {
-        int threads = options::Options::get().perft.threads;
+        // TODO : Base the numbers of threads on a command line option
+        int threads = 32;
         
         for (int i = 0; i < threads; ++i)
         {

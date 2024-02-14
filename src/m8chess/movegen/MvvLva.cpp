@@ -3,9 +3,9 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date August 2023
 
-#include "../eval/Eval.hpp"
+#include "m8chess/eval/Eval.hpp"
 
-#include "MvvLva.hpp"
+#include "m8chess/movegen/MvvLva.hpp"
 
 namespace m8::movegen
 {

@@ -3,9 +3,9 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date August 2023
 
-#include "../../m8/options/Options.hpp"
+#include <m8common/options/Options.hpp>
 
-#include "Eval.hpp"
+#include "m8chess/eval/Eval.hpp"
 
 namespace m8::eval
 {

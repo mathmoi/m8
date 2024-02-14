@@ -12,18 +12,18 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "../m8chess/SAN.hpp"
+#include "m8chess/SAN.hpp"
 
-#include "../m8common/chronoHelpers.hpp"
-#include "../m8common/console.hpp"
-#include "../m8common/logging.hpp"
-#include "../m8common/stringHelpers.hpp"
-#include "../m8common/Utils.hpp"
+#include "m8common/chronoHelpers.hpp"
+#include "m8common/console.hpp"
+#include "m8common/logging.hpp"
+#include "m8common/stringHelpers.hpp"
+#include "m8common/Utils.hpp"
 
 #include "engine/InvalidEngineCommandException.hpp"
 #include "engine/InvalidMoveException.hpp"
 
-#include "options/Options.hpp"
+#include "m8common/options/Options.hpp"
 
 #include "m8Intrf.hpp"
 #include "version.hpp"

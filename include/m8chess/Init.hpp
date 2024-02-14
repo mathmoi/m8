@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "../m8common/Bb.hpp"
+#include "m8common/Bb.hpp"
 
 #include "eval/Eval.hpp"
 

@@ -3,9 +3,9 @@
 /// @copyright Copyright (c) 2023 Mathieu Pagé
 /// @date August 2023
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/MoveLegality.hpp"
+#include "m8chess/MoveLegality.hpp"
 
 using namespace m8;
 

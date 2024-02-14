@@ -5,9 +5,9 @@
 
 #include <string>
 
-#include "catch.hpp"
+#include "catch2/catch_all.hpp"
 
-#include "../m8chess/SAN.hpp"
+#include "m8chess/SAN.hpp"
 
 using namespace m8;
 
