@@ -19,6 +19,9 @@ namespace m8
    class m8Intrf : public search::ISearchObserver<std::vector<std::string>, std::string>,
                    public IPerftObserver
    {
+   private:
+      std::uint32_t MIN_DISPLAY_DEPTH = 1;
+
    public:
       /// Default constructor.
       m8Intrf();
@@ -82,7 +85,6 @@ namespace m8
       void HandleForce();
       void HandleStop();
       void HandleNew();
-      void HandleRejected(std::vector<std::string> args_list);
       void HandlePing(std::vector<std::string> args_list);
       void HandleSt(std::vector<std::string> args_list);
       void HandleLevel(std::vector<std::string> args_list);

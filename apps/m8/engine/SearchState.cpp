@@ -74,7 +74,7 @@ namespace m8::engine
 
     void SearchState::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move)
     {
-        std::string str_move = options::Options::get().use_san ? RenderSAN(move, engine_->board_) : RenderCoordinateNotation(move);
+        std::string str_move = RenderSAN(move, engine_->board_);
         engine_->NotifySearchMoveAtRoot(depth, time, move_number, moves_number, nodes, str_move);
     }
 
@@ -138,7 +138,7 @@ namespace m8::engine
 
         for (size_t x = 0; x < pv.count(); ++x)
         {
-            std::string str_move = options::Options::get().use_san ? RenderSAN(pv[x], engine_->board_) : RenderCoordinateNotation(pv[x]);
+            std::string str_move = RenderSAN(pv[x], engine_->board_);
             moves.push_back(str_move);
             unmake_info_stack.push(engine_->board_.Make(pv[x]));
         }

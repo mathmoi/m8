@@ -32,21 +32,6 @@ namespace m8::options
             std::make_unique<TypedModifiableOption<m8::severity_level>>("max-log-severity",
                                                     "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).",
                                                     this->max_log_severity));
-
-        modifiable_options.emplace("display-auto", 
-            std::make_unique<TypedModifiableOption<bool>>("display-auto",
-                                                    "Indicate if the board should be displayed after each moves.",
-                                                    this->display_auto));
-
-        modifiable_options.emplace("display-eval", 
-            std::make_unique<TypedModifiableOption<bool>>("display-eval",
-                                                    "Indicate if the evaluation should be displayed with the board.",
-                                                    this->display_eval));
-
-        modifiable_options.emplace("use-san", 
-            std::make_unique<TypedModifiableOption<bool>>("use-san",
-                                                    "Indicate if the engine should use the Standard Algebraic Notation.",
-                                                    this->use_san));
     }
 
     template<typename T>
@@ -124,26 +109,6 @@ namespace m8::options
         if (TryReadOption<std::string>(tree, "perft-threads", temp))
         {
             options.perft_threads = boost::lexical_cast<std::uint32_t>(temp);
-        }
-
-        if (TryReadOption<std::string>(tree, "display-auto", temp))
-        {
-            options.display_auto = boost::lexical_cast<bool>(temp);
-        }
-
-        if (TryReadOption<std::string>(tree, "display-eval", temp))
-        {
-            options.display_eval = boost::lexical_cast<bool>(temp);
-        }
-
-        if (TryReadOption<std::string>(tree, "min-display-depth", temp))
-        {
-            options.min_display_depth = boost::lexical_cast<DepthType>(temp);
-        }
-
-        if (TryReadOption<std::string>(tree, "use-san", temp))
-        {
-            options.use_san = boost::lexical_cast<bool>(temp);
         }
 
         if (TryReadOption<std::string>(tree, "tt-size", temp))

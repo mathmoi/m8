@@ -148,11 +148,6 @@ namespace m8
             "accepted {Feature name}",
             std::bind([] {})));
 
-        shell_intrf_.AddCmd(ShellCmd("rejected",
-            "Indicate to the engine that a feature was rejected",
-            "rejected {Feature name}",
-            std::bind(&m8Intrf::HandleRejected, this, std::placeholders::_1)));
-
         shell_intrf_.AddCmd(ShellCmd("ping",
             "Ask the engine if it's ready to handle more commands",
             "ping {N}",
@@ -172,6 +167,7 @@ namespace m8
         shell_intrf_.AddCmd(ShellCmd("time",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("otim",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("computer", "", "", std::bind([] {})));
+        shell_intrf_.AddCmd(ShellCmd("rejected", "", "", std::bind([] {})));
     }
 
     void m8Intrf::HandleExit()
@@ -333,14 +329,6 @@ namespace m8
         M8_OUT_LINE(<< "feature colors=0");
         M8_OUT_LINE(<< "feature san=1");
         M8_OUT_LINE(<< "feature done=1");
-    }
-
-    void m8Intrf::HandleRejected(std::vector<std::string> args_list)
-    {
-        if (args_list[1] == "san")
-        {
-            options::Options::get().use_san = false;
-        }
     }
 
     void m8Intrf::HandleGo()
@@ -509,7 +497,7 @@ namespace m8
             {
                 auto sucess = CallEngineCommand([this, move]() {engine_.UserMove(move); }, move);
                 
-                if (sucess && !xboard_ && options::Options::get().display_auto)
+                if (sucess)
                 {
                     std::lock_guard<std::recursive_mutex> lock(output_mutex_);
                     DisplayBoard();
@@ -546,10 +534,7 @@ namespace m8
         M8_EMPTY_LINE();
         M8_OUT_LINE(<< engine_.board());
 
-        if (options::Options::get().display_eval)
-        {
-            M8_OUT_LINE(<< "Current evaluation: " << engine_.current_evaluation());
-        }
+        M8_OUT_LINE(<< "Current evaluation: " << engine_.current_evaluation());
 
         M8_EMPTY_LINE();
     }
@@ -615,7 +600,7 @@ namespace m8
     {
         using namespace std;
 
-        if (options::Options::get().min_display_depth <= depth && time > 0.01)
+        if (MIN_DISPLAY_DEPTH <= depth && time > 0.01)
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
             std::ostringstream out;
@@ -666,7 +651,7 @@ namespace m8
 
     void m8Intrf::DisplaySearchOutputXboard(const std::vector<std::string>& pv, EvalType eval, DepthType depth, double seconds, NodeCounterType nodes) const
     {
-        if (options::Options::get().min_display_depth <= depth && seconds > 0.01)
+        if (MIN_DISPLAY_DEPTH<= depth && seconds > 0.01)
         {
             std::lock_guard<std::recursive_mutex> lock(output_mutex_);
 
@@ -813,7 +798,7 @@ namespace m8
     void m8Intrf::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, std::string move)
     {
         if (xboard_
-            || depth < options::Options::get().min_display_depth
+            || depth < MIN_DISPLAY_DEPTH
             || time < 0.25)
         {
             return;
@@ -889,10 +874,7 @@ namespace m8
             DisplaySearchTableFooter(time, stats);
             M8_OUT_LINE(<< " m8 plays " << *pv.begin());
 
-            if (options::Options::get().display_auto)
-            {
-                DisplayBoard();
-            }
+            DisplayBoard();
 
             shell_intrf_.DisplayInvit();
         }

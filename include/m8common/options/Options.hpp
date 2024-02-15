@@ -117,19 +117,6 @@ namespace m8::options
         /// runtime.
         ModifiableOptions modifiable_options;
 
-        /// Parameter indicating if the evaluation should be displayed
-        bool display_eval = true;
-
-        /// Parameter indicating if the board should be displayed automatically
-        bool display_auto = true;
-
-        /// Minimum depth of the displayed engine thinking
-        DepthType min_display_depth = 4;
-
-        /// Indicate if the engine should use the Standatd Algebraic Notation. If it is
-        /// false, the Coordinate Algebraic Notation is used instead.
-        bool use_san;
-
         /// Options related to the evaluation function
         EvalOptions eval;
 

@@ -41,7 +41,7 @@ namespace m8::engine {
 
         try
         {
-            move = options::Options::get().use_san ? ParseSAN(str_move, engine_->board_) : ParseCoordinateNotation(str_move, engine_->board_);
+            move = ParseSAN(str_move, engine_->board_);
         }
         catch (const InvalidMoveNotationException&)
         {
