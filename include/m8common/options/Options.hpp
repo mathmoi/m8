@@ -32,16 +32,6 @@ namespace m8::options
         std::int32_t value;
     };
 
-    /// Class containing options related to the perft command
-    struct PerftOptions
-    {
-        /// Numbers of parallel threads to use for the perft command.
-        std::int32_t threads = 16;
-
-        /// Minimum number of work item the perft load is separated in.
-        std::int32_t min_works_items = 100;
-    };
-
     /// Class containing options related to the evaluation function
     struct EvalOptions
     {
@@ -118,7 +108,7 @@ namespace m8::options
         }
 
         /// Options of the perft command
-        PerftOptions perft;
+        std::int32_t perft_threads = 16;
 
         /// Max log severity
         severity_level max_log_severity;

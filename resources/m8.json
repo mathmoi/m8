@@ -1,8 +1,5 @@
 {
-  "perft": {
-    "threads": 16,
-    "min-works-items": 250
-  },
+  "perft-threads": 16,
   "max-log-severity": "none",
   "display-eval": 1,
   "display-auto": 1,

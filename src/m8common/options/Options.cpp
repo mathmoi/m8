@@ -26,7 +26,7 @@ namespace m8::options
         modifiable_options.emplace("perft-threads", 
             std::make_unique<TypedModifiableOption<std::int32_t>>("perft-threads",
                                                     "Numbers of parallel threads to use for the perft command.",
-                                                    this->perft.threads));
+                                                    this->perft_threads));
         
         modifiable_options.emplace("max-log-severity", 
             std::make_unique<TypedModifiableOption<m8::severity_level>>("max-log-severity",
@@ -60,16 +60,6 @@ namespace m8::options
         }
 
         return false;
-    }
-
-    void ReadPerftOptions(pt::ptree& tree, PerftOptions& options)
-    {
-        auto perft_tree = tree.get_child_optional("perft");
-        if (perft_tree.is_initialized())
-        {
-            TryReadOption<int>(perft_tree.get(), "threads", options.threads);
-            TryReadOption<int>(perft_tree.get(), "min-works-items", options.min_works_items);
-        }
     }
 
     void ReadEvalOptions(pt::ptree& tree, EvalOptions& options)
@@ -131,6 +121,11 @@ namespace m8::options
             options.max_log_severity = boost::lexical_cast<severity_level>(temp);
         }
 
+        if (TryReadOption<std::string>(tree, "perft-threads", temp))
+        {
+            options.perft_threads = boost::lexical_cast<std::uint32_t>(temp);
+        }
+
         if (TryReadOption<std::string>(tree, "display-auto", temp))
         {
             options.display_auto = boost::lexical_cast<bool>(temp);
@@ -156,7 +151,6 @@ namespace m8::options
             options.tt_size = boost::lexical_cast<size_t>(temp);
         }
         
-        ReadPerftOptions(tree, options.perft);
         ReadEvalOptions(tree, options.eval);
         ReadPsqtOptions(tree, options.eval.psqt_zones);
     }
@@ -193,5 +187,4 @@ namespace m8::options
         return stop_execution;
     }
 
-    
 } // namespace m8::options

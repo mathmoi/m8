@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "m8common/options/Options.hpp"
+
 #include "m8chess/movegen/MoveGeneration.hpp"
 
 #include "m8chess/Checkmate.hpp"
@@ -50,8 +52,7 @@ namespace m8
 
     void Perft::StartThreads()
     {
-        // TODO : Base the numbers of threads on a command line option
-        int threads = 32;
+        int threads = options::Options::get().perft_threads;
         
         for (int i = 0; i < threads; ++i)
         {
