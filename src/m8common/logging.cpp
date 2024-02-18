@@ -27,6 +27,7 @@
 
 #pragma warning (pop)
 
+#include "m8common/options/Options.hpp"
 #include "m8common/logging.hpp"
 #include "m8common/Utils.hpp"
 
@@ -67,23 +68,22 @@ namespace m8
 
     bool FilterLogRecord(logging::value_ref< severity_level, tag::severity > const& level)
     {
-        // TODO : Make this level configurable from the command line or the config file
-        return level <= m8::severity_level::error;
+        return level <= options::Options::get().max_log_severity;
     }
 
     void FormatLogRecord(logging::record_view const& rec, logging::formatting_ostream& strm)
     {
         static const std::map<const m8::severity_level, char> map_severity =
         {
-            { m8::severity_level::none, '_' },
-            { m8::severity_level::fatal, 'F' },
-            { m8::severity_level::error, 'E' },
+            { m8::severity_level::none,    '_' },
+            { m8::severity_level::fatal,   'F' },
+            { m8::severity_level::error,   'E' },
             { m8::severity_level::warning, 'W' },
-            { m8::severity_level::info, 'I' },
-            { m8::severity_level::output, '<' },
-            { m8::severity_level::input, '>' },
-            { m8::severity_level::debug, 'D' },
-            { m8::severity_level::trace, 'T' }
+            { m8::severity_level::info,    'I' },
+            { m8::severity_level::output,  '<' },
+            { m8::severity_level::input,   '>' },
+            { m8::severity_level::debug,   'D' },
+            { m8::severity_level::trace,   'T' }
         };
 
         auto date_formater = expr::stream << expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%H:%M:%S.%f ");

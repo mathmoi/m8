@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/program_options.hpp>
+
 #include "m8chess/Piece.hpp"
 #include "../../m8common/Bb.hpp"
 #include "../../m8common/logging.hpp"
@@ -139,17 +141,11 @@ namespace m8::options
     /// Read the properties from a configuration file.
     void ReadOptionsFromFile(const std::string filename);
 
-    /// Read the options from the command line
-    ///
-    /// @param argc  Number of arguments on the command line. This information is 
-    ///              passed to the main function.
-    /// @param argv  Values of the arguments.
-    /// @param out   Output stream the function can use to display informations to 
-    ///              the user.
-    /// @returns     A boolean value indicating if we must stop the execution. This 
-    ///              will be set to true if the users asked to display to availables
-    ///              options.
-    bool ReadOptionsFromCommandLine(int argc, char** argv, std::ostream& out);
+    /// Generate the global options descriptions so that the options can be read from the
+    /// command line.
+    /// 
+    /// @return po::options_description 
+    boost::program_options::options_description GenerateGlobalOptionsDescriptions();
 }
 
 #endif // M8_OPTIONS_OPTIONS_HPP_

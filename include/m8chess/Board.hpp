@@ -416,7 +416,7 @@ namespace m8
     inline Piece Board::operator[](std::size_t index) const
     {
         // A : l'index est valide
-        assert(0 <= index && index < kNumSqOnBoard);
+        assert(index < kNumSqOnBoard);
 
         return board_[index];
     }

@@ -9,8 +9,6 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <boost/program_options.hpp>
-
 #include "m8common/logging.hpp"
 #include "m8common/Utils.hpp"
 
@@ -120,36 +118,18 @@ namespace m8::options
         ReadPsqtOptions(tree, options.eval.psqt_zones);
     }
 
-    po::options_description GenerateOptionsDescriptions()
+    po::options_description GenerateGlobalOptionsDescriptions()
     {
         auto& options = Options::get();
 
         po::options_description desc("Allowed options");
         desc.add_options()
-            ("help", "produce help message")
+            ("help", "Produce this help message. Use \"m8 <command> --help\" to see the allowed options for a specific command.")
             ("max-log-severity", po::value<m8::severity_level>(&options.max_log_severity),
              "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).")
             ("tt-size", po::value<size_t>(&options.tt_size),
              "Transposition table size in megabytes (must be a power of two).");
-
+            
         return desc;
     }
-
-    bool ReadOptionsFromCommandLine(int argc, char** argv, std::ostream& out)
-    {
-        bool stop_execution = false;
-
-        auto desc = GenerateOptionsDescriptions();
-        po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::notify(vm);
-
-        if (vm.count("help")) {
-            out << desc << std::endl;
-            stop_execution = true;
-        }
-
-        return stop_execution;
-    }
-
 } // namespace m8::options

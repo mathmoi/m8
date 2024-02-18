@@ -158,7 +158,6 @@ namespace m8
             "setboard [XFenString]",
             std::bind(&m8Intrf::HandleFen, this, std::placeholders::_1)));
 
-        // TODO : Implement theses commands correctly
         shell_intrf_.AddCmd(ShellCmd("random",   "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("post",     "", "", std::bind([] {})));
         shell_intrf_.AddCmd(ShellCmd("hard",     "", "", std::bind([] {})));

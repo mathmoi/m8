@@ -3,27 +3,67 @@
 /// @date   May 2015
 /// @brief  Contains the entry point (main) of m8.
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <utility>
 
 #include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "m8chess/Init.hpp"
-
-#include "m8common/logging.hpp"
-
 #include "m8common/options/Options.hpp"
-
+#include "m8common/logging.hpp"
+#include "commands/CommandFactory.hpp"
 #include "m8Intrf.hpp"
+
+namespace po = boost::program_options;
 
 namespace m8
 {
-    bool ReadOptions(int argc, char* argv[])
+    std::tuple<std::unique_ptr<commands::Command>, int, char**> GetCommand(int argc, char* argv[])
     {
-        options::ReadOptionsFromFile("m8.json");
+        // If there is no commands, we return uci, the default command.
+        if (   argc < 2
+            || !std::all_of(argv[1], argv[1] + std::strlen(argv[1]), [](char c) { return std::isalpha(c); }))
+        {
+            return { commands::CreateCommand("uci"), argc, argv };
+        }
 
-        bool stop_execution = options::ReadOptionsFromCommandLine(argc, argv, std::cout);
-        return stop_execution;
+        auto command = commands::CreateCommand(argv[1]);
+        if (command)
+        {
+            return { std::move(command), argc - 1, argv + 1 };
+        }
+
+        return { std::move(command), argc, argv };
+    }
+
+    void DisplayHelpMessage(boost::program_options::options_description &all_options)
+    {
+        std::cout << "usage : m8 [command] [options]\n"
+                << '\n'
+                << "Allowed commands\n"
+                << "  uci    Launch m8 in UCI mode (this is the default command)\n"
+                << "  perft  Run a perft test, counting the nodes reachables from a position at a given depth.\n"
+                << "  cli    Launch m8 in cli mode (this mode is obsolete)\n"
+                << '\n'
+                << "The command is optional. If a command is not provided, m8 execute in UCI mode.\n";
+
+        std::cout << all_options << std::endl;
+    }
+
+    std::pair<po::options_description, po::variables_map>  ParseOptions(commands::Command* command, int argc, char* argv[])
+    {
+        po::options_description all_options;
+        all_options.add(m8::options::GenerateGlobalOptionsDescriptions());
+        if (command)
+        {
+            all_options.add(command->GetOptionsDescriptions());
+        }
+        po::variables_map vm;
+        po::store(po::parse_command_line(argc, argv, all_options), vm);
+        return { all_options, vm };
     }
 }
 
@@ -36,31 +76,45 @@ namespace m8
 ///          terminated correctly and another value otherwise.
 int main(int argc, char* argv[])
 {
-    int ret = 0;
-
     M8_LOG_SCOPE_THREAD();
 
     try {
-        bool stop_execution = m8::ReadOptions(argc, argv);
+        m8::options::ReadOptionsFromFile("m8.json");
 
-        if (!stop_execution)
-        {
-            m8::InitializePreCalc();
-           
-            m8::m8Intrf intrf;
-            intrf.Execute();
+        std::unique_ptr<m8::commands::Command> command(nullptr);
+        std::tie(command, argc, argv) = m8::GetCommand(argc, argv);
+
+        auto [all_options, vm] = m8::ParseOptions(command.get(), argc, argv);
+        
+        if (vm.count("help") || !command) {
+            m8::DisplayHelpMessage(all_options);
+            return 0;
         }
+        
+        po::notify(vm);
+
+        m8::InitializePreCalc();
+        (*command)();
     }
-    catch (const std::exception& ex) {
+    catch (const po::required_option& ex)
+    {
+        M8_FATAL << ex.what();
+        std::cerr << ex.what() <<'\n'
+                  << "To see a list of all options available, including required options, use \"m8 <command> --help\"."
+                  << std::endl;
+    }
+    catch (const std::exception& ex)
+    {
         M8_FATAL << "Unhandled exception: " << ex.what();
         std::cerr << "Unhandled exception: " << ex.what() <<std::endl;
-        ret = -1;
+        return -1;
     }
-    catch (...) {
+    catch (...)
+    {
         M8_FATAL << "Unhandled exception";
         std::cerr << "Unhandled exception" << std::endl;
-        ret = -2;
+        return -2;
     }
    
-    return ret;
+    return 0;
 }
