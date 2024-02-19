@@ -60,10 +60,11 @@ namespace m8
         }
     }
 
-    void Perft::Start()
+    void Perft::Run()
     {
         start_ = std::chrono::steady_clock::now();
         StartThreads();
+        JoinThreads();
     }
 
     std::uint64_t Perft::RecursivePerft(Board& board, int depth)
@@ -73,7 +74,7 @@ namespace m8
         MoveList moves;
         movegen::GenerateAllMoves(board, moves);
 
-        for (auto next = moves.begin(); next < moves.end() && !abort_; ++next)
+        for (auto next = moves.begin(); next < moves.end(); ++next)
         {
             UnmakeInfo unmake_info = board.Make(next->move);
 
@@ -109,11 +110,6 @@ namespace m8
         auto moves = node | std::views::filter([node_type](const PerftMove& move){ return move.status() == node_type; });
         for (auto& move : moves)
         {
-            if (abort_)
-            {
-                break;
-            }
-
             UnmakeInfo unmake_info = board.Make(move.move());
 
             if (!IsInCheck(OpposColor(board.side_to_move()), board))
@@ -138,7 +134,7 @@ namespace m8
 
             board.Unmake(move.move(), unmake_info);
 
-            if (is_root && !abort_ && move.status() == PerftMoveStatus::Done)
+            if (is_root && move.status() == PerftMoveStatus::Done)
             {
                 auto san_move = RenderSAN(move.move(), board_);
                 observer_->OnPartialPerftResult(san_move, move.count());
@@ -193,7 +189,7 @@ namespace m8
             Board board = board_;
             FindNodeToContribute(root_, board, depth_, true);
 
-            if (root_.done() && !abort_)
+            if (root_.done())
             {
                 SendResult();
             }

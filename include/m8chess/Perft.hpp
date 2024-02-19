@@ -152,7 +152,6 @@ namespace m8
         /// Constructor
         inline Perft(int depth, const Board& board, IPerftObserver* observer)
             : depth_(depth),
-              abort_(false),
               board_(board),
               root_(board_),
               observer_(observer)
@@ -162,20 +161,12 @@ namespace m8
         ~Perft() { JoinThreads(); };
 
         /// Run the test in prallel.
-        void Start();
-
-        /// Stop the current perft operation.
-        inline void Abort()
-        {
-            abort_ = true;
-            JoinThreads();
-        }
+        void Run();
 
     private:
         const int kMinParallelDepth = 3;
 
         int depth_;
-        bool abort_;
         Board board_;
 
         std::chrono::steady_clock::time_point start_;

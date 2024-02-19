@@ -11,7 +11,7 @@ namespace m8::engine {
 
     void PerftState::BeginState()
     {
-        perft_.Start();
+        perft_.Run();
     }
 
     void PerftState::OnPartialPerftResult(const std::string& move, std::uint64_t count)
@@ -29,8 +29,6 @@ namespace m8::engine {
 
     void PerftState::Stop()
     {
-        perft_.Abort();
-
         auto waiting_state = std::make_unique<ObservingState>(this->engine_);
         engine_->ChangeState(std::move(waiting_state));
     }

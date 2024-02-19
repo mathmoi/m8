@@ -3,8 +3,8 @@ file(GLOB_RECURSE M8_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_executable(m8 ${M8_SOURCES})
 
 # Add link libraries
-target_link_libraries(m8 m8chess
-                         m8common
+target_link_libraries(m8 m8common
+                         m8chess
                          Boost::program_options
                          Boost::filesystem
                          Boost::log

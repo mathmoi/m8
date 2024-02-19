@@ -4,7 +4,6 @@
 /// @brief  Contains the entry point (main) of m8.
 
 #include <algorithm>
-#include <iostream>
 #include <fstream>
 #include <utility>
 
@@ -14,6 +13,7 @@
 #include "m8chess/Init.hpp"
 #include "m8common/options/Options.hpp"
 #include "m8common/logging.hpp"
+#include "m8common/Output.hpp"
 #include "commands/CommandFactory.hpp"
 #include "m8Intrf.hpp"
 
@@ -41,16 +41,17 @@ namespace m8
 
     void DisplayHelpMessage(boost::program_options::options_description &all_options)
     {
-        std::cout << "usage : m8 [command] [options]\n"
-                << '\n'
-                << "Allowed commands\n"
-                << "  uci    Launch m8 in UCI mode (this is the default command)\n"
-                << "  perft  Run a perft test, counting the nodes reachables from a position at a given depth.\n"
-                << "  cli    Launch m8 in cli mode (this mode is obsolete)\n"
-                << '\n'
-                << "The command is optional. If a command is not provided, m8 execute in UCI mode.\n";
+        Output out;
+        out << "usage : m8 [command] [options]\n"
+            << '\n'
+            << "Allowed commands\n"
+            << "  uci    Launch m8 in UCI mode (this is the default command)\n"
+            << "  perft  Run a perft test, counting the nodes reachables from a position at a given depth.\n"
+            << "  cli    Launch m8 in cli mode (this mode is obsolete)\n"
+            << '\n'
+            << "The command is optional. If a command is not provided, m8 execute in UCI mode.\n";
 
-        std::cout << all_options << std::endl;
+        out << all_options << std::endl;
     }
 
     std::pair<po::options_description, po::variables_map>  ParseOptions(commands::Command* command, int argc, char* argv[])
@@ -98,9 +99,18 @@ int main(int argc, char* argv[])
     }
     catch (const po::required_option& ex)
     {
-        M8_FATAL << ex.what();
+        M8_ERROR << ex.what() <<'\n'
+                 << "To see a list of all options available, including required options, use \"m8 <command> --help\".";
         std::cerr << ex.what() <<'\n'
                   << "To see a list of all options available, including required options, use \"m8 <command> --help\"."
+                  << std::endl;
+    }
+    catch (const po::unknown_option& ex)
+    {
+        M8_ERROR << ex.what() <<'\n'
+                 << "To see a list of all options available use \"m8 <command> --help\".";
+        std::cerr << ex.what() <<'\n'
+                  << "To see a list of all options available use \"m8 <command> --help\"."
                   << std::endl;
     }
     catch (const std::exception& ex)

@@ -7,21 +7,25 @@
 #define M8_COMMANDS_PERFT_COMMAND_HPP_
 
 #include <cstdint>
-#include <iostream> // TODO : Remove this include
+
+#include "m8common/Output.hpp"
+#include "m8common/Utils.hpp"
 
 #include "m8chess/Board.hpp"
+#include "m8chess/Perft.hpp"
 #include "Command.hpp"
 
 namespace m8::commands
 {
     /// Implements the Perft commands that runs a perft test.
-    class PerftCommand : public Command
+    class PerftCommand : public Command, public IPerftObserver
     {
     public:
-        void operator()() const
+        void operator()()
         {
-            std::cout <<"Hello, Perft at depth " <<depth_ <<"!\n"
-                      <<"fen: " <<fen_ <<std::endl;
+            Board board(fen_);
+            m8::Perft perft(depth_, board, this);
+            perft.Run();
         };
 
         /// Returns the descriptions of the command line options supported for this command
@@ -31,9 +35,34 @@ namespace m8::commands
 
             po::options_description command_options("Perft Options");
             command_options.add_options()
-                ("depth,d", po::value<std::uint32_t>(&depth_)->required(), "Depth of the perft test (required)")
-                ("fen,f",   po::value<std::string>(&fen_)->default_value(kStartingPositionFEN), "FEN string representing the position to use for the perft test");
+                ("depth",   po::value<std::uint32_t>(&depth_)->required(), "Depth of the perft test (required)")
+                ("fen",     po::value<std::string>(&fen_)->default_value(kStartingPositionFEN), "FEN string representing the position to use for the perft test")
+                ("threads", po::value<std::int32_t>(&options::Options::get().perft_threads), "Number of parallele threads to use for the perft test");
             return command_options;
+        }
+
+        /// Method called everytime a partial perf result is ready
+        /// 
+        /// @param move  The move for which the result is available 
+        /// @param count The number of nodes
+        void OnPartialPerftResult(const std::string& move, std::uint64_t count)
+        {
+            Output out;
+            out << move << '\t' << count <<'\n';
+        }
+
+        /// Method called at the end of the perft test
+        /// 
+        /// @param count The number of nodes
+        /// @param time  The time used to complete the test
+        void OnPerftCompleted(std::uint64_t count, double time)
+        {
+            Output out;
+            out << '\n'
+                << "Threads: " <<options::Options::get().perft_threads <<'\n'
+                << "Nodes: " << count << '\n'
+                << "Time : " << time << '\n'
+                << "Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(count / time), 3) << std::endl;
         }
         
     private:

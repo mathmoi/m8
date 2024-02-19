@@ -16,7 +16,7 @@ namespace m8::commands
     class CliCommand : public Command
     {
     public:
-        void operator()() const
+        void operator()()
         {
             m8::m8Intrf intrf;
             intrf.Execute();

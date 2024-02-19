@@ -17,7 +17,7 @@ namespace m8::commands
     {
     public:
         /// Pure virtual method that execute the command.
-        virtual void operator()() const = 0;
+        virtual void operator()() = 0;
 
         /// Returns the descriptions of the command line options supported for this command
         virtual boost::program_options::options_description GetOptionsDescriptions() = 0;

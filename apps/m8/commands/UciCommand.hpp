@@ -7,7 +7,8 @@
 #define M8_COMMANDS_UCI_COMMAND_HPP_
 
 #include <cstdint>
-#include <iostream> // TODO : Remove this include
+
+#include "m8common/Output.hpp"
 
 #include "Command.hpp"
 
@@ -17,9 +18,10 @@ namespace m8::commands
     class UciCommand : public Command
     {
     public:
-        void operator()() const
+        void operator()()
         {
-            std::cout <<"Hello, UCI!" <<std::endl;
+            Output out;
+            out <<"Hello, UCI!" <<std::endl;
         };
 
         /// Returns the descriptions of the command line options supported for this command
@@ -28,15 +30,8 @@ namespace m8::commands
             namespace po = boost::program_options;
 
             po::options_description command_options;
-            // command_options.add_options()
-            //     ("depth,d", po::value<std::uint32_t>(), "Depth of the perft test")
-            //     ("fen,f",   po::value<std::string>()->default_value(kStartingPositionFEN), "FEN string representing the position to use for the perft test");
             return command_options;
         }
-        
-    private:
-    
-    
     };
 }
 

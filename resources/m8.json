@@ -1,6 +1,6 @@
 {
-  "perft-threads": 16,
-  "max-log-severity": "none",
+  "perft-threads": 32,
+  "max-log-severity": "error",
   "tt-size": 256,
   "eval" : {
       "pawn" : 100,

@@ -28,12 +28,6 @@ public:
         condition_variable_.notify_all();
     }
 
-    void WaitForCompletion()
-    {
-        std::unique_lock lock(mutex_);
-        condition_variable_.wait(lock, [this]{ return is_completed; });
-    }
-
     std::uint64_t count() const
     {
         assert(count_.has_value());
@@ -114,8 +108,7 @@ TEST_CASE("Perft test of differents positions at different depth")
     TestPerftObserver observer;
 
     Perft perft(depth, board, &observer);
-    perft.Start();
-    observer.WaitForCompletion();
+    perft.Run();
 
     REQUIRE(expected == observer.count());
 }

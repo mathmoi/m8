@@ -21,8 +21,6 @@
 #define M8_LOG_SCOPE_THREAD() \
             BOOST_LOG_SCOPED_THREAD_TAG("ThreadId", boost::this_thread::get_id());
 
-
-
 namespace m8
 {
 #define M8_SEVERITY_TRACE       8
