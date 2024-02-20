@@ -7,13 +7,14 @@
 #define M8_PV_HPP_
 
 #include <array>
+#include <algorithm>
 
 #include "../Move.hpp"
 
 namespace m8::search
 {
     /// Maximum size of a PV.
-    const std::size_t MAX_PV_SIZE = 512;
+    const std::size_t MAX_PV_SIZE = 128;
 
     /// Represent a principal variation 
     class PV 
@@ -37,10 +38,9 @@ namespace m8::search
             assert(count_ + other.count_ + 1 < MAX_PV_SIZE);
 
             moves_[0] = move;
-            for (size_t x = 0; x < other.count_; ++x)
-            {
-                moves_[x + 1] = other.moves_[x];
-            }
+            std::copy(other.moves_.begin(),
+                      other.moves_.begin() + other.count_,
+                      moves_.begin() + 1);
             count_ = other.count_ + 1;
         }
 

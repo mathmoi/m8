@@ -38,7 +38,7 @@ namespace m8::search {
         qsearch ? stats_.qnodes++ : stats_.nodes++;
 
         // We check if we need to abort the search because of time constraint
-        if (nodes_count_next_time_check_ <= stats_.all_nodes())
+        if (!qsearch && nodes_count_next_time_check_ <= stats_.all_nodes())
         {
             continue_ = !search_->is_aborted() && search_->time_manager().can_continue();
             if (!continue_)
@@ -51,7 +51,8 @@ namespace m8::search {
         // In internal search nodes (not root and not qsearch) we probe the
         // transposition table. If we find an acceptable exact score or a lower 
         // bound better than beta we might cut the search imediately. If we find
-        // a lower bound better than alpha but not better than beta we can immediately raise alpha
+        // a lower bound better than alpha but not better than beta we can immediately
+        // raise alpha.
         Move tt_move = kNullMove;
         if (!qsearch && !root)
         {
