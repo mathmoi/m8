@@ -1,7 +1,7 @@
-/// @file UciCommand.hpp
+/// @file UCICommand.hpp
 /// @author Mathieu Pagé
 /// @date February 2024
-/// @brief Contains the UciCommand class
+/// @brief Contains the UCICommand class
 
 #ifndef M8_COMMANDS_UCI_COMMAND_HPP_
 #define M8_COMMANDS_UCI_COMMAND_HPP_
@@ -10,18 +10,20 @@
 
 #include "m8common/Output.hpp"
 
+#include "../uci/UCI.hpp"
+
 #include "Command.hpp"
 
 namespace m8::commands
 {
     /// Implements the Perft commands that runs a perft test.
-    class UciCommand : public Command
+    class UCICommand : public Command
     {
     public:
         void operator()()
         {
-            Output out;
-            out <<"Hello, UCI!" <<std::endl;
+            uci::UCI uci;
+            uci.Run();
         };
 
         /// Returns the descriptions of the command line options supported for this command

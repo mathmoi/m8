@@ -38,8 +38,9 @@ namespace m8::search {
         NotifySearchStarted();
 
         DepthType current_depth = 1;
-        while(current_depth <= search->max_depth() &&
-              search->time_manager().can_start_new_iteration())
+        while(!search->is_aborted()
+                && current_depth <= search->max_depth()
+                && search->time_manager().can_start_new_iteration())
         {
             NotifyIterationStarted();
             SearchResult result = alpha_beta.Start(current_depth);
@@ -50,7 +51,10 @@ namespace m8::search {
                                          current_depth,
                                          0,
                                          result.stats_.nodes + result.stats_.qnodes);
+            }
 
+            if (result.type_ != ResultType::None)
+            {
                 // We bring the best move at the front of the list, this way the best move
                 // from a previous iteration is always searched first. This has two 
                 // benifits. First we can use the result of a partial search. If a new
@@ -59,10 +63,10 @@ namespace m8::search {
                 // root.
                 auto best_move = result.pv_.first();
                 root_moves.PullFront(best_move);
+
+                last_result += result;
             }
             
-            last_result += result;
-
             ++current_depth;
         }
 

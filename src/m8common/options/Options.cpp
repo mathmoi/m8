@@ -21,11 +21,10 @@ namespace m8::options
 {
     void Options::CreateModifiableOptions()
     {
-        modifiable_options.emplace("perft-threads", 
-            std::make_unique<TypedModifiableOption<std::int32_t>>("perft-threads",
-                                                    "Numbers of parallel threads to use for the perft command.",
-                                                    this->perft_threads));
-        
+        modifiable_options.emplace("Hash",
+            std::make_unique<TypedModifiableOption<size_t>>("Hash",
+                                                    "Define the hashtable size in Mb.",
+                                                    this->tt_size));
         modifiable_options.emplace("max-log-severity", 
             std::make_unique<TypedModifiableOption<m8::severity_level>>("max-log-severity",
                                                     "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).",

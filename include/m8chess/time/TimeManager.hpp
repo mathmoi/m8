@@ -83,7 +83,7 @@ namespace m8::time
         const DepthType            kMinDepth                 = 3;
         const ChessClock::Duration kSafetyBuffer             = std::chrono::milliseconds( 50);
         const ChessClock::Duration kMinDurationBetweenChecks = std::chrono::milliseconds( 10);
-        const ChessClock::Duration kMaxDurationBetweenChecks = std::chrono::milliseconds(400);
+        const ChessClock::Duration kMaxDurationBetweenChecks = std::chrono::milliseconds(250); // TODO : When we get a bench method. Check the incidence of this parameter on performances.
         
         inline const ChessClock& clock() const { return clock_; }
 

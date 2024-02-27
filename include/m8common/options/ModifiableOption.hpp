@@ -24,7 +24,7 @@ namespace m8::options
         std::string description() const { return description_; }
 
         virtual std::string ToString() const = 0;
-        virtual void set_value(const std::string& value) = 0;
+        virtual void set_value(std::string_view value) = 0;
 
     private:
         std::string name_;
@@ -49,7 +49,7 @@ namespace m8::options
         std::string ToString() const { return boost::lexical_cast<std::string>(value_storage_); }
 
         /// Set the value of the option
-        void set_value(const std::string& value) { value_storage_ = boost::lexical_cast<T>(value); };
+        void set_value(std::string_view value) { value_storage_ = boost::lexical_cast<T>(std::string(value)); };
 
     private:
         T& value_storage_;

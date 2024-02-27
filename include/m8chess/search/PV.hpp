@@ -63,6 +63,16 @@ namespace m8::search
         {
             count_ = 0;
         }
+
+        inline const Move* begin() const
+        {
+            return moves_.begin();
+        }
+
+        inline const Move* end() const
+        {
+            return moves_.begin() + count_;
+        }
         
     private:
         std::array<Move, MAX_PV_SIZE> moves_;

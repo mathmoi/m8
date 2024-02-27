@@ -7,6 +7,7 @@
 #define M8_STRING_HELPERS_HPP_
 
 #include <string>
+#include <vector>
 
 namespace m8
 {
@@ -16,7 +17,7 @@ namespace m8
     /// @param last      Iterator pointing past the last string to join.
     /// @param separator Separator to insert between each strings.
     /// @returns         A concatened string.
-    template<class Iterator> std::string join(Iterator first, Iterator last, std::string separator)
+    template<class Iterator> std::string Join(Iterator first, Iterator last, std::string separator)
     {
         std::string result("");
         for (auto it = first; it < last; ++it)
@@ -31,6 +32,12 @@ namespace m8
 
         return result;
     }
+
+    /// Split a string on whitespaces.
+    /// 
+    /// @param str String to split
+    /// @return a vector containing all the "words" in the string.
+    std::vector<std::string> Split(const std::string& str);
 }
 
 #endif // M8_STRING_HELPERS_HPP_

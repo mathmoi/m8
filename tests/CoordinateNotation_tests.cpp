@@ -28,18 +28,32 @@ void ParserTestRaise(std::string fen, std::string move)
 //                        ParseCoordinateNotation tests                                //
 /////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("ParseCoordinateNotation_OO_CorrectMovedReturned")
+TEST_CASE("ParseCoordinateNotation_KingCastleKingSide_CorrectMovedReturned")
 {   
     ParserTest("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R w Kq g6 0 1",
-               "O-O",
+               "e1g1",
                NewCastlingMove(kE1, kG1, kWhiteKing, kKingSideCastle));
 }
 
-TEST_CASE("ParseCoordinateNotation_OOO_CorrectMovedReturned")
+TEST_CASE("ParseCoordinateNotation_KingCastleQueenSide_CorrectMovedReturned")
 {
     ParserTest("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R b Kq g6 0 1",
-               "O-O-O",
+               "e8c8",
                NewCastlingMove(kE8, kC8, kBlackKing, kQueenSideCastle));
+}
+
+TEST_CASE("ParseCoordinateNotation_Chess960KingTakeRookKingSide_CorrectMovedReturned")
+{   
+    ParserTest("2rk4/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB1KR3 w Ec g6 0 1",
+               "d1e1",
+               NewCastlingMove(kD1, kG1, kWhiteKing, kKingSideCastle));
+}
+
+TEST_CASE("ParseCoordinateNotation_Chess960KingTakeRookQueenSide_CorrectMovedReturned")
+{
+    ParserTest("2rk4/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB1KR3 b Ec g6 0 1",
+               "d8c8",
+               NewCastlingMove(kD8, kC8, kBlackKing, kQueenSideCastle));
 }
 
 TEST_CASE("ParseCoordinateNotation_PawnTwoSquarePush_CorrectMoveReturned")
@@ -146,28 +160,48 @@ TEST_CASE("ParseCoordinateNotation_NoPieceOnFrom_ExceptionRaised")
 
 TEST_CASE("RenderCoordinateNotation_KingSideCastling_CorrectStringReturned")
 {
+    Board board("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R w Kq g6 0 1");
     Move move = NewMove(kE1, kG1, kWhiteKing, kNoPiece, kNoPiece, kKingSideCastle);
-    std::string actual = RenderCoordinateNotation(move);
-    REQUIRE("O-O" == actual);
+    std::string actual = RenderCoordinateNotation(move, board, false);
+    REQUIRE("e1g1" == actual);
 }
 
 TEST_CASE("RenderCoordinateNotation_QueenSideCastling_CorrectStringReturned")
 {
-    Move move = NewMove(kE1, kC1, kWhiteKing, kNoPiece, kNoPiece, kQueenSideCastle);
-    std::string actual = RenderCoordinateNotation(move);
-    REQUIRE("O-O-O" == actual);
+    Board board("r3k3/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB2K2R b Kq g6 0 1");
+    Move move = NewMove(kE8, kC8, kBlackKing, kNoPiece, kNoPiece, kQueenSideCastle);
+    std::string actual = RenderCoordinateNotation(move, board, false);
+    REQUIRE("e8c8" == actual);
+}
+
+TEST_CASE("RenderCoordinateNotation_Chess960KingSideCastling_CorrectStringReturned")
+{
+    Board board("2rk4/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB1KR3 w Ec g6 0 1");
+    Move move = NewMove(kD1, kG1, kWhiteKing, kNoPiece, kNoPiece, kKingSideCastle);
+    std::string actual = RenderCoordinateNotation(move, board, true);
+    REQUIRE("d1e1" == actual);
+}
+
+TEST_CASE("RenderCoordinateNotation_Chess960QueenSideCastling_CorrectStringReturned")
+{
+    Board board("2rk4/1pp1q1P1/Q7/2n3pP/3PR3/2N5/1PP5/rB1KR3 b Ec g6 0 1");
+    Move move = NewMove(kD8, kC8, kBlackKing, kNoPiece, kNoPiece, kQueenSideCastle);
+    std::string actual = RenderCoordinateNotation(move, board, true);
+    REQUIRE("d8c8" == actual);
 }
 
 TEST_CASE("RenderCoordinateNotation_SimpleKnightMove_CorrectStringReturned")
 {
+    Board board(kStartingPositionFEN);
     Move move = NewMove(kB1, kC3, kWhiteKnight);
-    std::string actual = RenderCoordinateNotation(move);
+    std::string actual = RenderCoordinateNotation(move, board, false);
     REQUIRE("b1c3" == actual);
 }
 
 TEST_CASE("RenderCoordinateNotation_PawnPromotion_CorrectStringReturned")
 {
+    Board board(kStartingPositionFEN);
     Move move = NewMove(kB7, kB8, kWhitePawn, kNoPiece, kRook);
-    std::string actual = RenderCoordinateNotation(move);
+    std::string actual = RenderCoordinateNotation(move, board, false);
     REQUIRE("b7b8r" == actual);
 }

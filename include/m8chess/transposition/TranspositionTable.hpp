@@ -21,7 +21,7 @@ namespace m8::transposition
     {
     public:
         TranspositionTable(size_t size)
-        : data_((UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(TranspositionEntry)),
+        : data_(CalculateNumberEntry(size)),
           mask_(data_.size() - 1),
           generation_(0)
         {
@@ -58,6 +58,18 @@ namespace m8::transposition
         {
             data_[key & mask_] = TranspositionEntry(key, move, generation_, type, depth, distance, eval);
         }
+
+        /// Resize the hash table.
+        ///
+        /// @param size Size of the hash table in bytes.
+        inline void Resize(size_t size)
+        {
+            assert(1024 <= size);
+
+            data_.resize(CalculateNumberEntry(size));
+            data_.shrink_to_fit();
+            mask_ = data_.size() - 1;
+        }
         
     private:
         static inline const size_t kMinSizeTable = 4 * 1024 * 1024;
@@ -66,6 +78,11 @@ namespace m8::transposition
         std::vector<TranspositionEntry> data_;
         ZobristKey                      mask_;
         std::uint8_t                    generation_;
+
+        inline static size_t CalculateNumberEntry(size_t size)
+        {
+            return (UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(TranspositionEntry);
+        }
     };
 }
 

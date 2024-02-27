@@ -22,8 +22,10 @@ namespace m8
     /// Remder a move into a string usind the coordinate algebraic notation.
     ///
     /// @param move The move to render as a string
+    /// @param chess960 Indicate if the castling moves need to be rendered as chess960
+    ///                 moves.
     /// @return A std::string representing the move
-    std::string RenderCoordinateNotation(Move move);
+    std::string RenderCoordinateNotation(Move move, const Board& board, bool chess960);
 }
 
 #endif // M8_CHESS_COORDINATE_NOTATION_HPP_

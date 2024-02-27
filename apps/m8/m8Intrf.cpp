@@ -195,7 +195,7 @@ namespace m8
         }
         else
         {
-            std::string fen = join(args_list.begin() + 1, args_list.end(), " ");
+            std::string fen = Join(args_list.begin() + 1, args_list.end(), " ");
 
             try
             {

@@ -72,9 +72,29 @@ namespace m8::eval
         return -kEvalMat + distance;
     }
 
-    inline double GetEvaluationInPawns(EvalType value)
+    inline double GetEvaluationInPawns(EvalType eval)
     {
-        return value / 100.0;
+        return eval / 100.0;
+    }
+
+    inline bool IsMateEval(EvalType eval)
+    {
+        return eval > kEvalMat - kMaxMat
+            || eval < -kEvalMat + kMaxMat;
+    }
+
+    inline std::int16_t GetMateDistance(EvalType eval)
+    {
+        assert(IsMateEval(eval));
+
+        if (eval < 0)
+        {
+            return -kEvalMat - eval;
+        }
+        else
+        {
+            return kEvalMat - eval;
+        }
     }
 }
 

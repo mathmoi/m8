@@ -11,21 +11,7 @@
 
 namespace m8
 {
-    Move ParseCastlingMove(CastleType castling, const Board& board)
-    {
-        Color side_to_move = board.side_to_move();
-        Piece piece = NewPiece(kKing, side_to_move);
-
-        Sq from = GetLsb(board.bb_piece(piece));
-
-        Colmn colmn = castling == kQueenSideCastle ? kColmnC : kColmnG;
-        Row first_row = GetColorWiseRow(side_to_move, kRow1);
-        Sq to = NewSq(colmn, first_row);
-
-        return NewCastlingMove(from, to, piece, castling);
-    }
-
-    Move ParseRegularMove(std::string input, const Board& board)
+    Move ParseCoordinateNotation(std::string input, const Board& board)
     {
         std::string::const_iterator first = input.begin();
         std::string::const_iterator end  = input.end();
@@ -64,22 +50,36 @@ namespace m8
             captured = NewPiece(kPawn, OpposColor(board.side_to_move()));
         }
 
-        return NewMove(from, to, piece, captured, promote_to);
-    }
-
-    Move ParseCoordinateNotation(std::string input, const Board& board)
-    {
-        if (input == "O-O")
+        CastleType castle_type = kNoCastling;
+        if (GetPieceType(piece) == kKing)
         {
-            return ParseCastlingMove(kKingSideCastle, board);
-        }
+            // If the move is a king taking it's own rook it's a castling move (chess960)
+            if (GetPieceType(captured) == kRook
+                && GetColor(piece) == GetColor(captured))
+            {
+                castle_type = to_colmn == board.casle_colmn(kKingSideCastle) ? kKingSideCastle : kQueenSideCastle;
+                Colmn castle_to_colomn = castle_type == kKingSideCastle ? kColmnG : kColmnC;
+                Row castle_to_row = GetRow(from);
+                to = NewSq(castle_to_colomn, castle_to_row);
+                captured = kNoPiece;
+            }
 
-        if (input == "O-O-O")
-        {
-            return ParseCastlingMove(kQueenSideCastle, board);
+            if (from_colmn == kColmnE)
+            {
+                // If the move is a king move from column e to g it's a king side castle
+                if (to_colmn == kColmnG)
+                {
+                    castle_type = kKingSideCastle;
+                }
+                // If the move is a king move from column e to g it's a king side castle
+                else if (to_colmn == kColmnC)
+                {
+                    castle_type = kQueenSideCastle;
+                }
+            }
         }
-
-        return ParseRegularMove(input, board);
+        
+        return NewMove(from, to, piece, captured, promote_to, castle_type);
     }
 
     std::string RenderCoordinateNotationNormalMove(Move move)
@@ -99,17 +99,35 @@ namespace m8
         return oss.str();
     }
 
-    std::string RenderCoordinateNotation(Move move)
+    std::string RenderCoordinateNotationCastlingMove(CastleType type, Move move, const Board& board, bool chess960)
+    {
+        Sq from = GetFrom(move);
+        Sq to;
+        if (chess960)
+        {
+            Colmn to_colmn = board.casle_colmn(type);
+            Row   to_row   = GetRow(from);
+            to = NewSq(to_colmn, to_row);
+        }
+        else
+        {
+            to = GetTo(move);
+        }
+        
+        std::ostringstream oss;
+
+        oss << SqToString(from);
+        oss << SqToString(to);
+
+        return oss.str();
+    }
+
+    std::string RenderCoordinateNotation(Move move, const Board& board, bool chess960)
     {
         CastleType castling = GetCastling(move);
-        if (castling == kKingSideCastle)
+        if (castling != kNoCastling)
         {
-            return "O-O";
-        }
-
-        if (castling == kQueenSideCastle)
-        {
-            return "O-O-O";
+            return RenderCoordinateNotationCastlingMove(castling, move, board, chess960);
         }
 
         return RenderCoordinateNotationNormalMove(move);

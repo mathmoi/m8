@@ -11,6 +11,7 @@
 #include "m8chess/eval/Eval.hpp"
 #include "m8common/logging.hpp"
 
+// TODO : The Searcher class need to be refactored. I'm not sure all the complexity is usefull
 namespace m8 { namespace search
 {
     Searcher::Searcher(transposition::TranspositionTable& transposition_table)
@@ -85,7 +86,15 @@ namespace m8 { namespace search
 
     void Searcher::Stop()
     {
-        StopSearch();
+        if (state_ == SearchState::Searching)
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+
+            if (state_ == SearchState::Searching)
+            {
+                current_search_->Abort();
+            }
+        }
     }
 
     void Searcher::RunSearchThread()
