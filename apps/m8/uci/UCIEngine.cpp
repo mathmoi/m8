@@ -34,6 +34,7 @@ namespace m8::uci
         interface_.SendId("name", "m8");
         interface_.SendId("author", "Mathieu Pagé <m@mathieupage.com>");
         interface_.SendSpinOption("Hash", 1, 1024*1024, options::Options::get().tt_size);
+        interface_.SendCheckOption("UCI_Chess960", false);
         interface_.SendUciok();
     }
 

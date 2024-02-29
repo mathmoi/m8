@@ -54,6 +54,45 @@ namespace m8::options
     private:
         T& value_storage_;
     };
+
+    template<>
+    class TypedModifiableOption<bool> : public ModifiableOption
+    {
+    public:
+        /// Constructor.
+        ///
+        /// @param name          Name of the options.
+        /// @param description   Description of the option.
+        /// @param value_storage Reference to an emplacement where the value of this 
+        ///                      option is stored
+        TypedModifiableOption(const std::string& name, const std::string& description, bool& value_storage)
+            : ModifiableOption(name, description), value_storage_(value_storage)
+        {}
+
+        /// Return the option's value
+        std::string ToString() const { return boost::lexical_cast<std::string>(value_storage_); }
+
+        /// Set the value of the option
+        void set_value(std::string_view value)
+        {
+            if (value == "true")
+            {
+                value_storage_ = true;
+                return;
+            }
+
+            if (value == "false")
+            {
+                value_storage_ = false;
+                return;
+            }
+
+            value_storage_ = boost::lexical_cast<bool>(std::string(value));
+        };
+
+    private:
+        bool& value_storage_;
+    };
 }
 
 #endif // M8_OPTIONS_MODIFICABLE_OPTION_HPP_

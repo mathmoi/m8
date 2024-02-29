@@ -240,47 +240,53 @@ namespace m8::movegen
                                       Colmn rook_final_column,
                                       MoveList& move_list)
     {
-        if (board.casle(color, castling_side))
+        if (!board.casle(color, castling_side))
         {
-            Piece king = NewPiece(kKing, color);
-            Bb bb_king = board.bb_piece(king);
-            Sq king_position = GetLsb(bb_king);
-            Row row = GetRow(king_position);
-            Sq king_final_position = NewSq(king_final_column, row);
-            Sq rook_position = NewSq(rook_original_column, row);
-            Sq rook_final_position = NewSq(rook_final_column, row);
+            return;
+        }
+        
+        Piece king = NewPiece(kKing, color);
+        Bb bb_king = board.bb_piece(king);
+        Sq king_position = GetLsb(bb_king);
+        Row row = GetRow(king_position);
+        Sq king_final_position = NewSq(king_final_column, row);
+        Sq rook_position = NewSq(rook_original_column, row);
+        Sq rook_final_position = NewSq(rook_final_column, row);
 
-            Bb bb_travel_king = BbBetween(king_position, king_final_position);
-            Bb bb_travel_rook = BbBetween(rook_position, rook_final_position);
+        // If there is not movement (possible in chess960) it's not possible to castle.
+        if (king_position == king_final_position && rook_position == rook_final_position)
+        {
+            return;
+        }
 
-            // Check if any of the travel squared is occupied.
-            Bb occ = board.bb_occupied();
-            occ ^= GetSingleBitBb(rook_position) | bb_king;
-            bool travel_occupied = (occ & (bb_travel_king | bb_travel_rook)) != kEmptyBb;
+        Bb bb_travel_king = BbBetween(king_position, king_final_position) | bb_king | GetSingleBitBb(king_final_position);
+        Bb bb_travel_rook = BbBetween(rook_position, rook_final_position) | GetSingleBitBb(rook_final_position);
 
-            if (!travel_occupied)
+        // Check if any of the travel squared is occupied.
+        Bb occ = board.bb_occupied();
+        occ ^= GetSingleBitBb(rook_position) | bb_king;
+        if ((occ & (bb_travel_king | bb_travel_rook)) != kEmptyBb)
+        {
+            return;
+        }
+
+        // Check if any of the square traveled by the king or the origin or 
+        // destination of the king are under attack.
+        Bb bb_opponents = board.bb_color(OpposColor(color));
+
+        while (bb_travel_king)
+        {
+            Sq pos = RemoveLsb(bb_travel_king);
+            if ((AttacksTo(board, pos) & bb_opponents) != kEmptyBb)
             {
-                // Check if any of the square traveled by the king or the origin or 
-                // destination of the king are under attack.
-                Bb bb_check_attack = bb_travel_king | bb_king | GetSingleBitBb(king_final_position);
-                Bb bb_opponents = board.bb_color(OpposColor(color));
-
-                bool attacked = false;
-                while (bb_check_attack && !attacked)
-                {
-                    Sq pos = RemoveLsb(bb_check_attack);
-                    attacked = (AttacksTo(board, pos) & bb_opponents) != kEmptyBb;
-                }
-
-                if (!attacked)
-                {
-                    move_list.Push(NewCastlingMove(king_position,
-                                                       king_final_position,
-                                                       king,
-                                                       castling_side));
-                }
+                return;
             }
         }
+
+        move_list.Push(NewCastlingMove(king_position,
+                                       king_final_position,
+                                       king,
+                                       castling_side));
     }
 
     /// Generate castling moves.

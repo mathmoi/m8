@@ -25,6 +25,12 @@ namespace m8::options
             std::make_unique<TypedModifiableOption<size_t>>("Hash",
                                                     "Define the hashtable size in Mb.",
                                                     this->tt_size));
+
+        modifiable_options.emplace("UCI_Chess960",
+            std::make_unique<TypedModifiableOption<bool>>("UCI_Chess960",
+                                                    "Indicate if we play a Chess960 game.",
+                                                    this->chess960));
+                                                    
         modifiable_options.emplace("max-log-severity", 
             std::make_unique<TypedModifiableOption<m8::severity_level>>("max-log-severity",
                                                     "Define the maximum log severity level (fatal, error, warning, info, output, input, debug, trace).",

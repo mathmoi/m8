@@ -628,8 +628,10 @@ namespace m8
         Sq rook_from = NewSq(rook_colmn, row);
         Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
 
-        MovePiece(from, to, piece);
-        MovePiece(rook_from, rook_to, rook);
+        RemovePiece(from);
+        RemovePiece(rook_from);
+        AddPiece(to, piece);
+        AddPiece(rook_to, rook);
     }
 
     inline void Board::MakeRookMove(Sq from, Sq to, Piece piece, Piece taken)
@@ -761,8 +763,10 @@ namespace m8
         Sq rook_from = NewSq(rook_colmn, row);
         Sq rook_to = NewSq(castle == kKingSideCastle ? kF1 : kD1, row);
 
-        MovePiece(to, from, piece);
-        MovePiece(rook_to, rook_from, rook);
+        RemovePiece(to);
+        RemovePiece(rook_to);
+        AddPiece(from, piece);
+        AddPiece(rook_from, rook);
     }
 
     inline void Board::UnmakeKingMove(Sq from, Sq to, Piece piece, Piece taken, CastleType castle)

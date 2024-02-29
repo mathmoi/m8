@@ -125,10 +125,14 @@ namespace m8::options
         /// Transposition table size in megabytes.
         size_t tt_size;
 
+        /// Indicate if we are playing a chess960 (aka Fisher Random) game.
+        bool chess960;
+
     private:
         /// Consctructor
         Options()
-        : max_log_severity(severity_level::none)
+        : max_log_severity(severity_level::none),
+          chess960(false)
         {}
 
         void CreateModifiableOptions();
