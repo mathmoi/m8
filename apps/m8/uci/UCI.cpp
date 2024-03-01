@@ -30,6 +30,10 @@ namespace m8::uci
 
     void UCI::Run()
     {
+        // On déactive les buffers sur les IO
+        std::cout.setf(std::ios::unitbuf);
+        std::cin.rdbuf()->pubsetbuf(0, 0);
+
         std::string input;
 
         std::vector<std::string> token_list;

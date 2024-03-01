@@ -68,9 +68,6 @@ namespace m8::uci
                              std::optional<std::chrono::milliseconds> move_time,
                              bool infinite)
     {
-
-        transposition_table_.Resize(options::Options::get().tt_size * 1024 * 1024);
-
         SetTimeControl(wtime, btime, winc, binc, moves_to_go, move_time, infinite);
         clock_->Start();
         auto time_manager = time::TimeManager::CreateTimeManager(*(time_control_), *(clock_));
@@ -93,6 +90,10 @@ namespace m8::uci
         {
             it->second->set_value(*value);
         }
+
+        // We resize the transposition table here in case it was resize by the option
+        // command. This will have no effect if the size remains the same.
+        transposition_table_.Resize(options::Options::get().tt_size * 1024 * 1024);
     }
 
     void UCIEngine::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
