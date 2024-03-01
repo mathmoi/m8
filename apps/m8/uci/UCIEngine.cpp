@@ -97,20 +97,23 @@ namespace m8::uci
 
     void UCIEngine::OnNewBestMove(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
-        interface_.SendInfo(depth,
-                            std::nullopt,
-                            std::chrono::milliseconds(static_cast<int>(time * 1000)),
-                            nodes,
-                            RenderPVMoves(pv),
-                            std::nullopt,
-                            eval,
-                            std::nullopt,
-                            std::nullopt,
-                            std::nullopt,
-                            nodes / time,
-                            std::nullopt,
-                            std::nullopt,
-                            std::nullopt);
+        if (time > 0.01 && pv.count() > 1)
+        {
+            interface_.SendInfo(depth,
+                                std::nullopt,
+                                std::chrono::milliseconds(static_cast<int>(time * 1000)),
+                                nodes,
+                                RenderPVMoves(pv),
+                                std::nullopt,
+                                eval,
+                                std::nullopt,
+                                std::nullopt,
+                                std::nullopt,
+                                nodes / time,
+                                std::nullopt,
+                                std::nullopt,
+                                std::nullopt);
+        }
     }
 
     void UCIEngine::OnSearchMoveAtRoot(DepthType depth, double time, std::uint16_t move_number, std::uint16_t moves_number, NodeCounterType nodes, Move move)
@@ -143,20 +146,23 @@ namespace m8::uci
 
     void UCIEngine::OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
-        interface_.SendInfo(depth,
-                            std::nullopt,
-                            std::chrono::milliseconds(static_cast<int>(time * 1000)),
-                            nodes,
-                            RenderPVMoves(pv),
-                            std::nullopt,
-                            eval,
-                            std::nullopt,
-                            std::nullopt,
-                            std::nullopt,
-                            nodes / time,
-                            std::nullopt,
-                            std::nullopt,
-                            std::nullopt);
+        if (time > 0.1)
+        {
+            interface_.SendInfo(depth,
+                                std::nullopt,
+                                std::chrono::milliseconds(static_cast<int>(time * 1000)),
+                                nodes,
+                                RenderPVMoves(pv),
+                                std::nullopt,
+                                eval,
+                                std::nullopt,
+                                std::nullopt,
+                                std::nullopt,
+                                nodes / time,
+                                std::nullopt,
+                                std::nullopt,
+                                std::nullopt);
+        }
     }
 
     std::vector<std::string> UCIEngine::RenderPVMoves(const search::PV& pv)
