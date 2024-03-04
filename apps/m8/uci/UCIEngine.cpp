@@ -147,7 +147,7 @@ namespace m8::uci
 
     void UCIEngine::OnIterationCompleted(const search::PV& pv, EvalType eval, DepthType depth, double time, NodeCounterType nodes)
     {
-        if (time > 0.1)
+        if (time > 0.1 || pv.count() > 1)
         {
             interface_.SendInfo(depth,
                                 std::nullopt,
