@@ -128,7 +128,7 @@ namespace m8::uci
                                 std::nullopt,
                                 std::nullopt,
                                 std::nullopt,
-                                RenderCoordinateNotation(move, board_, false), // TODO : Handle Chess960
+                                RenderCoordinateNotation(move, board_, options::Options::get().chess960),
                                 move_number,
                                 std::nullopt,
                                 nodes / time,
@@ -140,7 +140,7 @@ namespace m8::uci
 
     void UCIEngine::OnSearchCompleted(const search::PV& pv, double time, const search::SearchStats& stats)
     {
-        auto move = RenderCoordinateNotation(pv.first(), board_, false); // TODO : Handle Chess960
+        auto move = RenderCoordinateNotation(pv.first(), board_, options::Options::get().chess960);
         interface_.SendBestMove(move, std::nullopt);
         clock_->Stop();
     }
@@ -173,7 +173,7 @@ namespace m8::uci
 
         for (auto move : pv)
         {
-            std::string str_move = RenderCoordinateNotation(move, board_, false); // TODO : Handle Chess960
+            std::string str_move = RenderCoordinateNotation(move, board_, options::Options::get().chess960);
             moves.push_back(str_move);
             unmake_info_stack.push(board_.Make(move));
         }

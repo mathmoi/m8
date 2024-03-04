@@ -61,7 +61,6 @@ namespace m8
     void PrepareCastlingMove(const m8::Board & board, m8::ParseInfo & info, CastleType castling)
     {
         Color side_to_move = board.side_to_move();
-        // TODO : Is this compatible with chess360?
         Colmn colmn = castling == kQueenSideCastle ? kColmnC : kColmnG;
 
         info.piece = NewPiece(kKing, side_to_move);

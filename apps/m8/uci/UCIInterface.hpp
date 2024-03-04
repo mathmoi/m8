@@ -8,7 +8,6 @@
 
 #include <chrono>
 #include <optional>
-#include <string> // TODO: Est-ce qu'on peut tout remplacer par des string_view?
 #include <string_view>
 
 #include "m8common/Output.hpp"
@@ -26,7 +25,7 @@ namespace m8::uci
     {
     public:
         /// Send the id command to the gui.
-        void SendId(const std::string& id_type, const std::string& id_value);
+        void SendId(const std::string_view& id_type, const std::string& id_value);
 
         /// Send the uciok command to the gui.
         void SendUciok();
@@ -35,7 +34,7 @@ namespace m8::uci
         void SendReadyok();
 
         /// Send the bestmove command to the gui.
-        void SendBestMove(const std::string& move, const std::optional<std::string>& ponder_move);
+        void SendBestMove(const std::string_view& move, const std::optional<std::string>& ponder_move);
 
         /// Send the info command to the gui
         /// 
@@ -60,13 +59,13 @@ namespace m8::uci
                       std::optional<std::vector<std::string>>  pv,
                       std::optional<std::uint16_t>             multi_pv,
                       std::optional<EvalType>                  score,
-                      std::optional<std::string>               current_move,
+                      std::optional<std::string_view>          current_move,
                       std::optional<std::uint16_t>             current_move_number,
                       std::optional<std::uint16_t>             hash_full,
                       std::optional<NodeCounterType>           nps,
                       std::optional<NodeCounterType>           tb_hits,
                       std::optional<std::uint16_t>             cpu_load,
-                      std::optional<std::string>               string);
+                      std::optional<std::string_view>          string);
         
         /// Sends an option of type Check.
         /// 

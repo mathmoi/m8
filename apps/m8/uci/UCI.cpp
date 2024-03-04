@@ -4,7 +4,6 @@
 /// @brief Contains the UCI class implementation
 
 #include <chrono>
-#include <iostream> // TODO : Remove this include
 #include <optional>
 #include <regex>
 #include <string>

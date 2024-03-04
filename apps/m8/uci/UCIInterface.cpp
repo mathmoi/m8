@@ -12,7 +12,7 @@
 
 namespace m8::uci
 {
-    void UCIInterface::SendId(const std::string& id_type, const std::string& id_value)
+    void UCIInterface::SendId(const std::string_view& id_type, const std::string& id_value)
     {
         out_ <<"id " <<id_type <<' ' <<id_value <<std::endl;
     }
@@ -27,7 +27,7 @@ namespace m8::uci
         out_ <<"readyok" <<std::endl;
     }
 
-    void UCIInterface::SendBestMove(const std::string& move, const std::optional<std::string>& ponder_move)
+    void UCIInterface::SendBestMove(const std::string_view& move, const std::optional<std::string>& ponder_move)
     {
         out_ <<"bestmove " <<move;
         if (ponder_move.has_value())
@@ -44,13 +44,13 @@ namespace m8::uci
                                 std::optional<std::vector<std::string>>  pv,
                                 std::optional<std::uint16_t>             multi_pv,
                                 std::optional<EvalType>                  score,
-                                std::optional<std::string>               current_move,
+                                std::optional<std::string_view>          current_move,
                                 std::optional<std::uint16_t>             current_move_number,
                                 std::optional<std::uint16_t>             hash_full,
                                 std::optional<NodeCounterType>           nps,
                                 std::optional<NodeCounterType>           tb_hits,
                                 std::optional<std::uint16_t>             cpu_load,
-                                std::optional<std::string>               string)
+                                std::optional<std::string_view>          string)
     {
         out_ <<"info";
 
