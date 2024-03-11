@@ -11,7 +11,6 @@
 #include "m8chess/eval/Eval.hpp"
 #include "m8common/logging.hpp"
 
-// TODO : The Searcher class need to be refactored. I'm not sure all the complexity is usefull
 namespace m8 { namespace search
 {
     Searcher::Searcher(transposition::TranspositionTable& transposition_table)
