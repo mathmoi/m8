@@ -24,6 +24,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     find_package(Threads REQUIRED)
 endif()
 
+# Add definitions
+add_compile_definitions($<$<CONFIG:Debug>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_TRACE>
+                        $<$<CONFIG:RelWithDebInfo>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_TRACE>
+                        $<$<CONFIG:Release>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_INPUT>    
+                        $<$<CONFIG:MinSizeRel>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_INPUT>)
+
 add_subdirectory(src)
 add_subdirectory(apps)
 add_subdirectory(tests)

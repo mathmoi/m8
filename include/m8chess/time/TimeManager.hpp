@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include "m8common/Timer.hpp"
+
 #include "../Types.hpp"
 #include "../search/PV.hpp"
 #include "../search/ISearchObserver.hpp"
@@ -24,51 +26,35 @@ namespace m8::time
         /// Constructor
         /// 
         /// @param clock Pointer to the engine's chess clock
-        TimeManager(ChessClock& clock)
-        : clock_(clock),
-          last_iteration_duration(std::chrono::seconds(0)),
-          second_last_iteration_duration(std::chrono::seconds(0)),
-          iterations_completed_(0)
-        {}
-
-        /// Create a TimeManager object
-        /// 
-        /// @param time_control Time control to use
-        /// @param clock        Clock used to keep the engine's time
-        static std::unique_ptr<TimeManager> CreateTimeManager(const TimeControl& time_control,
-                                                              ChessClock& clock);
-
-        /// Initialise the time manager for a search. This should be called before the
-        /// begining of each search.
-        virtual void InitSearch() {}
+        TimeManager(std::optional<std::chrono::milliseconds> time,
+                    std::optional<std::chrono::milliseconds> increment,
+                    std::optional<std::uint32_t>             moves_to_go,
+                    std::optional<std::chrono::milliseconds> move_time,
+                    bool                                     infinite);
 
         /// Indicate if the search can continue. The search needs to call this regularly
         /// after searching a number of nodes defined by the method.
         ///  CalculateNodesBeforeNextCheck.
-        virtual bool can_continue() const = 0;
+        bool can_continue() const;
 
         /// Indicate if the search can start a new iteration.
-        virtual bool can_start_new_iteration() const = 0;
+        bool can_start_new_iteration() const;
+
+        /// Method called when the search starts.
+        void OnSearchStarted();
 
         /// Method called when an iteration is started.
-        inline void OnIterationStarted()
-        {
-            iteration_start = std::chrono::steady_clock::now();
-        }
+        void OnIterationStarted();
 
         /// Method called when an iteration is completed.
-        inline void OnIterationCompleted(const search::PV& pv,
-                                                EvalType eval,
-                                                DepthType depth,
-                                                double time,
-                                                NodeCounterType nodes)
-        {
-            auto iteration_end = std::chrono::steady_clock::now();
-            second_last_iteration_duration = last_iteration_duration;
-            last_iteration_duration = iteration_end - iteration_start;
-
-            ++iterations_completed_;
-        }
+        void OnIterationCompleted(const search::PV& pv,
+                                  EvalType eval,
+                                  DepthType depth,
+                                  double time,
+                                  NodeCounterType nodes);
+        
+        /// Method when the search is completed.
+        void OnSearchCompleted(const search::PV& pv, double time, const search::SearchStats& stats);
 
         /// Returns the number of nodes can be searched before we need to make another 
         /// call to can_continue.
@@ -77,37 +63,33 @@ namespace m8::time
         ///                         current search
         /// @return NodeCounterType Number of nodes to search before the next call to
         ///                         can_continue
-        virtual NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const = 0;
-
-    protected:
-        const DepthType            kMinDepth                 = 3;
-        const ChessClock::Duration kSafetyBuffer             = std::chrono::milliseconds( 50);
-        const ChessClock::Duration kMinDurationBetweenChecks = std::chrono::milliseconds( 10);
-        const ChessClock::Duration kMaxDurationBetweenChecks = std::chrono::milliseconds(250); // TODO : When we get a bench method. Check the incidence of this parameter on performances.
-        
-        inline const ChessClock& clock() const { return clock_; }
-
-        /// Indicate if the search need to continue because the minimum depth is not 
-        /// searched yet.
-        inline bool need_to_continue() const
-        {
-            return iterations_completed_ < kMinDepth;
-        }
-
-        inline ChessClock::Duration next_iteration_estimated_time() const
-        {
-            return last_iteration_duration * (last_iteration_duration / second_last_iteration_duration);
-        }
+        NodeCounterType CalculateNodesBeforeNextCheck(NodeCounterType nodes_searched) const;
 
     private:
-        ChessClock& clock_;
+        typedef Timer::ClockType::duration Duration;
 
-        std::chrono::steady_clock::time_point iteration_start;
-        ChessClock::Duration last_iteration_duration,
-                                second_last_iteration_duration;
+        const DepthType     kMinDepth                 = 3;
+        const double        kMaxOvertargetFactor      = 5.0;
+        const double        kMaxMaxDurationRatio      = 0.8;
+        const std::uint32_t kMovesToGoEstimate        = 35;
+        const Duration      kSafetyBuffer             = std::chrono::milliseconds( 50);
+        const Duration      kMinDurationBetweenChecks = std::chrono::milliseconds( 10);
+        const Duration      kMaxDurationBetweenChecks = std::chrono::milliseconds(250); // TODO : When we get a bench method. Check the incidence of this parameter on performances.
+        
+        Timer clock_;
+        Timer iteration_clock_;
 
+        Duration last_iteration_duration,
+                 second_last_iteration_duration;
         DepthType iterations_completed_;
+
+        Duration min_duration;
+        Duration max_duration;
+        Duration target_duration;
+
+        bool need_to_continue() const;
+        ChessClock::Duration next_iteration_estimated_time() const;
     };
 }
 
-#endif // m8_TIME_TIME_MANAGER_HPP_
+#endif // m8_TIME_TIME_MANAGER_HPP_o

@@ -11,13 +11,6 @@ target_link_libraries(m8 m8common
                          ${CMAKE_THREAD_LIBS_INIT})
 add_dependencies(m8 m8chess m8common)
 
-# Add definitions
-target_compile_definitions(m8 PRIVATE
-    $<$<CONFIG:Debug>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_TRACE>
-    $<$<CONFIG:RelWithDebInfo>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_TRACE>
-    $<$<CONFIG:Release>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_INPUT>    
-    $<$<CONFIG:MinSizeRel>:M8_MAX_LOG_SEVERITY=M8_SEVERITY_INPUT>)
-
 # Generating the version.hpp file
 find_package(Git)
 add_custom_target(version

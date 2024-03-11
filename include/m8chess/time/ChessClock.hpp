@@ -15,9 +15,9 @@
 
 namespace m8::time {
 
-    /// Represents the clock of a chess player. Tree time controls are available : 
-    /// Conventional chess clock (x moves y minutes), incremental chess clock (x minutes +
-    /// x seconds per move) and exact number of secondes per move.
+    // TODO : Remove this class it's replaced by Timer
+
+    /// Represents a chess clock that can be started and stopped.
     class ChessClock
     {
     public:
@@ -40,9 +40,12 @@ namespace m8::time {
         /// running.
         inline Duration elapsed() const
         {
-            auto now = std::chrono::steady_clock::now();
-            return now - (start_time_.has_value() ? start_time_.value()
-                                                  : now);
+            if (start_time_)
+            {
+                return std::chrono::steady_clock::now() - start_time_.value();
+            }
+
+            return Duration(0);
         }
 
         /// Returns the remaining time on the clock.
@@ -66,7 +69,6 @@ namespace m8::time {
             start_time_.reset();
         }
 
-    protected:
         /// Sets the time on the clock. The clock must previously be in a stopped state.
         inline void set_time_on_clock(Duration time_on_clock)
         {

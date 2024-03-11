@@ -82,17 +82,8 @@ namespace m8::uci
         Board board_;
         transposition::TranspositionTable transposition_table_;
         search::Searcher searcher_;
-        std::unique_ptr<time::TimeControl> time_control_;
-        std::unique_ptr<time::ChessClock> clock_;
 
         std::vector<std::string> RenderPVMoves(const search::PV& pv);
-        void SetTimeControl(std::optional<std::chrono::milliseconds> wtime,
-                            std::optional<std::chrono::milliseconds> btime,
-                            std::optional<std::chrono::milliseconds> winc,
-                            std::optional<std::chrono::milliseconds> binc,
-                            std::optional<std::uint32_t> moves_to_go,
-                            std::optional<std::chrono::milliseconds> move_time,
-                            bool infinite);
     };
 }
 

@@ -38,7 +38,7 @@ namespace m8::engine
 
         engine_->NotifySearchStarted();
 
-        auto time_manager = time::TimeManager::CreateTimeManager(*(engine_->time_control_), *(engine_->clock_));
+        auto time_manager = std::make_unique<time::TimeManager>(std::nullopt, std::nullopt, std::nullopt, std::chrono::milliseconds(1000), false);
         search_= std::make_shared<search::Search>(engine_->board_, std::move(time_manager), engine_->max_depth_);
         engine_->searcher_.Start(search_);
     }

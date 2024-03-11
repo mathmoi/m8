@@ -6,7 +6,12 @@
 #ifndef M8_COMMON_CHRONO_HELPERS_HPP_
 #define M8_COMMON_CHRONO_HELPERS_HPP_
 
+#include <boost/lexical_cast.hpp>
+
 #include <chrono>
+#include <optional>
+
+#include "Utils.hpp"
 
 namespace m8
 {
@@ -22,6 +27,17 @@ namespace m8
     inline std::chrono::nanoseconds FloatToNanoseconds(float seconds)
     {
         return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<float>(seconds));
+    }
+
+    template<typename TDuration>
+    inline std::string ToString(std::optional<TDuration> duration)
+    {
+        if (duration)
+        {
+            return ToString(ToFSec(*duration));
+        }
+
+        return "std::nullopt";
     }
 }
 #endif // M8_COMMON_CHRONO_HELPERS_HPP_
