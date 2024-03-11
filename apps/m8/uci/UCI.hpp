@@ -28,6 +28,7 @@ namespace m8::uci
         void HandlePosition(const std::vector<std::string> params);
         void HandleGo(const std::vector<std::string> params);
         void HandleStop(const std::vector<std::string> params);
+        void HandleQuit(const std::vector<std::string> params);
         void HandleSetOption(const std::vector<std::string> params);
 
         static const std::unordered_map<std::string, std::function<void(UCI*, const std::vector<std::string>&)>> HANDLERS;

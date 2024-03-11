@@ -24,6 +24,7 @@ namespace m8::uci
         {"position",  &UCI::HandlePosition},
         {"go",        &UCI::HandleGo},
         {"stop",      &UCI::HandleStop},
+        {"quit",      &UCI::HandleQuit},
         {"setoption", &UCI::HandleSetOption}
     };
 
@@ -168,6 +169,11 @@ namespace m8::uci
     }
 
     void UCI::HandleStop(const std::vector<std::string> params)
+    {
+        engine_.HandleStop();
+    }
+
+    void UCI::HandleQuit(const std::vector<std::string> params)
     {
         engine_.HandleStop();
     }
