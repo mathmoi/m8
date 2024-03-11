@@ -10,7 +10,7 @@
 #include <vector>
 #include <chrono>
 
-#include "m8chess/time/TimeManager.hpp"
+#include "m8chess/TimeManager.hpp"
 
 #include "../transposition/TranspositionTable.hpp"
 

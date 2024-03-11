@@ -10,11 +10,11 @@
 
 #include "m8common/Timer.hpp"
 
-#include "../Types.hpp"
-#include "../search/PV.hpp"
-#include "../search/ISearchObserver.hpp"
+#include "Types.hpp"
+#include "search/PV.hpp"
+#include "search/ISearchObserver.hpp"
 
-namespace m8::time
+namespace m8
 {
     /// Base class for all time managers. Time manager are responsible for the engine's
     /// time management. They tell it when to stop searching.

@@ -6,7 +6,7 @@
 #ifndef M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_
 #define M8_CHESS_SEARCH_ITERATIVE_DEEPENING_HPP_
 
-#include "../time/TimeManager.hpp"
+#include "../TimeManager.hpp"
 
 #include "../transposition/TranspositionTable.hpp"
 

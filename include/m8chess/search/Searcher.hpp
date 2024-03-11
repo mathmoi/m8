@@ -16,7 +16,7 @@
 #include <thread>
 #include <vector>
 
-#include "../time/TimeManager.hpp"
+#include "../TimeManager.hpp"
 
 #include "../transposition/TranspositionTable.hpp"
 

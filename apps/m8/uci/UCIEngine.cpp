@@ -65,7 +65,7 @@ namespace m8::uci
     {
         auto time = board_.side_to_move() == kWhite ? wtime : btime;
         auto inc  = board_.side_to_move() == kWhite ? winc  : binc;
-        auto time_manager = std::make_unique<time::TimeManager>(time, inc, moves_to_go, move_time, infinite);
+        auto time_manager = std::make_unique<TimeManager>(time, inc, moves_to_go, move_time, infinite);
 
         auto search = std::make_shared<search::Search>(board_, std::move(time_manager), 100);
         searcher_.Start(search);

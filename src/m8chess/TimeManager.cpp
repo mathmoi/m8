@@ -6,9 +6,9 @@
 #include "m8common/chronoHelpers.hpp"
 #include "m8common/logging.hpp"
 
-#include "m8chess/time/TimeManager.hpp"
+#include "m8chess/TimeManager.hpp"
 
-namespace m8::time
+namespace m8
 {
     TimeManager::TimeManager(std::optional<std::chrono::milliseconds> time,
                              std::optional<std::chrono::milliseconds> increment,

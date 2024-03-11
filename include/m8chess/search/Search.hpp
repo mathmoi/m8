@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "../time/TimeManager.hpp"
+#include "../TimeManager.hpp"
 
 #include "../Board.hpp"
 #include "../Types.hpp"
@@ -25,7 +25,7 @@ namespace m8::search
         /// @param time_manager time_manager to use for this search. The class 
         ///                     will take ownership of the time_manager.
         inline Search(const Board& board,
-                      std::unique_ptr<time::TimeManager> time_manager,
+                      std::unique_ptr<TimeManager> time_manager,
                       DepthType max_depth)
         : board_(board),
           time_manager_(std::move(time_manager)),
@@ -37,7 +37,7 @@ namespace m8::search
         inline const Board& board() const { return board_; }
 
         /// Returns a reference to the time manager for the search.
-        inline time::TimeManager& time_manager() const { return *time_manager_; }
+        inline TimeManager& time_manager() const { return *time_manager_; }
 
         /// Returns the maximum depth for the search.
         inline DepthType max_depth() const { return max_depth_; }
@@ -50,7 +50,7 @@ namespace m8::search
         
     private:
         Board board_;
-        std::unique_ptr<time::TimeManager> time_manager_;
+        std::unique_ptr<TimeManager> time_manager_;
         DepthType max_depth_;
         bool is_aborted_;
     };
