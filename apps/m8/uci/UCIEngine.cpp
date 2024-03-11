@@ -11,9 +11,6 @@
 
 #include "m8chess/Board.hpp"
 #include "m8chess/CoordinateNotation.hpp"
-#include "m8chess/time/ConventionalChessClock.hpp"
-#include "m8chess/time/IncrementalChessClock.hpp"
-#include "m8chess/time/TimePerMoveChessClock.hpp"
 
 #include "UCIEngine.hpp"
 

@@ -15,7 +15,6 @@
 #include "m8common/logging.hpp"
 #include "m8common/Output.hpp"
 #include "commands/CommandFactory.hpp"
-#include "m8Intrf.hpp"
 
 namespace po = boost::program_options;
 

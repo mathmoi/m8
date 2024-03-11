@@ -13,7 +13,6 @@
 #include "../Types.hpp"
 #include "../search/PV.hpp"
 #include "../search/ISearchObserver.hpp"
-#include "ChessClock.hpp"
 
 namespace m8::time
 {
@@ -88,7 +87,7 @@ namespace m8::time
         Duration target_duration;
 
         bool need_to_continue() const;
-        ChessClock::Duration next_iteration_estimated_time() const;
+        Duration next_iteration_estimated_time() const;
     };
 }
 

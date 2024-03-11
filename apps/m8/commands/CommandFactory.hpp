@@ -12,7 +12,6 @@
 #include "Command.hpp"
 #include "PerftCommand.hpp"
 #include "UCICommand.hpp"
-#include "CliCommand.hpp"
 
 namespace m8::commands
 {
@@ -31,11 +30,6 @@ namespace m8::commands
         if (command_name == "uci")
         {
             return std::make_unique<UCICommand>();
-        }
-
-        if (command_name == "cli")
-        {
-            return std::make_unique<CliCommand>();
         }
 
         return nullptr;

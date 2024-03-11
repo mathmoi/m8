@@ -41,8 +41,8 @@ namespace m8::time
             auto inc = increment.value_or(std::chrono::milliseconds(0));
             min_duration = Duration(0);
             target_duration = (time_on_clock + (mtg - 1) * inc) / mtg;
-            max_duration = std::chrono::duration_cast<ChessClock::Duration>(std::min(target_duration * kMaxOvertargetFactor,
-                                                                                    time_on_clock * kMaxMaxDurationRatio));
+            max_duration = std::chrono::duration_cast<Duration>(std::min(target_duration * kMaxOvertargetFactor,
+                                                                         time_on_clock * kMaxMaxDurationRatio));
         }
         M8_DEBUG <<"TimeManager::TimeManager: time:" <<ToString(time)
                  <<" increment:"       <<ToString(increment)
@@ -130,7 +130,7 @@ namespace m8::time
             || clock_.time_on_clock() < min_duration;
     }
 
-    ChessClock::Duration TimeManager::next_iteration_estimated_time() const
+    TimeManager::Duration TimeManager::next_iteration_estimated_time() const
     {
         return last_iteration_duration * (last_iteration_duration / second_last_iteration_duration);
     }
