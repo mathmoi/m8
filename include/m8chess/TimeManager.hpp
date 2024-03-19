@@ -73,7 +73,7 @@ namespace m8
         const std::uint32_t kMovesToGoEstimate        = 35;
         const Duration      kSafetyBuffer             = std::chrono::milliseconds( 50);
         const Duration      kMinDurationBetweenChecks = std::chrono::milliseconds( 10);
-        const Duration      kMaxDurationBetweenChecks = std::chrono::milliseconds(250); // TODO : When we get a bench method. Check the incidence of this parameter on performances.
+        const Duration      kMaxDurationBetweenChecks = std::chrono::milliseconds(100);
         
         Timer clock_;
         Timer iteration_clock_;
