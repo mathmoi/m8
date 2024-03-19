@@ -13,15 +13,15 @@
 
 namespace m8
 {
-    Board::Board(const std::string& fen,
-                 eval::PieceSqTablePtr psqt)
+    Board::Board(const std::string_view fen,
+                 eval::PieceSqTablePtr  psqt)
         : psqt_(psqt),
           material_value_(0),
           hash_key_(0)
     {
         Clear();
 
-        std::string::const_iterator it = fen.begin();
+        auto it = fen.begin();
 
         // First we consume the piece placement section
         Colmn colmn = kColmnA;

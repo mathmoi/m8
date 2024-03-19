@@ -46,7 +46,7 @@ namespace m8
             << "Allowed commands\n"
             << "  uci    Launch m8 in UCI mode (this is the default command)\n"
             << "  perft  Run a perft test, counting the nodes reachables from a position at a given depth.\n"
-            << "  cli    Launch m8 in cli mode (this mode is obsolete)\n"
+            << "  bench  Run a benchmark"
             << '\n'
             << "The command is optional. If a command is not provided, m8 execute in UCI mode.\n";
 

@@ -68,8 +68,8 @@ namespace m8
         /// @param psqt  Pointer to a piece-square table to use for material evaluation 
         ///              by the board. The board is responsible for this part of the
         ///              evaluation for performance reasons.
-        Board(const std::string&  fen,
-              eval::PieceSqTablePtr psqt = eval::GenerateEmptyPieceSqTable());
+        Board(const std::string_view fen,
+              eval::PieceSqTablePtr  psqt = eval::GenerateEmptyPieceSqTable());
 
         /// Index operator. Returns the piece that is on a given square.
         ///

@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <vector>
 
 #include "../../m8common/Bb.hpp"
@@ -69,6 +70,23 @@ namespace m8::transposition
             data_.resize(CalculateNumberEntry(size));
             data_.shrink_to_fit();
             mask_ = data_.size() - 1;
+        }
+
+        /// Remove all data from the hash table. This is not normally needed as outdated
+        /// data will usually not have a negative impact on performance. This is needed
+        /// when running benchmarks reusing the sames positions multiples times. If the
+        /// table is not zeroed-out there is a chance that the memory allocated for the
+        /// table was used by a previous table and contains valid entries data. When this
+        /// happens it will positively incluence the performance and make the benchmark
+        /// unreliable.
+        inline void Empty()
+        {
+#           pragma GCC diagnostic push
+#           pragma GCC diagnostic ignored "-Wclass-memaccess"
+
+            std::memset(data_.data(), 0, data_.size() * sizeof(TranspositionEntry));
+            
+#           pragma GCC diagnostic pop
         }
         
     private:

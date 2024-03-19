@@ -61,7 +61,7 @@ namespace m8::commands
             out << '\n'
                 << "Threads: " <<options::Options::get().perft_threads <<'\n'
                 << "Nodes: " << count << '\n'
-                << "Time : " << time << '\n'
+                << "Time: " << time << '\n'
                 << "Nodes per second: " << AddMetricSuffix(static_cast<std::uint64_t>(count / time), 3) << std::endl;
         }
         

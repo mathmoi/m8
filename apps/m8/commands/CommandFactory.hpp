@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 
+#include "BenchCommand.hpp"
 #include "Command.hpp"
 #include "PerftCommand.hpp"
 #include "UCICommand.hpp"
@@ -22,14 +23,19 @@ namespace m8::commands
     ///         cannot be created a null pointer is returned.
     std::unique_ptr<Command> CreateCommand(const std::string command_name)
     {
-        if (command_name == "perft")
-        {
-            return std::make_unique<PerftCommand>();
-        }
-
         if (command_name == "uci")
         {
             return std::make_unique<UCICommand>();
+        }
+
+        if (command_name == "bench")
+        {
+            return std::make_unique<BenchCommand>();
+        }
+
+        if (command_name == "perft")
+        {
+            return std::make_unique<PerftCommand>();
         }
 
         return nullptr;

@@ -11,7 +11,7 @@
 namespace m8
 {
     /// Type for the search depth
-    typedef std::uint16_t DepthType;
+    typedef std::int16_t DepthType;
 
     /// Type to count nodes
     typedef std::uint64_t NodeCounterType;
