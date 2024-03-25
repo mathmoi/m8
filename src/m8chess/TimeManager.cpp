@@ -52,6 +52,7 @@ namespace m8
                  <<" min_duration:"    <<ToString(ToFSec(min_duration))
                  <<" target_duration:" <<ToString(ToFSec(target_duration))
                  <<" max_duration:"    <<ToString(ToFSec(max_duration));
+        M8_DEBUG.flush();
     }
     
     bool TimeManager::can_continue() const
@@ -77,6 +78,7 @@ namespace m8
         auto time_before_target = target_duration - clock_.time_on_clock();
         auto next_iteration_estimate = next_iteration_estimated_time();
         M8_DEBUG <<"Next iteration estimated time: " <<ToString(ToFSec(next_iteration_estimate));
+        M8_DEBUG.flush();
         return next_iteration_estimate / 2 < time_before_target;
     }
 

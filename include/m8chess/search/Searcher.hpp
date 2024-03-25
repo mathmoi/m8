@@ -51,11 +51,17 @@ namespace m8::search
         /// returns the search state.
         inline SearchState state() const { return state_; };
 
-        /// Start the search
+        /// Start the search asynchronously.
         ///
+        /// @param search Search to start
         void Start(std::shared_ptr<Search> search);
 
-        /// Stop the search
+        /// Run a search synchronously.
+        /// 
+        /// @param search Search to run
+        void Run(std::shared_ptr<Search> search);
+
+        /// Stop the search.
         void Stop();
 
         ////////////////////////////////////////////////////////////////////////////////// 

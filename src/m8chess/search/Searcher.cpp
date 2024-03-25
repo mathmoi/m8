@@ -64,6 +64,28 @@ namespace m8 { namespace search
         condition_variable_.notify_one();
     }
 
+    void Searcher::Run(std::shared_ptr<Search> search)
+    {
+        assert(state_ == SearchState::Ready);
+
+        transposition_table_.IncrementGeneration();
+
+        state_          = SearchState::Searching;
+        current_search_ = search;
+        start_time_     = std::chrono::steady_clock::now();
+
+        Attach(&current_search_->time_manager());
+            
+        NotifySearchStarted();
+        auto search_result = iterative_deepening_.Start(search);
+        bool was_searching = StopSearch();
+        if (was_searching)
+        {
+            NotifySearchCompleted(search_result.pv_, GetSearchTime(), search_result.stats_);
+        }
+        state_ = SearchState::Ready;
+    }
+
     bool Searcher::StopSearch()
     {
         bool was_searching = false;
@@ -105,7 +127,7 @@ namespace m8 { namespace search
             std::shared_ptr<Search> search_to_run;
             {
                 std::unique_lock lock(mutex_);
-                condition_variable_.wait(lock, [this]{ return destroying_ || current_search_; });
+                condition_variable_.wait(lock);
 
                 if (!destroying_ && current_search_)
                 {

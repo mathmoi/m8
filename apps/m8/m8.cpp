@@ -44,9 +44,10 @@ namespace m8
         out << "usage : m8 [command] [options]\n"
             << '\n'
             << "Allowed commands\n"
-            << "  uci    Launch m8 in UCI mode (this is the default command)\n"
-            << "  perft  Run a perft test, counting the nodes reachables from a position at a given depth.\n"
-            << "  bench  Run a benchmark"
+            << "  uci     Launch m8 in UCI mode (this is the default command).\n"
+            << "  analyze Analyze a chess position.\n"
+            << "  perft   Run a perft test, counting the nodes reachables from a position at a given depth.\n"
+            << "  bench   Run a benchmark."
             << '\n'
             << "The command is optional. If a command is not provided, m8 execute in UCI mode.\n";
 

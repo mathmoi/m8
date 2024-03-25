@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "m8common/Signal.hpp"
+
 #include "m8chess/movegen/MoveGenerator.hpp"
 
 #include "m8chess/search/IterativeDeepening.hpp"
@@ -40,7 +42,8 @@ namespace m8::search {
         DepthType current_depth = 1;
         while(!search->is_aborted()
                 && current_depth <= search->max_depth()
-                && search->time_manager().can_start_new_iteration())
+                && search->time_manager().can_start_new_iteration()
+                && !signal_received.load())
         {
             NotifyIterationStarted();
             SearchResult result = alpha_beta.Start(current_depth);

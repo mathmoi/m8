@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 
+#include "AnalyzeCommand.hpp"
 #include "BenchCommand.hpp"
 #include "Command.hpp"
 #include "PerftCommand.hpp"
@@ -26,6 +27,11 @@ namespace m8::commands
         if (command_name == "uci")
         {
             return std::make_unique<UCICommand>();
+        }
+
+        if (command_name == "analyze")
+        {
+            return std::make_unique<AnalyzeCommand>();
         }
 
         if (command_name == "bench")

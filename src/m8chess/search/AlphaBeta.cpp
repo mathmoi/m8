@@ -6,6 +6,8 @@
 
 #include <chrono>
 
+#include "m8common/Signal.hpp"
+
 #include "m8chess/eval/Eval.hpp"
 
 #include "m8chess/movegen/MoveGenerator.hpp"
@@ -40,7 +42,9 @@ namespace m8::search {
         // We check if we need to abort the search because of time constraint
         if (!qsearch && nodes_count_next_time_check_ <= stats_.all_nodes())
         {
-            continue_ = !search_->is_aborted() && search_->time_manager().can_continue();
+            continue_ = !search_->is_aborted()
+                     && search_->time_manager().can_continue()
+                     && !signal_received.load();
             if (!continue_)
             {
                 return 0;
