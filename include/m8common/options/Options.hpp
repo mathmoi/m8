@@ -19,80 +19,11 @@
 #include "m8chess/Types.hpp"
 
 #include "ModifiableOption.hpp"
+#include "PiecesValues.hpp"
+#include "PhasePieceSquareTable.hpp"
 
 namespace m8::options
 {
-    struct PsqtZone
-    {
-        /// Human readable name for the zone
-        std::string name;
-
-        /// Bitboard representing all the squares of the zone
-        Bb zone;
-
-        /// Value (bonus or malus) applied to the zone
-        std::int32_t value;
-    };
-
-    /// Class containing options related to the evaluation function
-    struct EvalOptions
-    {
-        /// Value of a pawn
-        std::int32_t pawn = 100;
-
-        /// Value of a knight
-        std::int32_t knight = 320;
-
-        /// Value of a bishop
-        std::int32_t bishop = 333;
-
-        /// Value of a rook
-        std::int32_t rook = 510;
-
-        /// Value of a queen
-        std::int32_t queen = 880;
-
-        /// Zones values used to generate the piece/square table
-        std::unordered_map<PieceType, std::vector<PsqtZone>> psqt_zones;
-
-        /// Return the value of a give piece_type.
-        inline int get_value_piece_type(PieceType piece_type) const
-        {
-            assert(IsPieceType(piece_type));
-
-            int value;
-
-            switch (piece_type)
-            {
-            case kPawn:
-                value = pawn;
-                break;
-            case kKnight:
-                value = knight;
-                break;
-            case kBishop:
-                value = bishop;
-                break;
-            case kRook:
-                value = rook;
-                break;
-            case kQueen:
-                value = queen;
-                break;
-            case kKing:
-                // King does not really have a value, but sometimes it's necessary to 
-                // attribute it a value (ex. in MVV/LVA) so we use the value of two queens.
-                value = queen * 2;
-                break;
-            default:
-                value = 0;
-                break;
-            }
-
-            return value;
-        }
-    };
-
     /// Class containing all m8 options
     struct Options
     {
@@ -119,8 +50,14 @@ namespace m8::options
         /// runtime.
         ModifiableOptions modifiable_options;
 
-        /// Options related to the evaluation function
-        EvalOptions eval;
+        /// Values of the pieces for the middle game.
+        PiecesValues pieces_values_middle_game;
+
+        /// Values of the pieces for the end game.
+        PiecesValues pieces_values_end_game;
+
+        /// Values for the piece-square table
+        PhasePieceSquareTable piece_square_table;
 
         /// Transposition table size in megabytes.
         size_t tt_size;

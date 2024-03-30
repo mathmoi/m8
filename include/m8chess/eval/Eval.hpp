@@ -21,7 +21,7 @@ namespace m8::eval
     const EvalType kEvalMat  = 30000;
     const EvalType kMaxMat   = 1000;
 
-    extern std::array<EvalType, kMaxPieceType + 1> kPieceTypeValues;
+    extern std::array<std::array<EvalType, kMaxPieceType + 1>, static_cast<int>(GamePhase::Count)> kPieceTypeValues;
 
     /// Initialize evaluation globales variables.
     void InitializeEval();

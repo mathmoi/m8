@@ -17,7 +17,7 @@
 namespace m8::uci
 {
     UCIEngine::UCIEngine()
-    : board_(kStartingPositionFEN, eval::GeneratePieceSqTable()),
+    : board_(kStartingPositionFEN),
       transposition_table_(options::Options::get().tt_size*1024*1024),
       searcher_(transposition_table_)
     {
@@ -40,7 +40,7 @@ namespace m8::uci
 
     void UCIEngine::HandlePosition(const std::string& fen, const std::vector<std::string>& moves)
     {
-        board_ = Board(fen, eval::GeneratePieceSqTable());
+        board_ = Board(fen);
         for (const std::string& str_move : moves)
         {
             Move move = ParseCoordinateNotation(str_move, board_);

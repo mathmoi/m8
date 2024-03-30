@@ -8,6 +8,7 @@
 #include "m8common/Bb.hpp"
 
 #include "eval/Eval.hpp"
+#include "eval/PieceSqTable.hpp"
 
 #include "movegen/Attacks.hpp"
 #include "movegen/MvvLva.hpp"
@@ -22,6 +23,7 @@ namespace m8
     inline void InitializePreCalc()
     {
         eval::InitializeEval();
+        eval::InitializePieceSqTable();
         movegen::InitializeAttacks();
         movegen::InitializeMvvLva();
         BbInitializePreCalc();

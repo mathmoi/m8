@@ -26,7 +26,7 @@
 namespace m8
 {
     Analyzer::Analyzer(std::string_view fen, DepthType depth, float time)
-    : board_(fen, eval::GeneratePieceSqTable()),
+    : board_(fen),
       depth_(depth),
       time_(time)
     {

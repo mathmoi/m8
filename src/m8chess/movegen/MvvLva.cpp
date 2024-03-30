@@ -14,17 +14,18 @@ namespace m8::movegen
     EvalType CalculateMvvLva(PieceType victim, PieceType attacker, PieceType promotion)
     {
         // We add the value of the victim (MVV) and promotion differential
-        EvalType value = eval::kPieceTypeValues[victim];
-        if (IsPieceType(promotion))
+        EvalType value = eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][victim];
+        if (IsPieceType(promotion)) // TODO : Est-ce qu'on peut pas juste ajouter la valeur de kNoPiece sans condition?
         {
-            value += eval::kPieceTypeValues[promotion] - eval::kPieceTypeValues[kPawn];
+            value += eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][promotion]
+                   - eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][kPawn];
         }
 
         // We scale the value of the victim by 16 so it is the most important factor
         value *= 16;
 
         // We remove the value of the attacker (LVA)
-        value -= eval::kPieceTypeValues[attacker];
+        value -= eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][attacker];
 
         return value;        
     }
@@ -57,6 +58,7 @@ namespace m8::movegen
 
     EvalType GetMvvLvaValue(Move move)
     {
+        // TODO : Is it really faster to pre-compute MVV_LVA?
         auto victim    = GetPieceType(GetPieceTaken(move));
         auto attacker  = GetPieceType(GetPiece(move));
         auto promotion = GetPieceType(GetPromoteTo(move));

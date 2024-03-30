@@ -50,50 +50,93 @@ namespace m8::options
         return false;
     }
 
-    void ReadEvalOptions(pt::ptree& tree, EvalOptions& options)
+    // void ReadEvalOptions(pt::ptree& tree, EvalOptions& options)
+    // {
+    //     TryReadOption<int>(tree, "eval.pawn",   options.pawn);
+    //     TryReadOption<int>(tree, "eval.knight", options.knight);
+    //     TryReadOption<int>(tree, "eval.bishop", options.bishop);
+    //     TryReadOption<int>(tree, "eval.rook",   options.rook);
+    //     TryReadOption<int>(tree, "eval.queen",  options.queen);
+    // }
+
+    // std::vector<PsqtZone> ReadPsqtZones(pt::ptree& tree)
+    // {
+    //     std::vector<PsqtZone> list;
+
+    //     for (auto& zone_tree : tree)
+    //     {
+    //         PsqtZone zone;
+    //         zone.name = zone_tree.second.get<std::string>("name");
+    //         auto zone_str = zone_tree.second.get<std::string>("zone");
+    //         zone.zone = ConvertTo<Bb>(zone_str, true);
+    //         zone.value = zone_tree.second.get<std::int32_t>("value");
+    //         list.push_back(zone);
+    //     }
+
+    //     return list;
+    // }
+
+    // void ReadPsqtOptions(pt::ptree& tree, std::unordered_map<PieceType, std::vector<PsqtZone>>& psqt)
+    // {
+    //     auto psqt_tree = tree.get_child_optional("psqt");
+    //     if (psqt_tree.is_initialized())
+    //     {
+    //         for (auto& psqt_piece_tree : psqt_tree.get())
+    //         {
+    //             auto piece_type = GetPieceTypeFromName(psqt_piece_tree.first);
+    //             if (IsPieceType(piece_type))
+    //             {
+    //                 psqt.insert(std::make_pair(piece_type, ReadPsqtZones(psqt_piece_tree.second)));
+    //             }
+    //             else
+    //             {
+    //                 M8_WARNING << "Unknow piece type in config file (" << psqt_piece_tree.first << ")";
+    //             }
+    //         }
+    //     }
+    // }
+
+    void ReadPiecesValues(pt::ptree& tree, PiecesValues& values)
     {
-        TryReadOption<int>(tree, "eval.pawn",   options.pawn);
-        TryReadOption<int>(tree, "eval.knight", options.knight);
-        TryReadOption<int>(tree, "eval.bishop", options.bishop);
-        TryReadOption<int>(tree, "eval.rook",   options.rook);
-        TryReadOption<int>(tree, "eval.queen",  options.queen);
+        TryReadOption<std::int16_t>(tree, "pawn",   values.pawn);
+        TryReadOption<std::int16_t>(tree, "knight", values.knight);
+        TryReadOption<std::int16_t>(tree, "bishop", values.bishop);
+        TryReadOption<std::int16_t>(tree, "rook",   values.rook);
+        TryReadOption<std::int16_t>(tree, "queen",  values.queen);
+        TryReadOption<std::int16_t>(tree, "king",   values.king);
     }
 
-    std::vector<PsqtZone> ReadPsqtZones(pt::ptree& tree)
+    void ReadPiecesValues(pt::ptree& tree, Options& options)
     {
-        std::vector<PsqtZone> list;
-
-        for (auto& zone_tree : tree)
-        {
-            PsqtZone zone;
-            zone.name = zone_tree.second.get<std::string>("name");
-            auto zone_str = zone_tree.second.get<std::string>("zone");
-            zone.zone = ConvertTo<Bb>(zone_str, true);
-            zone.value = zone_tree.second.get<std::int32_t>("value");
-            list.push_back(zone);
-        }
-
-        return list;
+        ReadPiecesValues(tree.get_child_optional("pieces-values-middle-game").get(),
+                         options.pieces_values_middle_game);
+        ReadPiecesValues(tree.get_child_optional("pieces-values-end-game").get(),
+                         options.pieces_values_end_game);
     }
 
-    void ReadPsqtOptions(pt::ptree& tree, std::unordered_map<PieceType, std::vector<PsqtZone>>& psqt)
+    void ReadPieceSquareTable(pt::ptree& tree, PieceSquareTable::SinglePieceSqTable& single_piece_square_table)
     {
-        auto psqt_tree = tree.get_child_optional("psqt");
-        if (psqt_tree.is_initialized())
+        int index = 0;
+        for (const auto& item: tree)
         {
-            for (auto& psqt_piece_tree : psqt_tree.get())
-            {
-                auto piece_type = GetPieceTypeFromName(psqt_piece_tree.first);
-                if (IsPieceType(piece_type))
-                {
-                    psqt.insert(std::make_pair(piece_type, ReadPsqtZones(psqt_piece_tree.second)));
-                }
-                else
-                {
-                    M8_WARNING << "Unknow piece type in config file (" << psqt_piece_tree.first << ")";
-                }
-            }
+            single_piece_square_table[index++] = item.second.get_value<std::int16_t>();
         }
+    }
+
+    void ReadPieceSquareTable(pt::ptree& tree, PieceSquareTable& piece_square_table)
+    {
+        ReadPieceSquareTable(tree.get_child("pawn"),   piece_square_table.pawn);
+        ReadPieceSquareTable(tree.get_child("knight"), piece_square_table.knight);
+        ReadPieceSquareTable(tree.get_child("bishop"), piece_square_table.bishop);
+        ReadPieceSquareTable(tree.get_child("rook"),   piece_square_table.rook);
+        ReadPieceSquareTable(tree.get_child("queen"),  piece_square_table.queen);
+        ReadPieceSquareTable(tree.get_child("king"),   piece_square_table.king);
+    }
+
+    void ReadPieceSquareTable(pt::ptree& tree, Options& options)
+    {
+        ReadPieceSquareTable(tree.get_child("psqt.middle-game"), options.piece_square_table.middle_game);
+        ReadPieceSquareTable(tree.get_child("psqt.end-game"),    options.piece_square_table.end_game);
     }
 
     void ReadOptionsFromFile(const std::string filename)
@@ -118,9 +161,9 @@ namespace m8::options
         {
             options.tt_size = boost::lexical_cast<size_t>(temp);
         }
-        
-        ReadEvalOptions(tree, options.eval);
-        ReadPsqtOptions(tree, options.eval.psqt_zones);
+
+        ReadPiecesValues(tree, options);
+        ReadPieceSquareTable(tree, options);
     }
 
     po::options_description GenerateGlobalOptionsDescriptions()

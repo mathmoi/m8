@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+VERSION="$1"
 
 # Create a temporary directory
 TEMP_DIR=$(mktemp -d)
@@ -10,28 +11,27 @@ function finish {
 trap finish EXIT
 
 # Extract the code
-git clone https://github.com/mathmoi/m8.git ${TEMP_DIR}
-if ! git -C ${TEMP_DIR} checkout $1; then
+git clone git@github.com:mathmoi/m8.git ${TEMP_DIR}
+if ! git -C ${TEMP_DIR} checkout ${VERSION}; then
     exit 1    
 fi
 
 # Build m8
 BUILD_DIR="${TEMP_DIR}/build"
 mkdir ${BUILD_DIR}
-cmake -B${BUILD_DIR} -S${TEMP_DIR}/cmake -DCMAKE_BUILD_TYPE=Release
-cmake --build ${BUILD_DIR} --parallel 16 --target m8
+cmake -B${BUILD_DIR} -S${TEMP_DIR} -DCMAKE_BUILD_TYPE=Release
+cmake --build ${BUILD_DIR} --parallel 32 --target m8
 
 # Install the engine
 BIN_DIR="${HOME}/bin"
-INSTALL_DIR="${BIN_DIR}/m8-$1"
+INSTALL_DIR="${BIN_DIR}/m8-${VERSION}"
 if ! mkdir ${INSTALL_DIR}; then
     exit 2
 fi
-cp ${BUILD_DIR}/m8/m8      ${INSTALL_DIR}
-cp ${BUILD_DIR}/m8/m8.json ${INSTALL_DIR}
+cp ${BUILD_DIR}/apps/m8/m8      ${INSTALL_DIR}
+cp ${BUILD_DIR}/apps/m8/m8.json ${INSTALL_DIR}
 
 # Create a launcher script
-VERSION="$1"
 LAUNCHER="${BIN_DIR}/m8-${VERSION:1}"
 echo "#!/usr/bin/env bash
 (cd ${INSTALL_DIR} && ./m8 \$@)" >> $LAUNCHER

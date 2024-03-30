@@ -14,6 +14,7 @@
 
 #include "m8common/Bb.hpp"
 
+#include "eval/GamePhase.hpp"
 #include "eval/PieceSqTable.hpp"
 
 #include "transposition/Zobrist.hpp"
@@ -68,8 +69,7 @@ namespace m8
         /// @param psqt  Pointer to a piece-square table to use for material evaluation 
         ///              by the board. The board is responsible for this part of the
         ///              evaluation for performance reasons.
-        Board(const std::string_view fen,
-              eval::PieceSqTablePtr  psqt = eval::GenerateEmptyPieceSqTable());
+        Board(const std::string_view fen);
 
         /// Index operator. Returns the piece that is on a given square.
         ///
@@ -180,9 +180,6 @@ namespace m8
         /// @param value New value for the full move clock.
         inline void set_full_move_clock(std::uint32_t value) { full_move_clock_ = value; };
 
-        /// Set the piece square table to use
-        void set_psqt(eval::PieceSqTablePtr psqt);
-
         /// Returns the position of the king of the given color.
         inline Sq king_sq(Color color) const { return GetLsb(bb_piece(NewPiece(kKing, color))); };
 
@@ -193,7 +190,7 @@ namespace m8
         transposition::ZobristKey hash() const { return hash_key_; }
 
         /// Value of the material on the board. Based on the piece-square table values.
-        inline int material_value() const { return material_value_; };
+        inline int material_value() const;
 
         /// Add a piece to the board. The square where we add the piece must be 
         /// empty.
@@ -265,11 +262,14 @@ namespace m8
         ///  Number of moves played.
         std::uint32_t full_move_clock_;
 
-        /// Pointer to the piece-square table to use.
-        eval::PieceSqTablePtr psqt_;
+        /// Evaluation of the piece-square table in the middle game.
+        EvalType material_middle_game_;
 
-        /// Value of the material on the board.
-        int material_value_;
+        /// Evaluation of the piece-square table in the middle end game.
+        EvalType material_end_game_;
+
+        /// Value to extrapolate the game phase
+        eval::GamePhaseEstimate game_phase_estimate_;
 
         transposition::ZobristKey hash_key_;
 
@@ -400,9 +400,6 @@ namespace m8
         /// @param taken Piece taken.
         /// @param to    Target square of the move.
         inline void RemoveCastlingRookCaptured(Piece taken, Sq to);
-
-        /// Calculate the material value from scratch.
-        int CalculateMaterialValue() const;
     };
 
     /// Overloading the << operator for an output stream and a Board. This 
@@ -492,6 +489,13 @@ namespace m8
         return casle_colmn_[castle_type - 1];
     }
 
+    inline int Board::material_value() const
+    {
+        int middle_game_fraction = std::min(game_phase_estimate_, eval::kGamePhaseEstimateMax);
+        int end_game_fraction = eval::kGamePhaseEstimateMax - middle_game_fraction;
+        return (material_middle_game_ * middle_game_fraction + material_end_game_ * end_game_fraction) / static_cast<int>(eval::kGamePhaseEstimateMax);
+    }
+
     inline void Board::AddPiece(Sq sq, Piece piece)
     {
         // A : sq is a valid square, piece is a valid piece and the destination
@@ -507,7 +511,9 @@ namespace m8
         Color color = GetColor(piece);
         SetBit(bb_color_[color], sq);
 
-        material_value_ += (*psqt_)[piece][sq];
+        game_phase_estimate_  += eval::kPiecePhaseEstimate[piece];
+        material_middle_game_ += eval::gPieceSqTable[static_cast<int>(eval::GamePhase::MiddleGame)][piece][sq];
+        material_end_game_    += eval::gPieceSqTable[static_cast<int>(eval::GamePhase::EndGame)][piece][sq];
 
         hash_key_ ^= transposition::gZobristTable[piece][sq];
     }
@@ -525,7 +531,9 @@ namespace m8
 
         UnsetBit(bb_piece_[piece], sq);
 
-        material_value_ -= (*psqt_)[piece][sq];
+        game_phase_estimate_  -= eval::kPiecePhaseEstimate[piece];
+        material_middle_game_ -= eval::gPieceSqTable[static_cast<int>(eval::GamePhase::MiddleGame)][piece][sq];
+        material_end_game_    -= eval::gPieceSqTable[static_cast<int>(eval::GamePhase::EndGame)][piece][sq];
 
         hash_key_ ^= transposition::gZobristTable[piece][sq];
 
@@ -550,7 +558,10 @@ namespace m8
         bb_color_[GetColor(piece)] ^= diff;
         bb_piece_[piece] ^= diff;
 
-        material_value_ += (*psqt_)[piece][to] - (*psqt_)[piece][from];
+        material_middle_game_ += eval::gPieceSqTable[static_cast<int>(eval::GamePhase::MiddleGame)][piece][to]
+                               - eval::gPieceSqTable[static_cast<int>(eval::GamePhase::MiddleGame)][piece][from];
+        material_end_game_    += eval::gPieceSqTable[static_cast<int>(eval::GamePhase::EndGame)][piece][to]
+                               - eval::gPieceSqTable[static_cast<int>(eval::GamePhase::EndGame)][piece][from];
 
         hash_key_ ^= transposition::gZobristTable[piece][to] 
                   ^  transposition::gZobristTable[piece][from] ;

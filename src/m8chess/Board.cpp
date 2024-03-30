@@ -13,10 +13,10 @@
 
 namespace m8
 {
-    Board::Board(const std::string_view fen,
-                 eval::PieceSqTablePtr  psqt)
-        : psqt_(psqt),
-          material_value_(0),
+    Board::Board(const std::string_view fen)
+        : material_middle_game_(0),
+          material_end_game_(0),
+          game_phase_estimate_(0),
           hash_key_(0)
     {
         Clear();
@@ -383,7 +383,9 @@ namespace m8
         colmn_enpas_ = kInvalColmn;
         half_move_clock_ = 0;
         full_move_clock_ = 0;
-        material_value_ = 0;
+        game_phase_estimate_ = 0;
+        material_middle_game_ = 0;
+        material_end_game_ = 0;
         hash_key_ = 0;
     }
 
@@ -497,27 +499,5 @@ namespace m8
         DisplayColumnsChar(out);
 
         return out;
-    }
-
-    int Board::CalculateMaterialValue() const
-    {
-        int value = 0;
-        for (auto piece : all_pieces)
-        {
-            Bb bb = bb_piece_[piece];
-            while (bb)
-            {
-                Sq sq = RemoveLsb(bb);
-                value += (*psqt_)[piece][sq];
-            }
-        }
-
-        return value;
-    }
-
-    void Board::set_psqt(eval::PieceSqTablePtr psqt)
-    {
-        psqt_ = psqt;
-        material_value_ = CalculateMaterialValue();
     }
 }
