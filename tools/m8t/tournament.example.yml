@@ -1,0 +1,31 @@
+parameters:
+  pgn-file: result.pgn
+  concurency: 15
+  openings_file: openings.epd
+  tc: 10+1
+
+engines:
+  - name: matmoi
+    command: conf=matmoi
+  - name: robocide
+    command: conf=robocide
+  - name: vice
+    command: conf=vice
+  - name: m8-0.3
+    command: conf=m8-0.3
+  - name: m8-0.4
+    command: conf=m8-0.4
+
+gauntlets:
+  - engine: m8-0.3
+    opponents:
+      - matmoi
+      - vice
+      - robocide
+    rounds: 1000
+  - engine: m8-0.4
+    opponents:
+      - matmoi
+      - vice
+      - robocide
+    rounds: 1000

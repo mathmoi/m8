@@ -4,3 +4,6 @@ build/
 Build/
 *.pgn
 .vscode/
+
+tools/m8t/venv
+tools/m8t/tournament.yml
