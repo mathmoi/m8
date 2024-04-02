@@ -3,6 +3,8 @@
 /// @date February 2024
 /// @brief Contains the UCIInterface class implementation
 
+#include <cstdlib>
+
 #include <boost/lexical_cast.hpp>
 
 #include "m8chess/CoordinateNotation.hpp"
@@ -72,7 +74,10 @@ namespace m8::uci
             out_ <<" score ";
             if (eval::IsMateEval(*score))
             {
-                out_ <<"mate " <<eval::GetMateDistance(*score);
+                auto plies = eval::GetMateDistance(*score);
+                auto result_div = std::div(plies, 2);
+                auto full_moves = result_div.quot + result_div.rem;
+                out_ <<"mate " <<full_moves;
             }
             else
             {
