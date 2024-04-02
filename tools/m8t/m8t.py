@@ -76,7 +76,7 @@ def PlayMatches(matches_to_play, config):
                              second_engine_command)
 
 def LaunchCuteChessMatch(concurency, rounds, tc, oppenings, pgn_filename, first_engine, second_engine):
-    command = f'cutechess-cli -concurrency {concurency} -rounds {rounds} -openings file={oppenings} format=epd order=random -pgnout {pgn_filename} -repeat -each tc={tc} -engine {first_engine} -engine {second_engine}'
+    command = f'cutechess-cli -concurrency {concurency} -rounds {rounds} -openings file={oppenings} format=epd order=random -pgnout {pgn_filename} -repeat -recover -each tc={tc} -engine {first_engine} -engine {second_engine}'
     result = subprocess.run(command, shell=True)
 
 config = ReadConfig(sys.argv[1])
