@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-<!-- ## [Unreleased](#unreleased) -->
+## [Unreleased](#unreleased)
+
+### Fixed
+
+- Fixed a bug in the way mat scores were reported in plies instead of full move in UCI mode.
+- Fixed a couple of bugs in the way the analyze command table was displayed.
 
 ## [v0.4](#v-0-4) - 2024-01-01
 

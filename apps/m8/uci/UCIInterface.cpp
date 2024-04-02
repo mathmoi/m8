@@ -75,9 +75,7 @@ namespace m8::uci
             if (eval::IsMateEval(*score))
             {
                 auto plies = eval::GetMateDistance(*score);
-                auto result_div = std::div(plies, 2);
-                auto full_moves = result_div.quot + result_div.rem;
-                out_ <<"mate " <<full_moves;
+                out_ <<"mate " <<eval::ConvertDistanceFromPliesToMove(plies);
             }
             else
             {

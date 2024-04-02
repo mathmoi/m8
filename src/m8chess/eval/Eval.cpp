@@ -32,4 +32,10 @@ namespace m8::eval
             kPieceTypeValues[game_phase_index][kKing]   = options_pieces_value_phase.king;
         }
     }
+
+    std::int16_t ConvertDistanceFromPliesToMove(std::int16_t distance)
+    {
+        auto result_div = std::div(distance, 2);
+        return result_div.quot + result_div.rem;
+    }
 }

@@ -210,11 +210,11 @@ namespace m8
         ostringstream out;
 
         if (eval < -eval::kEvalMat + eval::kMaxMat)
-            out << "-MAT-" << eval + eval::kEvalMat;
+            out << "-MAT-" << eval::ConvertDistanceFromPliesToMove(eval + eval::kEvalMat);
         else if (eval > eval::kEvalMat - eval::kMaxMat)
-            out << "MAT-" << eval::kEvalMat - eval;
+            out << "MAT-" << eval::ConvertDistanceFromPliesToMove(eval::kEvalMat - eval)  <<' ';
         else
-            out << setiosflags(ios::fixed) << setprecision(2) << eval / 100.0f;
+            out << setiosflags(ios::fixed) << setprecision(2) << eval / 100.0f <<' ';
 
         return out.str();
     }
@@ -307,7 +307,7 @@ namespace m8
             out << std::setw(9) << FormatTime(time) << " |";
 
             // display evaluation
-            out << setw(6) << FormaterEval(eval) << " | ";
+            out << setw(7) << FormaterEval(eval) << "| ";
 
             // Display nodes count
             out << setw(7) << AddMetricSuffix(nodes, 2) << " |";
@@ -318,7 +318,7 @@ namespace m8
             // Display the other lines of the PV
             for (auto next = pv_str.begin() + 1; next < pv_str.end(); ++next)
             {
-                out <<"|      |          |       |        | " << setw(pv_width) << left << *next << " |" <<std::endl;
+                out <<"|      |          |       |         | " << setw(pv_width) << left << *next << " |" <<std::endl;
             }
         }
     }

@@ -96,6 +96,8 @@ namespace m8::eval
             return kEvalMat - eval;
         }
     }
+
+    std::int16_t ConvertDistanceFromPliesToMove(std::int16_t distance);
 }
 
 #endif // M8_EVAL_HPP_
