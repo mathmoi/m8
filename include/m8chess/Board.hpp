@@ -7,10 +7,12 @@
 #ifndef M8_BOARD_HPP_
 #define M8_BOARD_HPP_
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "m8common/Bb.hpp"
 
@@ -192,6 +194,18 @@ namespace m8
         /// Value of the material on the board. Based on the piece-square table values.
         inline int material_value() const;
 
+        /// Returns true if the position can be claimed as a draw because of a repetition 
+        /// or the 50 move rule.
+        ///
+        /// This method returns true if a position is repeated twice instead of three
+        /// times. This is done so that in the search, if the engine find it can repeat a
+        /// position twice, it will immediately evaluate it as a draw without having to
+        /// search four more plies to detect the 3-fold repetition. The idea is that if
+        /// the opponents let's us repeat the position once, it will let us repeat twice.
+        /// In the same way, if we can't prevent a second repetition it means we can't 
+        /// prevent a third one either.
+        inline bool is_draw() const;
+
         /// Add a piece to the board. The square where we add the piece must be 
         /// empty.
         ///
@@ -271,7 +285,11 @@ namespace m8
         /// Value to extrapolate the game phase
         eval::GamePhaseEstimate game_phase_estimate_;
 
+        /// Hash of the current position
         transposition::ZobristKey hash_key_;
+
+        /// History of the position during the game
+        std::vector<transposition::ZobristKey> positions_history_;
 
         /// Initialize the board with no pieces.
         void Clear();
@@ -496,6 +514,30 @@ namespace m8
         return (material_middle_game_ * middle_game_fraction + material_end_game_ * end_game_fraction) / static_cast<int>(eval::kGamePhaseEstimateMax);
     }
 
+    inline bool Board::is_draw() const
+    {
+        // If there has been more than 50 reversibles moves (100 half moves) the position is draw.
+        if (100 <= half_move_clock_)
+        {
+            return true;
+        }
+
+        // We check for repetition in the position_history_ table. We don't need to check
+        // past the half_move_clock_, because a repetition can't occure after an
+        // irreversible move. We only check each other position, because a repetition
+        // can't occure when the same side is not on move.
+        auto min_index = std::max(static_cast<std::int32_t>(positions_history_.size()) - static_cast<std::int32_t>(half_move_clock_), 0);
+        for (int i = positions_history_.size() - 2; min_index <= i; i -= 2)
+        {
+            if (positions_history_[i] == hash_key_)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     inline void Board::AddPiece(Sq sq, Piece piece)
     {
         // A : sq is a valid square, piece is a valid piece and the destination
@@ -704,6 +746,8 @@ namespace m8
     {
         assert(GetColor(GetPiece(move)) == side_to_move_);
 
+        positions_history_.push_back(hash_key_);
+
         Sq from = GetFrom(move);
         Sq to = GetTo(move);
         Piece piece = GetPiece(move);
@@ -822,6 +866,8 @@ namespace m8
     inline void Board::Unmake(Move move, UnmakeInfo unmake_info)
     {
         assert(GetColor(GetPiece(move)) == OpposColor(side_to_move_));
+
+        positions_history_.pop_back();
 
         Sq from = GetFrom(move);
         Sq to = GetTo(move);

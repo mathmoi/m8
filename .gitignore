@@ -7,3 +7,4 @@ Build/
 
 tools/m8t/venv
 tools/m8t/tournament.yml
+tools/m8t/self.yml

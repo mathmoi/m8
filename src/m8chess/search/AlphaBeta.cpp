@@ -107,6 +107,11 @@ namespace m8::search {
             }
         }
 
+        if (!qsearch && !root && board_.is_draw())
+        {
+            return eval::kEvalDraw;
+        }
+
         // Evaluate all moves
         movegen::MoveGenerator generator = root     ? movegen::MoveGenerator<root, qsearch>(root_moves_)
                                          : qsearch  ? movegen::MoveGenerator<root, qsearch>(board_)
