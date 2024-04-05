@@ -35,52 +35,56 @@ def ReadConfig(config_filename):
         data = yaml.safe_load(fichier)
     return Config(data)
 
-
-def ReadMatchesToPlay(config):
-    matches_to_play = {}
-    for gauntlet in config.gauntlets:
-        for opponent in gauntlet.opponents:
-            match_set = frozenset([gauntlet.engine, opponent])
-            rounds_to_play = matches_to_play.get(match_set, 0)
-            matches_to_play[match_set] = max(rounds_to_play, gauntlet.rounds)
-    return matches_to_play
-
-def RemoveGamedPlayed(pgn_filename, matches_to_play):
+def ReadGamesPlayed(pgn_filename):
+    games_played = {}
     if os.path.isfile(pgn_filename):
         with open(pgn_filename) as pgn_file:
             while True:
-                game = chess.pgn.read_game(pgn_file)
-                if game is None:
+                headers = chess.pgn.read_headers(pgn_file)
+                if headers is None:
                     break
                 
-                if game.headers['Result'] == '1-0' or game.headers['Result'] == '0-1' or game.headers['Result'] == '1/2-1/2':
-                    match_set = frozenset([game.headers["White"], game.headers["Black"]])
-                    rounds_to_play = matches_to_play.get(match_set)
-                    if rounds_to_play is not None:
-                        if rounds_to_play > 1:
-                            matches_to_play[match_set] = rounds_to_play - 1;
-                        else:
-                            matches_to_play.pop(match_set)
+                if headers['Result'] == '1-0' or headers['Result'] == '0-1' or headers['Result'] == '1/2-1/2':
+                    key = frozenset([headers["White"], headers["Black"]])
+                    games_played[key] = games_played.get(key, 0) + 1
+    return games_played
+        
+def PlayGauntlet(gauntlet, config):
+    while True:
+        games_played = ReadGamesPlayed(config.parameters.pgn_file)
+        games_to_play = []
+        for opponent in gauntlet.opponents:
+            key = frozenset([gauntlet.engine, opponent])
+            games_to_play_this_opponent = gauntlet.rounds - games_played.get(key, 0)
+            if games_to_play_this_opponent > 0:
+                games_to_play.append((opponent, games_to_play_this_opponent))
 
-def PlayMatches(matches_to_play, config):
-    for match_key, rounds in matches_to_play.items():
-        engines = list(match_key);
-        first_engine_command = config.engines[engines[0]].command
-        second_engine_command = config.engines[engines[1]].command
-        LaunchCuteChessMatch(config.parameters.concurency,
-                             rounds,
-                             config.parameters.tc,
-                             config.parameters.openings_file,
-                             config.parameters.pgn_file,
-                             first_engine_command,
-                             second_engine_command)
+        if games_to_play:
+            min_games_to_play = min(map(lambda x: x[1], games_to_play))
+            engines = [config.engines.get(gauntlet.engine).command] + [config.engines.get(x[0]).command for x in games_to_play]
+            LaunchCuteChessGauntlet(config.parameters.concurency,
+                                    min_games_to_play,
+                                    config.parameters.tc,
+                                    config.parameters.openings_file,
+                                    config.parameters.pgn_file,
+                                    engines)
+            games_to_play = [(x[0], x[1] - min_games_to_play) for x in games_to_play if x[1] > min_games_to_play]
+            any_games_played = True
+        else:
+            return
 
-def LaunchCuteChessMatch(concurency, rounds, tc, oppenings, pgn_filename, first_engine, second_engine):
-    command = f'cutechess-cli -concurrency {concurency} -rounds {rounds} -openings file={oppenings} format=epd order=random -pgnout {pgn_filename} -repeat -recover -each tc={tc} -engine {first_engine} -engine {second_engine}'
+def PlayGauntlets(config):
+    for gauntlet in config.gauntlets:
+        PlayGauntlet(gauntlet, config)
+
+def LaunchCuteChessGauntlet(concurency, rounds, tc, oppenings, pgn_filename, engines):
+    engines_args = ''
+    for engine in engines:
+        engines_args =  f'{engines_args} -engine {engine}'
+
+    command = f'cutechess-cli -concurrency {concurency} -tournament gauntlet -rounds {rounds} -openings file={oppenings} format=epd order=random -pgnout {pgn_filename} -repeat -recover -each tc={tc} {engines_args}'
+    print(f'Running: {command}')
     result = subprocess.run(command, shell=True)
 
 config = ReadConfig(sys.argv[1])
-matches_to_play = ReadMatchesToPlay(config)
-RemoveGamedPlayed(config.parameters.pgn_file, matches_to_play)
-PlayMatches(matches_to_play, config)
-
+PlayGauntlets(config)
