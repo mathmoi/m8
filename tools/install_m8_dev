@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+VERSION="$1"
+NICKNAME="$2"
+
+# Install the engine
+BIN_DIR="${HOME}/bin"
+INSTALL_DIR="${BIN_DIR}/m8-${VERSION}-${NICKNAME}"
+if ! mkdir ${INSTALL_DIR}; then
+    exit 2
+fi
+BUILD_DIR="/home/mathmoi/Source/m8/build"
+cp ${BUILD_DIR}/apps/m8/m8      ${INSTALL_DIR}
+cp ${BUILD_DIR}/apps/m8/m8.json ${INSTALL_DIR}
+
+# Create a launcher script
+LAUNCHER="${BIN_DIR}/m8-${VERSION:1}-${NICKNAME}"
+echo "#!/usr/bin/env bash
+(cd ${INSTALL_DIR} && ./m8 \$@)" >> $LAUNCHER
+chmod +x $LAUNCHER
