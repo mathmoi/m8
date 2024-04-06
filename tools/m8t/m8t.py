@@ -86,5 +86,8 @@ def LaunchCuteChessGauntlet(concurency, rounds, tc, oppenings, pgn_filename, eng
     print(f'Running: {command}')
     result = subprocess.run(command, shell=True)
 
-config = ReadConfig(sys.argv[1])
-PlayGauntlets(config)
+try:
+    config = ReadConfig(sys.argv[1])
+    PlayGauntlets(config)
+except KeyboardInterrupt:
+    pass
