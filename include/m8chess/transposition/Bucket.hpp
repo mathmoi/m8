@@ -11,7 +11,7 @@
 namespace m8::transposition
 {
     /// Represent a bucket in the transposition table.
-    class Bucket
+    class alignas(64) Bucket
     {
     public:
         /// Get from the bucket the transposition table entry corresponding to the hash
@@ -50,7 +50,7 @@ namespace m8::transposition
         {
             if (always_replace_entry_.key() != key &&
                 (generation != depth_prefered_entry_.generation() || // TODO Deal with generation in a better way
-                 depth_prefered_entry_.depth() < depth)) // TODO : Test <=
+                 depth_prefered_entry_.depth() <= depth)) // TODO : Test <=
             {
                 depth_prefered_entry_ = TranspositionEntry(key, move, generation, type, depth, distance, eval);
                 return;

@@ -21,13 +21,23 @@ namespace m8::transposition
     class TranspositionTable
     {
     public:
-        TranspositionTable(size_t size)
-        : data_(CalculateNumberEntry(size)),
-          mask_(data_.size() - 1),
+        inline TranspositionTable(size_t size)
+        : data_(nullptr),
+          buckets_count_(0),
           generation_(0)
         {
-            assert(16 == sizeof(TranspositionEntry));
+            assert(64 == sizeof(Bucket));
             assert(1024 <= size);
+
+            Resize(size);
+        }
+
+        inline ~TranspositionTable()
+        {
+            if (data_ != nullptr)
+            {
+                std::free(data_);
+            }
         }
 
         /// Increment the current generation. This need to be call once between each
@@ -68,9 +78,18 @@ namespace m8::transposition
         {
             assert(1024 <= size);
 
-            data_.resize(CalculateNumberEntry(size));
-            data_.shrink_to_fit();
-            mask_ = data_.size() - 1;
+            auto new_count = CalculateNumberEntry(size);
+            if (new_count != buckets_count_)
+            {
+                if (data_ != nullptr)
+                {
+                    std::free(data_);
+                }
+
+                buckets_count_ = new_count;
+                data_ = static_cast<Bucket*>(std::aligned_alloc(64, buckets_count_ * sizeof(Bucket)));
+                mask_ = buckets_count_ - 1;
+            }
         }
 
         /// Remove all data from the hash table. This is not normally needed as outdated
@@ -85,17 +104,19 @@ namespace m8::transposition
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wclass-memaccess"
 
-            std::memset(data_.data(), 0, data_.size() * sizeof(Bucket));
+            std::memset(data_, 0, buckets_count_ * sizeof(Bucket));
             
 #           pragma GCC diagnostic pop
         }
         
     private:
+        static inline const size_t kAssumedCacheLineSize = 64;
         static inline const size_t kMinSizeTable = 4 * 1024 * 1024;
 
-        std::vector<Bucket> data_;
-        ZobristKey          mask_;
-        std::uint8_t        generation_;
+        Bucket*      data_;
+        size_t       buckets_count_;
+        ZobristKey   mask_;
+        std::uint8_t generation_;
 
         inline static size_t CalculateNumberEntry(size_t size)
         {
