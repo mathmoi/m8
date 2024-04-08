@@ -87,7 +87,7 @@ namespace m8::transposition
                 }
 
                 buckets_count_ = new_count;
-                data_ = static_cast<Bucket*>(std::aligned_alloc(64, buckets_count_ * sizeof(Bucket)));
+                data_ = static_cast<Bucket*>(std::aligned_alloc(kAssumedCacheLineSize, buckets_count_ * sizeof(Bucket)));
                 mask_ = buckets_count_ - 1;
             }
         }
@@ -111,7 +111,7 @@ namespace m8::transposition
         
     private:
         static inline const size_t kAssumedCacheLineSize = 64;
-        static inline const size_t kMinSizeTable = 4 * 1024 * 1024;
+        static inline const size_t kMinSizeTable = 1 * 1024 * 1024;
 
         Bucket*      data_;
         size_t       buckets_count_;

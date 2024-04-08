@@ -76,6 +76,12 @@ namespace m8::transposition
             EvalType eval = static_cast<std::int64_t>((data_ & kEvalMask) >> kEvalPos) - (INT64_C(1) << (kEvalSize - 1));
             return eval::AddDistanceToMate(eval, distance);
         }
+
+        /// Calculate the age of the entry based on the current generation.é
+        inline std::uint8_t GetAge(std::uint8_t current_generation) const
+        {
+            return current_generation - generation();
+        }
         
     private:
         static const std::uint64_t kMoveSize       = 26;

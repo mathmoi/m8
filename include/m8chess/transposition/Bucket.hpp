@@ -27,9 +27,12 @@ namespace m8::transposition
                 return &always_replace_entry_;
             }
 
-            if (depth_prefered_entry_.key() == key)
+            for (int i = 0; i < 3; ++i)
             {
-                return &depth_prefered_entry_;
+                if (depth_prefered_entries_[i].key() == key)
+                {
+                    return &depth_prefered_entries_[i];
+                }
             }
 
             return nullptr;
@@ -42,25 +45,46 @@ namespace m8::transposition
         /// @param generation Current generation of the search. This can be used to prefer
         ///                   entries of the current seatch to entries of a previous search
         ///                   when deciding how to overwrite.
-        /// @param type       Type of evaluation in the entry (exact, lower
-        ///                   bound, upper bound)
+        /// @param type       Type of evaluation in the entry (exact, lower bound, upper
+        ///                   bound)
         /// @param depth      Depth of the search used to get the evaluation
         /// @param eval       Evaluation of the position
         inline void Insert(ZobristKey key, Move move, std::uint8_t generation, EntryType type, DepthType depth, DepthType distance, EvalType eval)
         {
-            if (always_replace_entry_.key() != key &&
-                (generation != depth_prefered_entry_.generation() || // TODO Deal with generation in a better way
-                 depth_prefered_entry_.depth() <= depth)) // TODO : Test <=
+            if (always_replace_entry_.key() != key)
             {
-                depth_prefered_entry_ = TranspositionEntry(key, move, generation, type, depth, distance, eval);
-                return;
+                auto candidate = std::min_element(std::begin(depth_prefered_entries_),
+                                                  std::end(depth_prefered_entries_),
+                                                  [generation, key](const TranspositionEntry& lhs, const TranspositionEntry& rhs)
+                                                  {
+                                                    // Returns true if lhs is a better candidate than rhs to store the new position.
+                                                    return lhs.key() == key ||
+                                                           (
+                                                             rhs.key() != key &&
+                                                             (
+                                                               lhs.GetAge(generation) > rhs.GetAge(generation) ||
+                                                               (
+                                                                 lhs.GetAge(generation) == rhs.GetAge(generation) &&
+                                                                 lhs.depth() < rhs.depth()
+                                                               )
+                                                             )
+                                                           );                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                  });
+
+                if (candidate->key() == key ||
+                    candidate->generation() != generation ||
+                    candidate->depth() <= depth)
+                {
+                    *candidate = TranspositionEntry(key, move, generation, type, depth, distance, eval);
+                    return;
+                }
             }
 
             always_replace_entry_ = TranspositionEntry(key, move, generation, type, depth, distance, eval);
         }
         
     private:
-        TranspositionEntry depth_prefered_entry_;
+        TranspositionEntry depth_prefered_entries_[3];
         TranspositionEntry always_replace_entry_;
     };
 }

@@ -15,7 +15,7 @@ namespace m8::movegen
     {
         // We add the value of the victim (MVV) and promotion differential
         EvalType value = eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][victim];
-        if (IsPieceType(promotion)) // TODO : Est-ce qu'on peut pas juste ajouter la valeur de kNoPiece sans condition?
+        if (IsPieceType(promotion))
         {
             value += eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][promotion]
                    - eval::kPieceTypeValues[static_cast<std::size_t>(eval::GamePhase::MiddleGame)][kPawn];
