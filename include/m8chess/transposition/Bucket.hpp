@@ -22,16 +22,11 @@ namespace m8::transposition
         ///         correspond to the position.
         inline TranspositionEntry* operator[](ZobristKey key)
         {
-            if (always_replace_entry_.key() == key)
+            for (size_t i = 0; i < kNumberOfEntries; ++i)
             {
-                return &always_replace_entry_;
-            }
-
-            for (int i = 0; i < 3; ++i)
-            {
-                if (depth_prefered_entries_[i].key() == key)
+                if (entries_[i].key() == key)
                 {
-                    return &depth_prefered_entries_[i];
+                    return &entries_[i];
                 }
             }
 
@@ -51,41 +46,30 @@ namespace m8::transposition
         /// @param eval       Evaluation of the position
         inline void Insert(ZobristKey key, Move move, std::uint8_t generation, EntryType type, DepthType depth, DepthType distance, EvalType eval)
         {
-            if (always_replace_entry_.key() != key)
-            {
-                auto candidate = std::min_element(std::begin(depth_prefered_entries_),
-                                                  std::end(depth_prefered_entries_),
-                                                  [generation, key](const TranspositionEntry& lhs, const TranspositionEntry& rhs)
-                                                  {
-                                                    // Returns true if lhs is a better candidate than rhs to store the new position.
-                                                    return lhs.key() == key ||
-                                                           (
-                                                             rhs.key() != key &&
-                                                             (
-                                                               lhs.GetAge(generation) > rhs.GetAge(generation) ||
-                                                               (
-                                                                 lhs.GetAge(generation) == rhs.GetAge(generation) &&
-                                                                 lhs.depth() < rhs.depth()
-                                                               )
-                                                             )
-                                                           );                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-                                                  });
-
-                if (candidate->key() == key ||
-                    candidate->generation() != generation ||
-                    candidate->depth() <= depth)
-                {
-                    *candidate = TranspositionEntry(key, move, generation, type, depth, distance, eval);
-                    return;
-                }
-            }
-
-            always_replace_entry_ = TranspositionEntry(key, move, generation, type, depth, distance, eval);
+            auto entry = std::min_element(std::begin(entries_),
+                                          std::end(entries_),
+                                          [generation, key](const TranspositionEntry& lhs, const TranspositionEntry& rhs)
+                                          {
+                                          // Returns true if lhs is a better candidate than rhs to store the new position.
+                                          return lhs.key() == key ||
+                                                 (
+                                                    rhs.key() != key &&
+                                                    (    
+                                                        lhs.GetAge(generation) > rhs.GetAge(generation) ||
+                                                        (
+                                                            lhs.GetAge(generation) == rhs.GetAge(generation) &&
+                                                            lhs.depth() < rhs.depth()
+                                                        )
+                                                    )
+                                                 );                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                          });
+            *entry = TranspositionEntry(key, move, generation, type, depth, distance, eval);
         }
         
     private:
-        TranspositionEntry depth_prefered_entries_[3];
-        TranspositionEntry always_replace_entry_;
+        static const std::size_t kNumberOfEntries = 4;
+
+        TranspositionEntry entries_[kNumberOfEntries];
     };
 }
 
