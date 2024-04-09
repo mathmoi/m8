@@ -44,7 +44,7 @@ def ReadGamesPlayed(pgn_filename):
                 if headers is None:
                     break
                 
-                if headers['Result'] == '1-0' or headers['Result'] == '0-1' or headers['Result'] == '1/2-1/2':
+                if 'Result' in headers and (headers['Result'] == '1-0' or headers['Result'] == '0-1' or headers['Result'] == '1/2-1/2'):
                     key = frozenset([headers["White"], headers["Black"]])
                     games_played[key] = games_played.get(key, 0) + 1
     return games_played
