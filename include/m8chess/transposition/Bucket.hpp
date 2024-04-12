@@ -49,8 +49,8 @@ namespace m8::transposition
         inline void Insert(ZobristKey key, Move move, std::uint8_t generation, EntryType type, DepthType depth, DepthType distance, EvalType eval)
         {
             if (always_replace_entry_.key() != key &&
-                (generation != depth_prefered_entry_.generation() || // TODO Deal with generation in a better way
-                 depth_prefered_entry_.depth() < depth)) // TODO : Test <=
+                (generation != depth_prefered_entry_.generation() ||
+                 depth_prefered_entry_.depth() <= depth))
             {
                 depth_prefered_entry_ = TranspositionEntry(key, move, generation, type, depth, distance, eval);
                 return;
