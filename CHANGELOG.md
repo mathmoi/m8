@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 <!-- ## [Unreleased](#unreleased) -->
 
+## [v0.6](v-0-6) - 2024-04-11
+
+### Changed
+
+- m8's transposition table replacement policy now use a two-tier strategy (depth-prefered/always replace).
+
 ## [v0.5](#v-0-5) - 2024-04-03
 
 ### Added
