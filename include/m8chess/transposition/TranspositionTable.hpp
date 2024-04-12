@@ -13,7 +13,7 @@
 
 #include "../../m8common/Bb.hpp"
 
-#include "TranspositionEntry.hpp"
+#include "Bucket.hpp"
 
 namespace m8::transposition
 {
@@ -33,15 +33,15 @@ namespace m8::transposition
         /// Increment the current generation. This need to be call once between each
         /// search to increment the current generation value. This is usefull to
         /// differentiate entry from the current search from entry of previous search.
-        inline void IncrementGeneration() { generation_ = (generation_ + 1) & kGenerationMask; }
+        inline void IncrementGeneration() { ++generation_; }
 
         /// Returns a pointer to the entry in the transposition table corresponding to the
         /// key passed in parameters. If there is no information stored for the current
         /// position a null pointer is retured.
         inline TranspositionEntry* operator[](ZobristKey key)
         {
-            auto entry = &data_[key & mask_];
-            return entry->key() == key ? entry : nullptr;
+            auto& bucket = data_[key & mask_];
+            return bucket[key];
         }
 
         /// Insert an entry in the transposition table.
@@ -57,7 +57,8 @@ namespace m8::transposition
         /// @param eval       Evaluation of the position
         inline void Insert(ZobristKey key, Move move, EntryType type, DepthType depth, DepthType distance, EvalType eval)
         {
-            data_[key & mask_] = TranspositionEntry(key, move, generation_, type, depth, distance, eval);
+            auto& bucket = data_[key & mask_];
+            bucket.Insert(key, move, generation_, type, depth, distance, eval);
         }
 
         /// Resize the hash table.
@@ -84,22 +85,21 @@ namespace m8::transposition
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wclass-memaccess"
 
-            std::memset(data_.data(), 0, data_.size() * sizeof(TranspositionEntry));
+            std::memset(data_.data(), 0, data_.size() * sizeof(Bucket));
             
 #           pragma GCC diagnostic pop
         }
         
     private:
         static inline const size_t kMinSizeTable = 4 * 1024 * 1024;
-        static inline const std::uint8_t kGenerationMask = 0x3f;
 
-        std::vector<TranspositionEntry> data_;
-        ZobristKey                      mask_;
-        std::uint8_t                    generation_;
+        std::vector<Bucket> data_;
+        ZobristKey          mask_;
+        std::uint8_t        generation_;
 
         inline static size_t CalculateNumberEntry(size_t size)
         {
-            return (UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(TranspositionEntry);
+            return (UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(Bucket);
         }
     };
 }
