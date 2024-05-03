@@ -82,7 +82,7 @@ def LaunchCuteChessGauntlet(concurency, rounds, tc, oppenings, pgn_filename, eng
     for engine in engines:
         engines_args =  f'{engines_args} -engine {engine}'
 
-    command = f'cutechess-cli -concurrency {concurency} -tournament gauntlet -rounds {rounds} -openings file={oppenings} format=epd order=random -pgnout {pgn_filename} -repeat -recover -each tc={tc} {engines_args}'
+    command = f'cutechess-cli -concurrency {concurency} -tournament gauntlet -rounds {rounds} -draw movenumber=60 movecount=10 score=10 -resign movecount=10 score=1500 twosided=true -openings file={oppenings} format=epd order=random -pgnout {pgn_filename} -repeat -recover -each tc={tc} {engines_args} 2>/dev/null'
     print(f'Running: {command}')
     result = subprocess.run(command, shell=True)
 
