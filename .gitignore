@@ -6,6 +6,7 @@ Build/
 .vscode/
 
 tools/m8t/venv
+tools/m8t/Archives
 tools/m8t/*.pgn
 tools/m8t/*.yml
 !tools/m8t/tournament.example.yml
