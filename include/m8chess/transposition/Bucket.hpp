@@ -22,15 +22,8 @@ namespace m8::transposition
         ///         correspond to the position.
         inline TranspositionEntry* operator[](ZobristKey key)
         {
-            for (size_t i = 0; i < kNumberOfEntries; ++i)
-            {
-                if (entries_[i].key() == key)
-                {
-                    return &entries_[i];
-                }
-            }
-
-            return nullptr;
+            auto entry = std::find_if(entries_.begin(), entries_.end(), [key](const TranspositionEntry entry) {return entry.key() == key; });
+            return entry != entries_.end() ? entry : nullptr;
         }
 
         /// Store a new position in the bucket
@@ -48,7 +41,7 @@ namespace m8::transposition
         {
             auto entry = std::min_element(std::begin(entries_),
                                           std::end(entries_),
-                                          [generation, key](const TranspositionEntry& lhs, const TranspositionEntry& rhs)
+                                          [generation, key](const TranspositionEntry& lhs, const TranspositionEntry rhs)
                                           {
                                           // Returns true if lhs is a better candidate than rhs to store the new position.
                                           return lhs.key() == key ||
@@ -69,7 +62,7 @@ namespace m8::transposition
     private:
         static const std::size_t kNumberOfEntries = 4;
 
-        TranspositionEntry entries_[kNumberOfEntries];
+        std::array<TranspositionEntry, kNumberOfEntries> entries_;
     };
 }
 
