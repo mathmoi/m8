@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
-## [Unreleased](#unreleased)
+<!-- ## [Unreleased](#unreleased) -->
+
+## [v0.7](v-0-7) - 2024-05-07
+
+### Changed
+
+- The transposition table replacement policy now use a four entries bucket and an always
+  replace the shallowest entry policy.
 
 ### Removed
 
