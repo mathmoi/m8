@@ -13,7 +13,7 @@
 
 #include "../../m8common/Bb.hpp"
 
-#include "TranspositionEntry.hpp"
+#include "Bucket.hpp"
 
 namespace m8::transposition
 {
@@ -21,27 +21,37 @@ namespace m8::transposition
     class TranspositionTable
     {
     public:
-        TranspositionTable(size_t size)
-        : data_(CalculateNumberEntry(size)),
-          mask_(data_.size() - 1),
+        inline TranspositionTable(size_t size)
+        : data_(nullptr),
+          buckets_count_(0),
           generation_(0)
         {
-            assert(16 == sizeof(TranspositionEntry));
+            assert(64 == sizeof(Bucket));
             assert(1024 <= size);
+
+            Resize(size);
+        }
+
+        inline ~TranspositionTable()
+        {
+            if (data_ != nullptr)
+            {
+                std::free(data_);
+            }
         }
 
         /// Increment the current generation. This need to be call once between each
         /// search to increment the current generation value. This is usefull to
         /// differentiate entry from the current search from entry of previous search.
-        inline void IncrementGeneration() { generation_ = (generation_ + 1) & kGenerationMask; }
+        inline void IncrementGeneration() { ++generation_; }
 
         /// Returns a pointer to the entry in the transposition table corresponding to the
         /// key passed in parameters. If there is no information stored for the current
         /// position a null pointer is retured.
         inline TranspositionEntry* operator[](ZobristKey key)
         {
-            auto entry = &data_[key & mask_];
-            return entry->key() == key ? entry : nullptr;
+            auto& bucket = data_[key & mask_];
+            return bucket[key];
         }
 
         /// Insert an entry in the transposition table.
@@ -57,7 +67,8 @@ namespace m8::transposition
         /// @param eval       Evaluation of the position
         inline void Insert(ZobristKey key, Move move, EntryType type, DepthType depth, DepthType distance, EvalType eval)
         {
-            data_[key & mask_] = TranspositionEntry(key, move, generation_, type, depth, distance, eval);
+            auto& bucket = data_[key & mask_];
+            bucket.Insert(key, move, generation_, type, depth, distance, eval);
         }
 
         /// Resize the hash table.
@@ -67,9 +78,18 @@ namespace m8::transposition
         {
             assert(1024 <= size);
 
-            data_.resize(CalculateNumberEntry(size));
-            data_.shrink_to_fit();
-            mask_ = data_.size() - 1;
+            auto new_count = CalculateNumberEntry(size);
+            if (new_count != buckets_count_)
+            {
+                if (data_ != nullptr)
+                {
+                    std::free(data_);
+                }
+
+                buckets_count_ = new_count;
+                data_ = static_cast<Bucket*>(std::aligned_alloc(kAssumedCacheLineSize, buckets_count_ * sizeof(Bucket)));
+                mask_ = buckets_count_ - 1;
+            }
         }
 
         /// Remove all data from the hash table. This is not normally needed as outdated
@@ -84,22 +104,23 @@ namespace m8::transposition
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wclass-memaccess"
 
-            std::memset(data_.data(), 0, data_.size() * sizeof(TranspositionEntry));
+            std::memset(data_, 0, buckets_count_ * sizeof(Bucket));
             
 #           pragma GCC diagnostic pop
         }
         
     private:
-        static inline const size_t kMinSizeTable = 4 * 1024 * 1024;
-        static inline const std::uint8_t kGenerationMask = 0x3f;
+        static inline const size_t kAssumedCacheLineSize = 64;
+        static inline const size_t kMinSizeTable = 1 * 1024 * 1024;
 
-        std::vector<TranspositionEntry> data_;
-        ZobristKey                      mask_;
-        std::uint8_t                    generation_;
+        Bucket*      data_;
+        size_t       buckets_count_;
+        ZobristKey   mask_;
+        std::uint8_t generation_;
 
         inline static size_t CalculateNumberEntry(size_t size)
         {
-            return (UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(TranspositionEntry);
+            return (UINT64_C(1) << GetMsb((std::max)(size, kMinSizeTable))) / sizeof(Bucket);
         }
     };
 }
